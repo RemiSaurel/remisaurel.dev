@@ -66,7 +66,7 @@ const projects = computed(() => {
   <div class="flex flex-col gap-12">
     <div v-for="group in projects" :key="group.monthYear" class="relative">
       <h2
-        class="my-1 text-zinc-400/60 font-medium dark:text-zinc-7 absolute -left-4 -top-8 z-0 text-lg cursor-default"
+        class="my-1 text-zinc-400/60 font-medium dark:text-zinc-7 absolute -left-4 -top-8 z-0 text-lg cursor-default tracking-tight"
       >
         {{ group.monthYear }}
       </h2>
