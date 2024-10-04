@@ -1,10 +1,9 @@
 <script setup lang="ts">
 useSeoMeta({
-  title: "My Amazing Site",
-  ogTitle: "My Amazing Site",
-  description: "This is my amazing site, let me tell you all about it.",
-  ogDescription: "This is my amazing site, let me tell you all about it.",
-  ogImage: "https://example.com/image.png",
+  title: "RemiSaurel",
+  ogTitle: "RemiSaurel",
+  description: "Yet another blog with projects, ideas, thoughts, and more.",
+  ogImage: "/blog.png",
   twitterCard: "summary_large_image",
 });
 import type { ParsedContent } from "@nuxt/content";

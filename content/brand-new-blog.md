@@ -1,6 +1,6 @@
 ---
 title: "BNB (Brand New Blog)"
-description: "My new blog built with NuxtContent"
+description: "My Brand New Blog 😎"
 date: 2024-10-06
 ---
 
