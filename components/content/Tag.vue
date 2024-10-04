@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineProps<{
-  color: "blue" | "yellow" | "red" | "green" | "purple";
+  color: "blue" | "yellow" | "red" | "green" | "purple" | "gray";
 }>();
 
 const c = {
@@ -9,6 +9,7 @@ const c = {
   red: "bg-red-500",
   green: "bg-green-500",
   purple: "bg-purple-500",
+  gray: "bg-gray-500",
 };
 </script>
 <template>

@@ -40,7 +40,7 @@ const handleClick = () => {
 <template>
   <ClientOnly>
     <div
-      class="inline-flex relative top-1 px-1 items-center gap-1 hover:cursor-pointer font-light w-fit border-b-solid text-zinc border-zinc-200 dark:border-zinc-700 hover:text-zinc-700 hover:border-zinc-500 dark:hover:text-zinc-2 transition duration-500 group"
+      class="inline-flex relative top-1 px-1 items-center gap-1 hover:cursor-pointer font-light w-fit border-b-solid text-zinc-5 border-zinc-300 dark:border-zinc-700 dark:text-zinc-4 hover:text-zinc-700 hover:border-zinc-500 dark:hover:text-zinc-2 transition duration-500 group"
       @click="handleClick"
     >
       <Icon
