@@ -33,14 +33,20 @@ const icon = {
     color: "text-purple-600",
   },
 };
+
+const formatTitle = (type: string) => {
+  return type.charAt(0).toUpperCase() + type.slice(1);
+};
 </script>
 <template>
-  <div class="border-l-solid border-3 m-0 my-4" :class="color[type]">
+  <div class="border-l-solid border-3 m-0 my-6" :class="color[type]">
     <div class="flex gap-2 pl-4 pb-2 items-center">
       <Icon :name="icon[type].name" :class="icon[type].color" />
-      <span :class="icon[type].color">{{ type.toLocaleUpperCase() }}</span>
+      <span class="font-semibold" :class="icon[type].color">{{
+        formatTitle(type)
+      }}</span>
     </div>
-    <blockquote class="m-0 px-4">
+    <blockquote class="m-0 px-4 opacity-70 font-300">
       <ContentSlot :use="$slots.default" unwrap="p" />
     </blockquote>
   </div>

@@ -4,55 +4,29 @@ description: "My new blog built with NuxtContent"
 date: 2024-10-06
 ---
 
-# Brand New Blog
+# Why ?
 
-## Why ?
-
-After several experimentations on a custom-made blog, the inertia of the project has been too much to handle. I've decided to switch to a more robust solution, and _NuxtContent_ seems to be the perfect fit.
-
-Separator :
-
-:separator
-Heh
-
-```vue [file.ts]
-<template>
-  <div>
-    <h1>{{ title }}</h1>
-    <p>{{ description }}</p>
-  </div>
-</template>
-```
-
-:separator
+After several experimentations on a custom-made blog, the inertia of the project has been too much to handle. I've decided to switch to a more robust solution, and _NuxtContent_ seems to be the perfect fit between flexibility and ease of use.
 
 ::blockquote{type="info"}
-Highlights information that users should take into account, even when skimming.
-This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam mi justo, lacinia in nisl non, scelerisque elementum nunc. Nullam sit amet urna non felis eleifend semper. Nullam sit amet urna non felis eleifend semper.
+This is the first post of my new blog. I'm still working on the design and the content. I'll try to release new content as soon as possible and share misc, useful or not, thoughts.
 ::
 
-::blockquote{type="important"}
-Highlights information that users should take into account, even when skimming.
-This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam mi justo, lacinia in nisl non, scelerisque elementum nunc. Nullam sit amet urna non felis eleifend semper. Nullam sit amet urna non felis eleifend semper.
-::
+# How ?
 
-::blockquote{type="warning"}
-Highlights information that users should take into account, even when skimming.
-This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam mi justo, lacinia in nisl non, scelerisque elementum nunc. Nullam sit amet urna non felis eleifend semper. Nullam sit amet urna non felis eleifend semper.
-::
+With the amazing :icon-link{route="https://nuxtjs.org/" external icon-name="uil:document-info" text="Nuxt doc"} ecosystem, I've been able to set up the blog in a few minutes. I'm using :tag{color="green"}[NuxtContent] to manage the content and :tag{color="gray"}[UnoCSS] for the design.
 
-::blockquote{type="danger"}
-Highlights information that users should take into account, even when skimming.
-This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam mi justo, lacinia in nisl non, scelerisque elementum nunc. Nullam sit amet urna non felis eleifend semper. Nullam sit amet urna non felis eleifend semper.
-::
+# What ?
 
-::blockquote{type="note"}
-Highlights information that users should take into account, even when skimming.
-This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam mi justo, lacinia in nisl non, scelerisque elementum nunc. Nullam sit amet urna non felis eleifend semper. Nullam sit amet urna non felis eleifend semper.
-::
+Tutorials, tips, and tricks but also random thoughts about my journey in the tech world and my life in general.
+I'll also be able to share code snippets, and maybe some projects I'm working on.
+Here's an example of a code snippet:
 
-## How ?
+```js [main.js]
+const hello = "world";
+console.log(hello);
+```
 
-With the amazing [doc](https://content.nuxtjs.org/).
+# When ?
 
-## What ?
+I'll try to release new content as soon as possible. I'm still working on the design and the content, so stay tuned! 😎
