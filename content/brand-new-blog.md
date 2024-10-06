@@ -14,7 +14,7 @@ This is the first post of my new blog. I'm still working on the design and the c
 
 # How ?
 
-With the amazing :icon-link{route="https://nuxtjs.org/" external icon-name="uil:document-info" text="Nuxt doc"} ecosystem, I've been able to set up the blog in a few minutes. I'm using :tag{color="green"}[NuxtContent] to manage the content and :tag{color="gray"}[UnoCSS] for the design.
+With the amazing [Nuxt](https://nuxtjs.org/) ecosystem, I've been able to set up the blog in a few minutes. I'm using :tag{color="green"}[NuxtContent] to manage the content and :tag{color="gray"}[UnoCSS] for the design.
 
 # What ?
 

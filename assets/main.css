@@ -8,7 +8,7 @@
 
 .dark {
     background: #18181b;
-    color: #f3f4f6;
+    color: #cecfd1;
 }
 
 a {
@@ -18,4 +18,12 @@ a {
 
 pre {
   overflow: auto;
+}
+
+h2 {
+  font-size: 1.35rem;
+}
+
+h3 {
+  font-size: 1.1rem;
 }
