@@ -2,7 +2,7 @@
   <NuxtLink
     :href="props.href"
     :target="props.target"
-    class="inline-flex items-end border-b-solid text-zinc-5 border-zinc-300 dark:border-zinc-700 dark:text-zinc-4 hover:text-zinc-700 hover:border-zinc-500 dark:hover:text-zinc-2 transition duration-500 group"
+    class="inline-flex border-b-solid text-zinc-5 border-zinc-300 border-2 dark:border-zinc-700 dark:text-zinc-4 hover:text-zinc-700 hover:border-zinc-500 dark:hover:text-zinc-2 transition duration-500 group"
   >
     <slot />
     <Icon

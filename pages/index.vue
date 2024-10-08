@@ -2,7 +2,7 @@
   <div class="flex flex-col gap-1">
     <div class="text-2xl font-semibold">Rémi Saurel</div>
     <div
-      class="flex gap-2 items-center rounded-xl border-solid border-zinc-2 dark:border-zinc-5 pr-3 pl-2 py-0.5 w-fit"
+      class="flex gap-2 items-center rounded-xl border-solid border-1 border-zinc-2 dark:border-zinc-5 pr-3 pl-2 py-0.5 w-fit"
     >
       <div
         class="size-3 bg-zinc-700 dark:bg-zinc-200 rounded-full animate-ping"
@@ -17,8 +17,8 @@
   </div>
 
   <div class="inline-flex flex-wrap gap-1 mt-4">
-    You can find <ProseA href="/posts">blog posts</ProseA> and a list of my
-    <ProseA href="/projects">projects</ProseA> on this website.
+    You can find blog<ProseA href="/posts"> posts</ProseA> and (soon) some
+    projects I've been working on.
   </div>
 
   <Separator />
@@ -89,19 +89,17 @@
     </div>
   </div>
 
-  <ProseBlockquote type="info">
+  <div class="my-8">
     I'm interested in the design and evaluation of TEL environments, with a
     focus on the use of AI and data analytics to support learning and teaching.
-  </ProseBlockquote>
+  </div>
 
   <div class="flex gap-2">
     Outside of programming, I enjoy listening to music, playing padel and
-    watching Stade Toulousain 🔴⚫️ rugby games.
+    watching Stade Toulousain rugby games.
   </div>
 
-  <Separator />
-
-  <div class="mt-8 flex flex-col gap-2">
+  <div class="mt-16 flex flex-col gap-2">
     <span class="text-xl font-semibold">Find me on</span>
     <div class="flex flex-wrap gap-4">
       <IconLink

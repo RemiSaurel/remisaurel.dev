@@ -20,10 +20,17 @@ pre {
   overflow: auto;
 }
 
+h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
 h2 {
   font-size: 1.35rem;
+  font-weight: 550;
 }
 
 h3 {
   font-size: 1.1rem;
+  font-weight: 550;
 }

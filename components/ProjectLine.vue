@@ -10,7 +10,7 @@ defineProps<{
   <NuxtLink :to="to">
     <div class="w-full flex flex-col gap-1 group">
       <h3
-        class="text-md my-0 font-bold dark:text-zinc-500 text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-200 transition duration-500"
+        class="text-md my-0 font-semibold dark:text-zinc-500 text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-200 transition duration-500"
       >
         {{ title }}
       </h3>
