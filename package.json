@@ -17,6 +17,7 @@
   "devDependencies": {
     "@unocss/nuxt": "^0.63.2",
     "@unocss/preset-mini": "^0.63.2",
+    "animated-unocss": "^0.0.6",
     "unocss": "^0.63.2"
   }
 }

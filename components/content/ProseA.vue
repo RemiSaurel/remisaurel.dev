@@ -7,7 +7,7 @@
     <slot />
     <Icon
       name="uil:arrow-up-right"
-      class="size-5 pl-1 bg-zinc-4 relative -top-0.5 group-hover:bg-zinc-6 dark:bg-zinc-4 dark:group-hover:bg-zinc-2 transition duration-500"
+      class="size-5 bg-zinc-4 relative -right-0.5 -top-0.5 group-hover:bg-zinc-6 dark:bg-zinc-4 dark:group-hover:bg-zinc-2 transition duration-500"
     />
   </NuxtLink>
 </template>

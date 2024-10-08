@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const toHome = () => {
-  return useRouter().push("/");
+  return useRouter().push("/posts");
 };
 </script>
 
