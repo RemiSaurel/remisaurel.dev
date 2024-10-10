@@ -38,25 +38,25 @@ const handleClick = () => {
 </script>
 
 <template>
-  <ClientOnly>
-    <div
-      class="inline-flex rounded items-center relative pr-1 gap-2 hover:cursor-pointer font-light w-fit text-zinc-5 dark:text-zinc-4 hover:text-zinc-700 bg-gray-400/10 hover:bg-gray-400/20 pl-1 pr-2 dark:hover:text-zinc-2 transition duration-500 group"
-      :class="[size === 'sm' ? 'py-0.5 text-sm' : 'py-1']"
-      @click="handleClick"
-    >
+  <div
+    class="inline-flex rounded items-center relative pr-1 gap-2 hover:cursor-pointer font-light w-fit text-zinc-5 dark:text-zinc-4 hover:text-zinc-700 bg-gray-400/10 hover:bg-gray-400/20 pl-1 pr-2 dark:hover:text-zinc-2 transition duration-500 group"
+    :class="[size === 'sm' ? 'py-0.5 text-sm' : 'py-1']"
+    @click="handleClick"
+  >
+    <ClientOnly>
       <Icon
         v-if="iconName"
         :name="iconName"
         class="transition duration-500"
         :class="[size === 'sm' ? 'w-4' : 'w-5']"
       />
-      <img
-        v-if="image"
-        :src="image"
-        class="transition duration-500"
-        :class="[size === 'sm' ? 'w-4' : 'w-5']"
-      />
-      <slot />
-    </div>
-  </ClientOnly>
+    </ClientOnly>
+    <img
+      v-if="image"
+      :src="image"
+      class="transition duration-500"
+      :class="[size === 'sm' ? 'w-4' : 'w-5']"
+    />
+    <slot />
+  </div>
 </template>
