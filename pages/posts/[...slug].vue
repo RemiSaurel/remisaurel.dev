@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
-
 const headings = ref<{ level: number; text: string; anchor: string }[]>([]);
 
 const slugify = (text: string) => {
@@ -55,7 +53,7 @@ const to = (anchor: string) => {
       <div class="fixed top-5 left-6 inline-block">
         <div
           @click="toggleToC"
-          class="text-zinc-400 hover:text-zinc-6 transition duration-400 dark:text-zinc-6 dark:hover:text-zinc-4 flex items-center space-x-2 cursor-pointer group"
+          class="text-zinc-600 hover:text-zinc-8 transition duration-400 dark:text-zinc-4 dark:hover:text-zinc-2 flex items-center space-x-2 cursor-pointer group"
         >
           <span>TOC</span>
           <span
@@ -80,7 +78,7 @@ const to = (anchor: string) => {
           >
             <div class="flex flex-col gap-2 p-0 m-0">
               <div
-                v-for="(heading, index) in headings"
+                v-for="heading in headings"
                 :key="heading.text"
                 class="text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-2 transition cursor-pointer"
                 :class="{
@@ -101,7 +99,7 @@ const to = (anchor: string) => {
 
     <main>
       <ContentDoc v-slot="{ doc }">
-        <article>
+        <article class="leading-6">
           <h1 class="text-4xl mb-4">{{ doc.title }}</h1>
           <ContentRenderer :value="doc" />
         </article>
