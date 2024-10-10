@@ -44,6 +44,11 @@ export default defineNuxtConfig({
     "@nuxt/icon",
     "@nuxt/image",
   ],
+  icon: {
+    serverBundle: {
+      collections: ["logos", "uil"],
+    },
+  },
 
   routeRules: {
     "/": { prerender: true },
