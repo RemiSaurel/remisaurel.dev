@@ -7,13 +7,12 @@
       <div
         class="size-3 bg-zinc-700 dark:bg-zinc-200 rounded-full animate-ping"
       ></div>
-      <span class="text-xs"> Pursuing a PhD in CS </span>
+      <span class="text-xs"> Software Engineer </span>
     </div>
   </div>
 
   <div class="mt-12">
-    Hey! I'm a Rémi, a French PhD student in Computer Science and
-    Technology-Enhanced Learning located in Toulouse, France.
+    Hey! I'm a Rémi, a French Software Engineer located in Toulouse, France.
   </div>
 
   <div class="inline-flex flex-wrap gap-1 mt-4">
