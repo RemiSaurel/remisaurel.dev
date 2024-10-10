@@ -45,9 +45,7 @@ export default defineNuxtConfig({
     "@nuxt/image",
   ],
   icon: {
-    serverBundle: {
-      collections: ["logos", "uil"],
-    },
+    serverBundle: "remote",
   },
 
   routeRules: {
