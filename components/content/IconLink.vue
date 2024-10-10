@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import { defineProps } from "vue";
 
 const props = defineProps({
   iconName: {
@@ -11,10 +10,6 @@ const props = defineProps({
     type: String,
     required: false,
   },
-  text: {
-    type: String,
-    required: true,
-  },
   route: {
     type: String,
     required: true,
@@ -23,6 +18,11 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: false,
+  },
+  size: {
+    type: String as PropType<"sm" | "md">,
+    required: false,
+    default: "md",
   },
 });
 
@@ -38,22 +38,25 @@ const handleClick = () => {
 </script>
 
 <template>
-  <ClientOnly>
-    <div
-      class="inline-flex relative top-1 px-1 items-center gap-1 hover:cursor-pointer font-light w-fit border-b-solid text-zinc-5 border-zinc-300 dark:border-zinc-700 dark:text-zinc-4 hover:text-zinc-700 hover:border-zinc-500 dark:hover:text-zinc-2 transition duration-500 group"
-      @click="handleClick"
-    >
+  <div
+    class="inline-flex rounded items-center relative pr-1 gap-2 hover:cursor-pointer font-light w-fit text-zinc-5 dark:text-zinc-4 hover:text-zinc-700 bg-gray-400/10 hover:bg-gray-400/20 pl-1 pr-2 dark:hover:text-zinc-2 transition duration-500 group"
+    :class="[size === 'sm' ? 'py-0.5 text-sm' : 'py-1']"
+    @click="handleClick"
+  >
+    <ClientOnly>
       <Icon
         v-if="iconName"
         :name="iconName"
-        class="size-5 bg-zinc-4 group-hover:bg-zinc-6 dark:bg-zinc-4 dark:group-hover:bg-zinc-2 transition duration-500"
+        class="transition duration-500"
+        :class="[size === 'sm' ? 'w-4' : 'w-5']"
       />
-      <img
-        v-if="image"
-        :src="image"
-        class="w-6 -left-2 bg-zinc-4 group-hover:bg-zinc-6 dark:bg-zinc-4 dark:group-hover:bg-zinc-2 transition duration-500"
-      />
-      <span class="items-baseline flex text-base">{{ text }}</span>
-    </div>
-  </ClientOnly>
+    </ClientOnly>
+    <img
+      v-if="image"
+      :src="image"
+      class="transition duration-500"
+      :class="[size === 'sm' ? 'w-4' : 'w-5']"
+    />
+    <slot />
+  </div>
 </template>

@@ -44,6 +44,9 @@ export default defineNuxtConfig({
     "@nuxt/icon",
     "@nuxt/image",
   ],
+  icon: {
+    serverBundle: "remote",
+  },
 
   routeRules: {
     "/": { prerender: true },

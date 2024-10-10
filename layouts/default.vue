@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const toHome = () => {
-  return useRouter().push("/");
+  return useRouter().push("/posts");
 };
 </script>
 
@@ -16,7 +16,9 @@ const toHome = () => {
         </button>
       </ClientOnly>
 
-      <ColorModeSwitcher />
+      <ClientOnly>
+        <ColorModeSwitcher />
+      </ClientOnly>
     </nav>
     <div class="px-3 md:px-0 max-w-3xl m-auto mt-12">
       <slot />
