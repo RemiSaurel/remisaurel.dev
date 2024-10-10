@@ -102,14 +102,14 @@ const to = (anchor: string) => {
     <main>
       <ContentDoc v-slot="{ doc }">
         <article>
-          <h1 class="text-4xl font-black mb-4">{{ doc.title }}</h1>
+          <h1 class="text-4xl mb-4">{{ doc.title }}</h1>
           <ContentRenderer :value="doc" />
         </article>
       </ContentDoc>
     </main>
 
     <div class="mt-8">
-      <IconLink iconName="uil:arrow-left" text="Back to home" route="/" />
+      <IconLink iconName="uil:arrow-left" route="/"> Back to home </IconLink>
     </div>
   </div>
 </template>
