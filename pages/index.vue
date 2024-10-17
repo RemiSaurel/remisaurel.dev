@@ -1,3 +1,13 @@
+<script setup lang="ts">
+useSeoMeta({
+  title: "RemiSaurel",
+  ogTitle: "RemiSaurel",
+  description: "My little corner of the internet.",
+  ogImage: "/home.png",
+  twitterCard: "summary_large_image",
+});
+</script>
+
 <template>
   <div class="flex flex-col gap-1">
     <div class="text-2xl font-semibold">Rémi Saurel</div>
@@ -7,17 +17,18 @@
       <div
         class="size-3 bg-zinc-700 dark:bg-zinc-200 rounded-full animate-ping"
       ></div>
-      <span class="text-xs"> Software Engineer </span>
+      <span class="text-xs"> PhD student in CS </span>
     </div>
   </div>
 
   <div class="mt-12">
-    Hey! I'm a Rémi, a French Software Engineer located in Toulouse, France.
+    Hey! I'm a Rémi, a French PhD student in Computer Science and
+    Technology-Enhanced Learning located in Toulouse, France.
   </div>
 
   <div class="inline-flex flex-wrap gap-1 mt-4">
-    You can find blog<ProseA href="/posts"> posts</ProseA> and (soon) some
-    projects I've been working on.
+    You can find blog<ProseA href="/posts"> posts</ProseA> and some
+    <ProseA href="/projects"> projects </ProseA> I've been working on.
   </div>
 
   <Separator />
@@ -34,8 +45,12 @@
         </IconLink>
       </div>
       <div>
-        <IconLink iconName="uil:book" route="https://katalog.irit.fr" external>
-          Katalog
+        <IconLink
+          iconName="uil:book"
+          route="https://elaasticatalog.irit.fr"
+          external
+        >
+          elaasticatalog
         </IconLink>
       </div>
     </div>
@@ -102,7 +117,7 @@
     <span class="text-xl font-semibold">Find me on</span>
     <div class="flex flex-wrap gap-4">
       <IconLink
-        iconName="i-logos-github-icon"
+        iconName="uil:github-alt"
         route="https://github.com/remisaurel"
         external
         >GitHub
