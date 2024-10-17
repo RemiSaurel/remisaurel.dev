@@ -47,7 +47,7 @@ useSeoMeta({
       <div>
         <IconLink
           iconName="uil:book"
-          route="https://elaasticatalog.irit.fr"
+          route="https://github.com/elaastic/elaasticatalog"
           external
         >
           elaasticatalog
