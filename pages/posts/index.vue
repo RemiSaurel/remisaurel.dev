@@ -71,7 +71,7 @@ const projects = computed(() => {
       </h2>
       <div class="flex flex-col gap-2">
         <div v-for="p in group.projects" :key="p._path">
-          <ProjectLine
+          <PostLine
             :to="p._path!"
             :title="p.title!"
             :description="p.description!"
