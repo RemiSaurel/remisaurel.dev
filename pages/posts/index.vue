@@ -62,25 +62,34 @@ const projects = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-12 pl-4">
-    <div v-for="group in projects" :key="group.monthYear" class="relative">
-      <h2
-        class="my-1 text-zinc-400/70 dark:text-zinc-6 absolute -left-4 -top-8 z-0 text-lg cursor-default tracking-tight"
-      >
-        {{ group.monthYear }}
-      </h2>
-      <div class="flex flex-col gap-2">
-        <div v-for="p in group.projects" :key="p._path">
-          <PostLine
-            :to="p._path!"
-            :title="p.title!"
-            :description="p.description!"
-          />
+  <div>
+    <div class="mb-16">
+      <h5 class="text-2xl font-semibold m-0">Blog</h5>
+      <p>
+        You'll find here some blog posts I've written. <br />
+        Posts can be technical-oriented, personal thoughts, or anything else.
+      </p>
+    </div>
+    <div class="flex flex-col gap-12 pl-4">
+      <div v-for="group in projects" :key="group.monthYear" class="relative">
+        <h2
+          class="my-1 text-zinc-400/70 dark:text-zinc-6 absolute -left-4 -top-8 z-0 text-lg cursor-default tracking-tight"
+        >
+          {{ group.monthYear }}
+        </h2>
+        <div class="flex flex-col gap-2">
+          <div v-for="p in group.projects" :key="p._path">
+            <PostLine
+              :to="p._path!"
+              :title="p.title!"
+              :description="p.description!"
+            />
+          </div>
         </div>
       </div>
-    </div>
-    <div class="mt-8">
-      <IconLink iconName="uil:arrow-left" route="/"> Back to home </IconLink>
+      <div class="mt-8">
+        <IconLink iconName="uil:arrow-left" route="/"> Back to home </IconLink>
+      </div>
     </div>
   </div>
 </template>
