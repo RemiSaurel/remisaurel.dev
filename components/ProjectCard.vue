@@ -22,13 +22,13 @@ const getIconName = (key: string) => {
     class="relative min-w-42 min-h-24 dark:bg-zinc-7 border-t-solid bg-zinc-1/60 border-zinc-1 dark:border-zinc-5 rounded-lg p-4 flex flex-col gap-2 group overflow-clip hover:bg-zinc-2/60 dark:hover:bg-zinc-6 transition-all duration-500"
   >
     <div
-      class="absolute -top-3 opacity-20 -right-3 -rotate-30 group-hover:-rotate-10 group-hover:translate-x--3 group-hover:translate-y-2 group-hover:opacity-50 group-hover:scale-120 transition-all duration-400 text-5xl"
+      class="absolute -top-3 opacity-40 -right-3 -rotate-30 group-hover:-rotate-10 group-hover:translate-x--3 group-hover:translate-y-2 group-hover:opacity-50 group-hover:scale-120 transition-all duration-400 text-5xl"
     >
       {{ project.icon }}
     </div>
     <div class="flex flex-col gap-8 justify-between h-full">
       <div
-        class="flex flex-col gap-2 justify-between dark:text-zinc-4 text-zinc-5 group-hover:text-zinc-8 dark:group-hover:text-zinc-1 transition-all duration-500"
+        class="flex flex-col gap-2 justify-between dark:text-zinc-3 text-zinc-5 group-hover:text-zinc-8 dark:group-hover:text-zinc-1 transition-all duration-500"
       >
         <h2 class="text-xl font-semibold m-0">
           {{ project.title }}
