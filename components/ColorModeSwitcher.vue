@@ -13,9 +13,8 @@ const toggleColorMode = () => {
   >
     <Icon
       name="uil:moon"
-      class="size-5"
+      class="size-5 dark:text-zinc-2"
       v-if="colorMode.preference === 'dark'"
-      style="color: white"
     />
     <Icon name="uil:sun" class="size-5" v-else />
   </button>
