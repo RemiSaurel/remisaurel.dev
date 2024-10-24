@@ -87,9 +87,6 @@ const projects = computed(() => {
           </div>
         </div>
       </div>
-      <div class="mt-8">
-        <IconLink iconName="uil:arrow-left" route="/"> Back to home </IconLink>
-      </div>
     </div>
   </div>
 </template>

@@ -105,10 +105,6 @@ const to = (anchor: string) => {
         </article>
       </ContentDoc>
     </main>
-
-    <div class="mt-8">
-      <IconLink iconName="uil:arrow-left" route="/"> Back to home </IconLink>
-    </div>
   </div>
 </template>
 

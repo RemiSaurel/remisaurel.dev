@@ -1,42 +1,8 @@
-# Content v2 Minimal Starter
+![image](https://github.com/user-attachments/assets/43a7ad6a-ec76-4e1f-9eb6-ad65b4ef5e7f)
 
-Look at the [Content documentation](https://content.nuxt.com/) to learn more.
+My portfolio / blog built with Nuxt and Nuxt content.
 
-## Setup
-
-Make sure to install the dependencies:
-
-```bash
-# yarn
-yarn install
-
-# npm
-npm install
-
-# pnpm
-pnpm install
-```
-
-## Development Server
-
-Start the development server on http://localhost:3000
-
-```bash
-npm run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-npm run build
-```
-
-Locally preview production build:
-
-```bash
-npm run preview
-```
-
-Checkout the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+Inspiration: 
+- [Estbéan Soubiran website](https://soubiran.dev/)
+- [Anthony Fu website](https://antfu.me/)
+- [Julien Ripouteau website](https://julr.dev/projects)
