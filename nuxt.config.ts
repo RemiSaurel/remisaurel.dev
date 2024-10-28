@@ -52,5 +52,9 @@ export default defineNuxtConfig({
     "/": { prerender: true },
   },
 
+  runtimeConfig: {
+    githubToken: "",
+  },
+
   compatibilityDate: "2024-10-04",
 });
