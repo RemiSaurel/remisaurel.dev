@@ -53,7 +53,7 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    githubToken: "",
+    githubToken: process.env.NUXT_GITHUB_TOKEN,
   },
 
   compatibilityDate: "2024-10-04",
