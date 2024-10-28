@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { defineProps, computed } from "vue";
 import type { GitHubActivity } from "~/pages/activity/index.vue";
 
 const props = defineProps<{
