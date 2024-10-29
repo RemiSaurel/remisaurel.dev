@@ -8,6 +8,7 @@ export default defineEventHandler(async (event) => {
     {
       headers: {
         Authorization: `Bearer ${config.githubToken}`,
+        UserAgent: "remisaurel",
       },
     }
   );
