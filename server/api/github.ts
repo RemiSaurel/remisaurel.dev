@@ -2,7 +2,7 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event);
 
   const headers = {
-    Authorization: `Bearer ${config.githubToken}`,
+    "Authorization": `Bearer ${config.githubToken}`,
     "User-Agent": "remisaurel",
   };
 
