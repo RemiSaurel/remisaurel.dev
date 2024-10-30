@@ -19,9 +19,12 @@ export type GitHubActivity = {
   };
 };
 
-const { data } = await useFetch<GitHubActivity[]>("/api/github", {
-  lazy: true,
-});
+const { data } = await useFetch<GitHubActivity[]>(
+  "https://api.github.com/users/remisaurel/events?per_page=20",
+  {
+    lazy: true,
+  }
+);
 
 // Filter only on the GitHubActivityType events
 const filteredData = computed(() => {
