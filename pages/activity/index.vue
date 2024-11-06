@@ -19,7 +19,7 @@ export type GitHubActivity = {
   };
 };
 
-const { data } = await useFetch<GitHubActivity[]>(
+const { data, status } = await useFetch<GitHubActivity[]>(
   "https://api.github.com/users/remisaurel/events?per_page=20",
   {
     lazy: true,
@@ -48,12 +48,13 @@ const filteredData = computed(() => {
       <h5 class="text-2xl font-semibold m-0">Activity</h5>
       <p>My recent activity on GitHub.</p>
     </div>
-    <div class="flex flex-col gap-2">
+    <div v-if="status !== 'pending'" class="flex flex-col gap-2">
       <GitHubActivity
         v-for="activity in filteredData"
         :key="activity.date"
         :activity="activity"
       />
     </div>
+    <div v-else>Loading...</div>
   </div>
 </template>
