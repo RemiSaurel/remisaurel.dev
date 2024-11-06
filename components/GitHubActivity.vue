@@ -57,11 +57,13 @@ const relativeTimeSinceNow = () => {
     class="flex justify-between items-center bg-neutral-1 dark:bg-neutral-8 rounded-xl p-3"
   >
     <div class="flex flex-wrap items-center gap-2 px-2">
-      <Icon
-        :name="iconName"
-        v-if="iconName"
-        class="size-8 relative bg-neutral-5 mr-2 sm:mr-8"
-      />
+      <ClientOnly>
+        <Icon
+          :name="iconName"
+          v-if="iconName"
+          class="size-8 relative bg-neutral-5 mr-2 sm:mr-8"
+        />
+      </ClientOnly>
       <span class="">{{ activity.type }} on</span>
       <a
         :href="getHtmlUrl(activity.repo.url)"
