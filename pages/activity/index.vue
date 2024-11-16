@@ -19,11 +19,10 @@ export type GitHubActivity = {
   };
 };
 
-const { data } = await useFetch<GitHubActivity[]>(
-  "https://api.github.com/users/remisaurel/events?per_page=20",
-  {
-    lazy: true,
-  }
+const { data, status, error } = await useAsyncData("github-activity", () =>
+  $fetch<GitHubActivity[]>(
+    "https://api.github.com/users/remisaurel/events?per_page=20"
+  )
 );
 
 // Filter only on the GitHubActivityType events
@@ -48,12 +47,14 @@ const filteredData = computed(() => {
       <h5 class="text-2xl font-semibold m-0">Activity</h5>
       <p>My recent activity on GitHub.</p>
     </div>
-    <div class="flex flex-col gap-2">
+    <div v-if="error">An error occurred while loading the data.</div>
+    <div v-else-if="status !== 'pending'" class="flex flex-col gap-2">
       <GitHubActivity
         v-for="activity in filteredData"
         :key="activity.date"
         :activity="activity"
       />
     </div>
+    <div v-else>Loading...</div>
   </div>
 </template>
