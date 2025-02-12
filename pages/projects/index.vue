@@ -12,6 +12,16 @@ export interface Project {
 
 const PROJECTS: Project[] = [
   {
+    title: "littleman",
+    description:
+      "A simple Discord bot to fetch papers from arXiv. .",
+    icon: "🤖",
+    links: {
+      github: "https://github.com/RemiSaurel/littleman",
+    },
+    date: 2025,
+  },
+  {
     title: "memoire",
     description: "Flashcards app. based on research recommendations.",
     icon: "🧠",
@@ -111,7 +121,7 @@ const PROJECTS: Project[] = [
       "Python script that allows you to discover new artists based on your recommendations. I'm using the Spotify API to get the recommendations and create the playlist.",
     icon: "🎧",
     links: {
-      github: "https://github.com/RemiSaurel/sorting-algorithms",
+      github: "https://github.com/RemiSaurel/SpotiDrone",
     },
     date: 2023,
   },
@@ -135,11 +145,7 @@ const projectList = computed(() => {
       </p>
     </div>
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
-      <ProjectCard
-        v-for="project in projectList"
-        :key="project.title"
-        :project="project"
-      />
+      <ProjectCard v-for="project in projectList" :key="project.title" :project="project" />
     </div>
   </div>
 </template>
