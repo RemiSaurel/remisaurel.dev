@@ -22,7 +22,9 @@ export type GitHubActivity = {
 const { data, status, error } = await useAsyncData("github-activity", () =>
   $fetch<GitHubActivity[]>(
     "https://api.github.com/users/remisaurel/events?per_page=20"
-  )
+  ), {
+  lazy: true,
+}
 );
 
 // Filter only on the GitHubActivityType events
@@ -49,11 +51,7 @@ const filteredData = computed(() => {
     </div>
     <div v-if="error">An error occurred while loading the data.</div>
     <div v-else-if="status !== 'pending'" class="flex flex-col gap-2">
-      <GitHubActivity
-        v-for="activity in filteredData"
-        :key="activity.date"
-        :activity="activity"
-      />
+      <GitHubActivity v-for="activity in filteredData" :key="activity.date" :activity="activity" />
     </div>
     <div v-else>Loading...</div>
   </div>
