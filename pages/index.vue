@@ -12,11 +12,8 @@ useSeoMeta({
   <div class="flex flex-col gap-1">
     <div class="text-2xl font-semibold">Rémi Saurel</div>
     <div
-      class="flex gap-2 items-center rounded-xl border-solid border-1 border-zinc-2 dark:border-zinc-5 pr-3 pl-2 py-0.5 w-fit"
-    >
-      <div
-        class="size-3 bg-zinc-700 dark:bg-zinc-200 rounded-full animate-ping"
-      ></div>
+      class="flex gap-2 items-center rounded-xl border-solid border-1 border-zinc-2 dark:border-zinc-5 pr-3 pl-2 py-0.5 w-fit">
+      <div class="size-3 bg-zinc-700 dark:bg-zinc-200 rounded-full animate-ping"></div>
       <span class="text-xs"> PhD student in CS </span>
     </div>
   </div>
@@ -27,7 +24,7 @@ useSeoMeta({
   </div>
 
   <div class="inline-flex flex-wrap gap-1 mt-4">
-    You can find blog<ProseA href="/posts"> posts</ProseA> and some
+    You can find blog<ProseA href="/posts"> posts</ProseA>, <ProseA href="/teaching"> teaching</ProseA> and some
     <ProseA href="/projects"> projects </ProseA> I've been working on.
   </div>
 
@@ -35,77 +32,26 @@ useSeoMeta({
 
   <div class="mt-6 flex flex-col gap-1.5">
     <div class="flex flex-wrap items-center gap-2">
-      <span class="font-semibold">Creator</span> of
-      <div>
-        <IconLink
-          image="/landing/memoire.png"
-          route="https://memoire.cloud"
-          external
-          >Memoire
-        </IconLink>
-      </div>
-      <div>
-        <IconLink
-          iconName="uil:book"
-          route="https://github.com/elaastic/elaasticatalog"
-          external
-        >
-          elaasticatalog
-        </IconLink>
-      </div>
-    </div>
-    <div class="flex flex-wrap items-center gap-2">
-      <span class="font-semibold">Contributed</span> on
-      <IconLink
-        image="/landing/elaastic_logo.webp"
-        route="https://elaastic.irit.fr"
-        external
-        >Elaastic
-      </IconLink>
-    </div>
-    <div class="flex flex-wrap items-center gap-2">
       <span class="font-semibold">Mainly programming</span> with
-      <IconLink
-        iconName="i-logos-nuxt-icon"
-        route="https://nuxtjs.org"
-        external
-        size="sm"
-        >Nuxt
+      <IconLink iconName="i-logos-nuxt-icon" route="https://nuxtjs.org" external size="sm">Nuxt
       </IconLink>
-      <IconLink
-        iconName="i-logos-vue"
-        route="https://vuejs.org"
-        external
-        size="sm"
-        >Vue
+      <IconLink iconName="i-logos-vue" route="https://vuejs.org" external size="sm">Vue
       </IconLink>
-      <IconLink
-        iconName="i-logos-typescript-icon"
-        route="https://www.typescriptlang.org"
-        external
-        size="sm"
-        >TypeScript
+      <IconLink iconName="i-logos-typescript-icon" route="https://www.typescriptlang.org" external size="sm">TypeScript
       </IconLink>
-      <IconLink
-        iconName="i-logos-adonisjs-icon"
-        route="https://www.adonisjs.com"
-        external
-        size="sm"
-        >AdonisJS
+      <IconLink iconName="i-logos-adonisjs-icon" route="https://www.adonisjs.com" external size="sm">AdonisJS
       </IconLink>
-      <IconLink
-        iconName="i-logos-spring-icon"
-        route="https://www.spring.io"
-        external
-        size="sm"
-        >Spring Boot
+      <IconLink iconName="i-logos-spring-icon" route="https://www.spring.io" external size="sm">Spring Boot
       </IconLink>
     </div>
   </div>
 
   <div class="my-8">
     I'm interested in the design and evaluation of TEL environments, with a
-    focus on the use of AI and data analytics to support learning and teaching.
+    focus on the use of <span class="font-semibold">AI</span> and <span class="font-semibold">learning analytics</span>
+    to
+    support
+    learning and teaching.
   </div>
 
   <div class="flex gap-2">
@@ -116,23 +62,11 @@ useSeoMeta({
   <div class="mt-16 flex flex-col gap-2">
     <span class="text-xl font-semibold">Find me on</span>
     <div class="flex flex-wrap gap-4">
-      <IconLink
-        iconName="uil:github-alt"
-        route="https://github.com/remisaurel"
-        external
-        >GitHub
+      <IconLink iconName="uil:github-alt" route="https://github.com/remisaurel" external>GitHub
       </IconLink>
-      <IconLink
-        iconName="i-logos-linkedin-icon"
-        route="https://www.linkedin.com/in/r%C3%A9mi-saurel/"
-        external
-        >LinkedIn
+      <IconLink iconName="uil:linkedin" route="https://www.linkedin.com/in/r%C3%A9mi-saurel/" external>LinkedIn
       </IconLink>
-      <IconLink
-        iconName="i-simple-icons-x"
-        route="https://twitter.com/remisaurel"
-        external
-        >Twitter
+      <IconLink iconName="i-simple-icons-x" route="https://twitter.com/remisaurel" external>X (Twitter)
       </IconLink>
     </div>
   </div>
@@ -160,10 +94,12 @@ useSeoMeta({
     transform: scale(1);
     opacity: 1;
   }
+
   75% {
     transform: scale(2.2);
     opacity: 0;
   }
+
   100% {
     transform: scale(2);
     opacity: 0;
