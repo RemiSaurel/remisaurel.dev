@@ -44,7 +44,7 @@ const formatTitle = (type: string) => {
       <Icon :name="icon[type].name" :class="icon[type].color" />
       <span class="font-semibold" :class="icon[type].color">{{
         formatTitle(type)
-      }}</span>
+        }}</span>
     </div>
     <blockquote class="m-0 px-4 opacity-70 font-300">
       <ContentSlot :use="$slots.default" unwrap="p" />

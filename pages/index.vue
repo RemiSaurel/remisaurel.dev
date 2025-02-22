@@ -39,10 +39,17 @@ useSeoMeta({
       </IconLink>
       <IconLink iconName="i-logos-typescript-icon" route="https://www.typescriptlang.org" external size="sm">TypeScript
       </IconLink>
-      <IconLink iconName="i-logos-adonisjs-icon" route="https://www.adonisjs.com" external size="sm">AdonisJS
+      <IconLink iconName="uil-docker" route="https://www.java.com" external size="sm">Docker
+      </IconLink>
+      <IconLink iconName="i-logos-react" route="https://reactjs.org" external size="sm">React
       </IconLink>
       <IconLink iconName="i-logos-spring-icon" route="https://www.spring.io" external size="sm">Spring Boot
       </IconLink>
+      <IconLink iconName="i-logos-adonisjs-icon" route="https://www.adonisjs.com" external size="sm">AdonisJS
+      </IconLink>
+      <IconLink iconName="i-logos-python" route="https://www.python.org" external size="sm">Python
+      </IconLink>
+
     </div>
   </div>
 
