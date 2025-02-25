@@ -26,10 +26,10 @@ First, my thesis subject Technology-enhanced regulation of learning: what contri
 
 ## Iterative improvements
 
-Iterative improvements. By testing different methods and refine them, I found a way to be more efficient in my reading process. When I read about a subject, this was my workflow:
+Iterative improvements. By testing different methods and refine them, I found a way to be more efficient in my reading process. The goal was to try methods, see what works and what doesn't, and then refine them. Here is what I first did:
 
 1. Identify key papers in the field.
-2. Add them in Zotero
+2. Add them in Zotero (using <ProseA href="https://www.zotero.org/download/connectors" target="_blank">this wonderful Zotero browser plugin</ProseA>).
 3. Read and annotate them on GoodNotes on my iPad.
 
 ::blockquote{type="info"}
@@ -40,12 +40,24 @@ After a few weeks, I had a lot of papers in my Zotero library. I then started to
 I also tagged them depending on their status. I have a tag :tag{color="wine"}[FINISHED] for finished papers, and :tag{color="blue"}[CURRENT] to track papers I'm currently reading. Finally, for "important papers" I have 2 tags: :tag{color="lime"}[C>100] for papers with more than 100 citations and :tag{color="grass"}[C++] (you got it?) for "important" papers in their
 field.
 
-<figure style="width: 100%; margin: 0;">
+<figure style="width: 80%; margin: auto; padding: 1rem 0;">
     <img src="/blog/zotero_tags.png" alt="Zotero tags" style="width: 100%;"/>
     <figcaption class="italic">My Zotero tags used to organize my readings</figcaption>
 </figure>
 
 I also started to directly annotate through Zotero from my laptop. Their annotation tool is really good and allows me to highlight (with a specific color code) with less friction than GoodNotes.
+
+Zotero is synced and I can access my library from any device. It's really convenient to read from my iPad or quickly search for a paper on my phone.
+
+After a few weeks of reading papers, we had the opportunity to write a first paper based on our findings.
+
+::blockquote{type="important"}
+Due to anonymity reasons, I can't share or talk about the content of the paper. It'll be the subject for another post 🤓. I'll still share the main difficulties I had during this exercice and how I dealt with it.
+::
+
+## From divergence to convergence
+
+Reading with divergence ideas to then identify and converge on gaps in existing work in our area.
 
 # Teaching experience
 
