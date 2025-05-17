@@ -4,7 +4,6 @@ const navItems = [
   { route: '/posts', icon: 'uil:book-alt' },
   { route: '/projects', icon: 'lucide:laptop' },
   { route: '/teaching', icon: 'lucide:graduation-cap' },
-  { route: '/activity', icon: 'lucide:workflow' }
 ];
 </script>
 

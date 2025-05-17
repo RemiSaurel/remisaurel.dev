@@ -7,7 +7,7 @@ date: 2025-02-24
 I was wondering how I could start this post. Maybe a 🎶 song 🎶 is worth a thousand words:
 
 <div class="flex items-center justify-center pt-8">
-<iframe style="border-radius:12px; height: 100px"  src="https://open.spotify.com/embed/track/2t8yVaLvJ0RenpXUIAC52d?utm_source=generator" width="300" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/DmWWqogr_r8?si=_cN-2EOKZMsPYKkE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
 
 Yes, I learned a lot. On the PhD itself, on teaching and learning, but also on myself. Let's jump in!
@@ -57,10 +57,18 @@ Due to anonymity reasons, I can't share or talk about the content of the paper. 
 
 ## From divergence to convergence
 
-Reading with divergence ideas to then identify and converge on gaps in existing work in our area.
+I think one of the main difficulty in the writing exercise has been to quickly switch from a divergent way of thinking (by exploring different papers and ideas) to a convergent way (by identifying gaps in the literature and proposing positions). This writing exercise was really helpful and I learned a lot from it. 
+
+If I had the opportunity to go back 2 years ago, I'd probably focus more on writing exercises. I felt I had lacked practice in this area. I think it's really important to be able to write effectively and efficiently while being able to convey strong messages in a clear way. Reading papers helps you find out formulas, expressions or a basis for your writing. But I think practicing writing is **really** important.
 
 # Teaching experience
+During this period, I also had the opportunity to teach a course on :tag{color="wine"}[Kotlin] and :tag{color="green"}[Spring Boot] to 3rd year students. It was a really interesting experience and definitely something I'd like to do again. 
 
-# Top 3 of this period
+::blockquote{type="info"}
+You can find all my teaching experience on my <ProseA href="/teaching">teaching page</ProseA>.
+::
+
+I've always liked the "learning by teaching". During my first university years, I had the opportunity to participate in tutoring sessions. I really liked it and I think it helped me a lot in my learning process. I think it's a great way to learn and to understand concepts.
 
 # What's next?
+After submitting my first paper, the goal is to gather stakeholders' feedback and to start working on application. Antoine will join us as a full-stack intern and will help us in the development of the application. Stay tuned for more updates on this topic! (Pssst, I'm writing this way later than expected. I should have written this post a few weeks ago... but keep this as a secret 🤫)
