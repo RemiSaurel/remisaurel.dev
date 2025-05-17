@@ -1,0 +1,96 @@
+interface News {
+    date: Date;
+    title: string;
+    content?: string;
+    links?: {
+        text: string;
+        url: string;
+    }[]
+}
+
+export const news: News[] = [
+    {
+        date: new Date("2025-05-10"),
+        title: "🥳 1st paper accepted (full paper) !!!",
+        content: " 📄 Intégration responsable de l’IA Générative dans l’Éducation : proposition d’un plan d’actions stratégiques dirigé par les risques liés aux questions éthiques. Rémi Saurel, Franck Silvestre, Jean-Baptiste Raclet, Emmanuel Lescure. 12ème Conférence sur les Environnements Informatiques pour l’Apprentissage Humain (EIAH 2025), ATIEF : Association des Technologies de l’Information pour l’Education et la Formation, Jun 2025, Lille, France. hal-05070808",
+        links: [
+            {
+                text: "Paper",
+                url: "https://hal.science/hal-05070808"
+            },
+            {
+                text: "Conference",
+                url: "https://eiah2025.sciencesconf.org/"
+            }
+        ]
+    },
+    {
+        date: new Date("2025-05-06"),
+        title: "🎤 Talk given to IUT de Rodez about Research and Education.",
+        links: [
+            {
+                text: "LinkedIn post",
+                url: "https://www.linkedin.com/feed/update/urn:li:activity:7325808468269981696/"
+            }
+        ]
+    },
+    {
+        date: new Date("2025-04-10"),
+        title: "👨‍💻 Antoine joined us as a full-stack intern for 4 months.",
+        content: "Antoine will work on the first screens of KDo (Konsolidation Dashboard), but also on the backend and maybe on the AI part.",
+        links: [
+            {
+                text: "Antoine's GitHub",
+                url: "https://github.com/antoinemcx"
+            }
+        ]
+    },
+    {
+        date: new Date("2025-04-15"),
+        title: "📝 2 papers submission (1 full, 1 demo) waiting for reviews",
+        content: "The full paper is basically the same as the one that got rejected. We try to see how another community will react to our work. The demo paper is about a more technical aspect of our work.",
+    },
+    {
+        date: new Date("2025-04-03"),
+        title: "🥴 1 full paper rejected",
+        content: "The paper was rejected mainly because the work was still preliminary. Although it was rejected, we had some positive feedback from the reviewers, especially on our position. We will work on it and resubmit it to another conference.",
+    },
+    {
+        date: new Date("2025-03-15"),
+        title: "📝 1 full paper submission waiting for reviews",
+    },
+    {
+        date: new Date("2025-03-20"),
+        title: "🏫 2 focus groups with teachers",
+        content: "We work with several French and Mathematics teachers. The goal is to gather their feedback on the first dashboard prototype and to understand their pedagogical needs.",
+
+    },
+    {
+        date: new Date("2025-02-10"),
+        title: "🧑‍🏫 Teaching assistant for the 1st time (Kotlin / Spring Boot / Web)",
+        content: "Working on Kotlin and Spring Boot at IUT de Toulouse for 3rd year students. More details on the teaching page.",
+        links: [
+            {
+                text: "Teaching",
+                url: "https://remisaurel.dev/teaching"
+            }
+        ]
+    },
+    {
+        date: new Date("2025-01-15"),
+        title: "📝 1 full paper submission, waiting for reviews",
+    },
+    {
+        date: new Date("2024-12-20"),
+        title: "🧠 1st draft of a potential paper",
+    },
+    {
+        date: new Date("2024-12-04"),
+        title: "📚 Reading mode: activated",
+    },
+    {
+        date: new Date("2024-11-04"),
+        title: "👶 1st day as a PhD student",
+    },
+    
+];
