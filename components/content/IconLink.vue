@@ -39,7 +39,7 @@ const handleClick = () => {
 
 <template>
   <div
-    class="inline-flex rounded items-center relative pr-1 gap-2 hover:cursor-pointer font-light w-fit text-zinc-5 dark:text-zinc-4 hover:text-zinc-700 bg-gray-400/10 hover:bg-gray-400/20 pl-1 pr-2 dark:hover:text-zinc-2 transition duration-500 group"
+    class="inline-flex rounded items-center relative px-2 gap-2 hover:cursor-pointer font-light w-fit  text-zinc-5 dark:text-zinc-4 hover:text-zinc-700 bg-gray-400/10 hover:bg-gray-400/20 dark:hover:text-zinc-2 transition duration-500 group"
     :class="[size === 'sm' ? 'py-0.5 text-sm' : 'py-1']"
     @click="handleClick"
   >

@@ -4,6 +4,7 @@
   font-family: "Teachers", sans-serif;
   transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out;
   color: #27272a;
+  font-size: 1.1rem;
 }
 
 .dark {
@@ -33,4 +34,10 @@ h2 {
 h3 {
   font-size: 1.1rem;
   font-weight: 550;
+}
+
+figcaption {
+  font-size: 0.9rem;
+  font-style: italic;
+  text-align: center;
 }

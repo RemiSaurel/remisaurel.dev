@@ -51,42 +51,29 @@ const to = (anchor: string) => {
   <div>
     <div class="hidden lg:block relative top-0 left-0">
       <div class="fixed top-5 left-6 inline-block">
-        <div
-          @click="toggleToC"
-          class="text-zinc-600 hover:text-zinc-8 transition duration-400 dark:text-zinc-4 dark:hover:text-zinc-2 flex items-center space-x-2 cursor-pointer group"
-        >
+        <div @click="toggleToC"
+          class="text-zinc-600 hover:text-zinc-8 transition duration-400 dark:text-zinc-4 dark:hover:text-zinc-2 flex items-center space-x-2 cursor-pointer group">
           <span>TOC</span>
-          <span
-            :class="showToC ? 'rotate-90' : ''"
-            class="transition-transform duration-300 flex items-center justify-center"
-          >
+          <span :class="showToC ? 'rotate-90' : ''"
+            class="transition-transform duration-300 flex items-center justify-center">
             <Icon name="uil:angle-right" class="size-6" />
           </span>
         </div>
 
-        <Transition
-          enter-active-class="transition-all duration-300 ease-out"
-          leave-active-class="transition-all duration-200 ease-in"
-          enter-from-class="opacity-0 transform -translate-y-2"
-          enter-to-class="opacity-100 transform translate-y-0"
-          leave-from-class="opacity-100 transform translate-y-0"
-          leave-to-class="opacity-0 transform -translate-y-2"
-        >
-          <div
-            v-if="showToC"
-            class="absolute mt-2 bg-white dark:bg-zinc-8 border-solid border-0.5 shadow-lg border-zinc-2 dark:border-zinc-7 rounded-lg p-4 w-64 z-10"
-          >
+        <Transition enter-active-class="transition-all duration-300 ease-out"
+          leave-active-class="transition-all duration-200 ease-in" enter-from-class="opacity-0 transform -translate-y-2"
+          enter-to-class="opacity-100 transform translate-y-0" leave-from-class="opacity-100 transform translate-y-0"
+          leave-to-class="opacity-0 transform -translate-y-2">
+          <div v-if="showToC"
+            class="absolute mt-2 bg-white dark:bg-zinc-8 border-solid border-0.5 shadow-lg border-zinc-2 dark:border-zinc-7 rounded-lg p-4 w-64 z-10">
             <div class="flex flex-col gap-2 p-0 m-0">
-              <div
-                v-for="heading in headings"
-                :key="heading.text"
+              <div v-for="heading in headings" :key="heading.text"
                 class="text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-2 transition cursor-pointer"
                 :class="{
                   'font-medium': heading.level === 1,
                   'ml-3 text-base': heading.level === 2,
                   'ml-6 text-sm': heading.level === 3,
-                }"
-              >
+                }">
                 <div @click="to(heading.anchor)">
                   {{ heading.text }}
                 </div>

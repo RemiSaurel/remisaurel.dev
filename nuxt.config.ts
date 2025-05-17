@@ -43,6 +43,7 @@ export default defineNuxtConfig({
     "@nuxtjs/color-mode",
     "@nuxt/icon",
     "@nuxt/image",
+    "motion-v/nuxt",
   ],
   icon: {
     serverBundle: "remote",
