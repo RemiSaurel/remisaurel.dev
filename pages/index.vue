@@ -60,13 +60,12 @@ const MAIN_TRANSITION = { duration: 1, delay: 0.6 }
           <div class="text-zinc-4 text-sm -mt-1 font-light">remi.saurel [at] irit.fr</div>
         </div>
       </div>
-      <div class="flex flex-wrap gap-2 mt-1 h-fit justify-center">
+      <div class="flex flex-wrap gap-2 mt-1 justify-center">
+        <IconLink iconName="academicons:google-scholar" route="https://scholar.google.com/citations?user=r8AM0OIAAAAJ&hl=fr" external>
+        </IconLink>
         <IconLink iconName="i-simple-icons-x" route="https://twitter.com/remisaurel" external>
         </IconLink>
         <IconLink iconName="uil:linkedin" route="https://www.linkedin.com/in/r%C3%A9mi-saurel/" external>
-        </IconLink>
-        <IconLink iconName="i-lucide-graduation-cap"
-          route="https://scholar.google.com/citations?user=r8AM0OIAAAAJ&hl=fr" external>
         </IconLink>
         <IconLink iconName="uil:github-alt" route="https://github.com/remisaurel" external />
       </div>
