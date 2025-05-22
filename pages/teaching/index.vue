@@ -14,6 +14,12 @@ const TEACHING: TeachingSubject[] = [
         description: "Introduction to Kotlin and web development on an existing project (elaastic) using Spring Boot.",
         students: "BUT3 Info (3rd year students)",
         link: "https://github.com/MyPedagogicalRessources/BUT3-Kotlin"
+    },
+    {
+        year: "2021",
+        subject: "Tutoring",
+        description: "Tutoring sessions for students in the 1st year of DUT on various subjects.",
+        students: "DUT1 Info (1st year students)",
     }
 ];
 </script>
