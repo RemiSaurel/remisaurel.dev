@@ -10,8 +10,19 @@ interface News {
 
 export const news: News[] = [
     {
+        date: new Date("2025-06-03"),
+        title: "🥳 1 demo paper accepted, 🥴 1 Blue-Sky paper rejected (ECTEL 2025)",
+        content: "As expected, the Blue-Sky paper was rejected (I think we barely missed the acceptance with our -2, -1, 1 and 2 grades). The demo paper about MAESTRO was accepted. We will present it at ECTEL 2025 in September.",
+        links: [
+            {
+                text: "Conference",
+                url: "https://ea-tel.eu/organization/ectel-2025"
+            }
+        ]
+    },
+    {
         date: new Date("2025-05-10"),
-        title: "🥳 1st paper accepted (full paper) !!!",
+        title: "🥳 1st paper accepted (full paper) !!! (EIAH 2025)",
         content: " 📄 Intégration responsable de l’IA Générative dans l’Éducation : proposition d’un plan d’actions stratégiques dirigé par les risques liés aux questions éthiques. Rémi Saurel, Franck Silvestre, Jean-Baptiste Raclet, Emmanuel Lescure. 12ème Conférence sur les Environnements Informatiques pour l’Apprentissage Humain (EIAH 2025), ATIEF : Association des Technologies de l’Information pour l’Education et la Formation, Jun 2025, Lille, France. hal-05070808",
         links: [
             {
