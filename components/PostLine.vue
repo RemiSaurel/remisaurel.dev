@@ -5,6 +5,8 @@ interface Props {
   description: string;
   disabled?: boolean;
 }
+const nuxtLink = resolveComponent('NuxtLink');
+
 
 const props = withDefaults(defineProps<Props>(), {
   disabled: false,
@@ -35,7 +37,7 @@ const displayTitle = computed(() =>
 
 <template>
   <component 
-    :is="disabled ? 'div' : 'NuxtLink'" 
+    :is="disabled ? 'div' : nuxtLink" 
     :to="disabled ? undefined : to"
     :class="containerClasses"
   >
