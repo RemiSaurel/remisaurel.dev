@@ -37,7 +37,7 @@ export const news: News[] = [
     },
     {
         date: new Date("2025-05-06"),
-        title: "🎤 Talk given to IUT de Rodez about Research and Education.",
+        title: "🎤 Talk given to IUT de Rodez about Research and Education",
         links: [
             {
                 text: "LinkedIn post",

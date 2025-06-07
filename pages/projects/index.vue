@@ -11,6 +11,17 @@ export interface Project {
 }
 
 const PROJECTS: Project[] = [
+    {
+    title: "evalbuddy",
+    description:
+      "A tool to easily evaluate answers",
+    icon: "🧑‍🏫",
+    links: {
+      github: "https://github.com/RemiSaurel/evalbuddy",
+      demo: "https://evalbuddy.nuxt.dev",
+    },
+    date: 2025,
+  },
   {
     title: "littleman",
     description:
