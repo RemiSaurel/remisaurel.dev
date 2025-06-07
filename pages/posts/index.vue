@@ -83,6 +83,7 @@ const projects = computed(() => {
               :to="p._path!"
               :title="p.title!"
               :description="p.description!"
+              :disabled="p.disabled"
             />
           </div>
         </div>

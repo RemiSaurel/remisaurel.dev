@@ -1,24 +1,49 @@
 <script setup lang="ts">
-defineProps<{
+interface Props {
   to: string;
   title: string;
   description: string;
-}>();
+  disabled?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  disabled: false,
+});
+
+// Computed classes for better maintainability
+const containerClasses = computed(() => [
+  'w-full flex flex-col gap-1',
+  props.disabled ? 'opacity-40' : 'group'
+]);
+
+const titleClasses = computed(() => [
+  'text-md my-0 font-semibold transition duration-500',
+  'dark:text-zinc-400 text-zinc-500',
+  !props.disabled && 'group-hover:text-zinc-900 dark:group-hover:text-zinc-200'
+].filter(Boolean));
+
+const descriptionClasses = computed(() => [
+  'text-sm my-0 font-medium transition duration-500',
+  'dark:text-zinc-500 text-zinc-400',
+  !props.disabled && 'group-hover:text-zinc-500 dark:group-hover:text-zinc-400'
+].filter(Boolean));
+
+const displayTitle = computed(() => 
+  props.disabled ? `${props.title} 🔜` : props.title
+);
 </script>
 
 <template>
-  <NuxtLink :to="to">
-    <div class="w-full flex flex-col gap-1 group">
-      <h3
-        class="text-md my-0 font-semibold dark:text-zinc-400 text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-200 transition duration-500"
-      >
-        {{ title }}
-      </h3>
-      <h4
-        class="text-sm my-0 font-medium dark:text-zinc-500 text-zinc-400 group-hover:text-zinc-500 dark:group-hover:text-zinc-400 transition duration-500"
-      >
-        {{ description }}
-      </h4>
-    </div>
-  </NuxtLink>
+  <component 
+    :is="disabled ? 'div' : 'NuxtLink'" 
+    :to="disabled ? undefined : to"
+    :class="containerClasses"
+  >
+    <h3 :class="titleClasses">
+      {{ displayTitle }}
+    </h3>
+    <h4 :class="descriptionClasses">
+      {{ description }}
+    </h4>
+  </component>
 </template>
