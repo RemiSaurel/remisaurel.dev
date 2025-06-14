@@ -2,7 +2,6 @@
 title: "EIAH: first conference"
 description: "Recap of my first conference experience at EIAH 2025 in Lille"
 date: 2025-06-15
-disabled: true
 ---
 
 <div class="flex items-center justify-center pt-8">
