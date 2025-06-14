@@ -1,7 +1,7 @@
 ---
 title: "Focus, create, fail, learn"
 description: "1st PhD year is going very well so far, some feedback about lessons learned and future actions"
-date: 2025-06-07
+date: 2025-07-10
 disabled: true
 ---
 
