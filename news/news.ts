@@ -9,6 +9,17 @@ interface News {
 }
 
 export const news: News[] = [
+        {
+        date: new Date("2025-06-10"),
+        title: "👥 Went to my 1st conference (EIAH 2025)",
+        content: "Amazing experience at EIAH 2025 in Lille! I had the opportunity to present my first paper, meet many people, and attend interesting talks. More details on my blog post.",
+        links: [
+            {
+                text: "Blog post",
+                url: "https://remisaurel.dev/posts/eiah-first-conf"
+            }
+        ]
+    },
     {
         date: new Date("2025-06-03"),
         title: "🥳 1 demo paper accepted, 🥴 1 Blue-Sky paper rejected (ECTEL 2025)",
