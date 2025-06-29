@@ -20,6 +20,8 @@ const { INITIAL_FADE, ANIMATE_FADE, MAIN_TRANSITION } = useAnimations();
     My main focus is about <span class="font-semibold">AI</span> and <span class="font-semibold">learning analytics</span> 
     to support learning and teaching. I'm working on Learning Analytics Dashboards for teachers to
     help them regulate out-of-class learning activities from their students (K-12).
+
+    <p>Focused on <span class="font-semibold">Human-AI Interaction</span> and promoting the responsible use of AI for teachers and learners.</p>
     <p>I am advised by Franck Silvestre, Jean-Baptiste Raclet, and Emmanuel Lescure.</p>
   </motion.div>
 </template>
