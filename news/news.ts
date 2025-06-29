@@ -9,7 +9,21 @@ interface News {
 }
 
 export const news: News[] = [
-        {
+    {
+        date: new Date("2025-06-29"),
+        title: "👨‍💻 Created evalbuddy tool to facilitate evaluation",
+        links: [
+            {
+                text: "Github",
+                url: "https://github.com/remisaurel/evalbuddy"
+            },
+            {
+                text: "Website",
+                url: "https://evalbuddy.nuxt.dev/"
+            }
+        ]
+    },
+    {
         date: new Date("2025-06-10"),
         title: "👥 Went to my 1st conference (EIAH 2025)",
         content: "Amazing experience at EIAH 2025 in Lille! I had the opportunity to present my first paper, meet many people, and attend interesting talks. More details on my blog post.",

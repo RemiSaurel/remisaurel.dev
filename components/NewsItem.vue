@@ -8,10 +8,10 @@ const { toggleExpanded, isExpanded } = useNews();
 
 <template>
   <div class="flex flex-col gap-0.5">
-    <div class="flex flex-wrap gap-0.5">
+    <div class="flex flex-wrap gap-0.5 items-baseline">
       <!-- For items with content, make title clickable -->
       <div 
-        class="font-medium pr-1"
+        class="font-medium pr-3"
         :class="{ 'cursor-pointer': item.content }" 
         @click="item.content ? toggleExpanded(item.title) : null"
       >
