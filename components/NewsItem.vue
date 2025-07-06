@@ -8,16 +8,15 @@ const { toggleExpanded, isExpanded } = useNews();
 
 <template>
   <div class="flex flex-col gap-0.5">
-    <div class="flex flex-wrap gap-0.5 items-baseline">
+    <div class="flex flex-wrap gap-1 items-baseline">
       <!-- For items with content, make title clickable -->
       <div 
         class="font-medium pr-3"
-        :class="{ 'cursor-pointer': item.content }" 
-        @click="item.content ? toggleExpanded(item.title) : null"
       >
         {{ item.title }}
-        <span v-if="item.content" class="text-xs ml-1 text-zinc-600 dark:text-zinc-400">
-          {{ isExpanded(item.title) ? '▼' : '►' }}
+        <span v-if="item.content" class="text-xs ml-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer select-none" :class="{ 'cursor-pointer': item.content }" 
+        @click="item.content ? toggleExpanded(item.title) : null">
+          {{ isExpanded(item.title) ? 'See less' : 'See more' }}
         </span>
       </div>
       
@@ -26,19 +25,25 @@ const { toggleExpanded, isExpanded } = useNews();
           <ProseA 
             :href="link.url" 
             target="_blank"
-            class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
           >
             {{ link.text }}
           </ProseA>
         </span>
       </div>
     </div>
+
+    <div class="flex flex-wrap gap-1">
+      <div v-for="(item, index) in item.categories" :key="index" class="text-xs  text-neutral-7 bg-neutral-1 dark:bg-neutral-700 dark:text-neutral-400 rounded py-0.5 px-2">
+          {{ item }}
+      </div>
+    </div>
+    
     
     <!-- Collapsible content section -->
     <Transition name="slide">
       <div 
         v-if="item.content && isExpanded(item.title)"
-        class="text-sm text-zinc-500 dark:text-zinc-400 pl-4 mt-1"
+        class="text-sm text-zinc-500 dark:text-zinc-400  mt-1"
       >
         {{ item.content }}
       </div>
