@@ -32,8 +32,8 @@ const { toggleExpanded, isExpanded } = useNews();
       </div>
     </div>
 
-    <div class="flex flex-wrap gap-1">
-      <div v-for="(item, index) in item.categories" :key="index" class="text-xs  text-neutral-7 bg-neutral-1 dark:bg-neutral-700 dark:text-neutral-400 rounded py-0.5 px-2">
+    <div class="flex flex-wrap items-center gap-1">
+      <div v-for="(item, index) in item.categories" :key="index" class="text-xs text-neutral-7 bg-neutral-1 dark:bg-neutral-700 dark:text-neutral-400 rounded py-1 px-2">
           {{ item }}
       </div>
     </div>

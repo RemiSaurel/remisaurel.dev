@@ -36,21 +36,18 @@ const { groupedNews, uniqueNewsCategories, toggleCategory, isCategoryActive, cle
     </div>
   </div>
 
-    <div class="flex flex-col gap-2" style="position: relative;">
-      <AnimatePresence mode="wait">
+    <div class="flex flex-col gap-2 relative">
+      <AnimatePresence>
         <motion.div
-          :key="groupedNews.map(g => g.monthYear).join('-')"
+          v-for="group in groupedNews" 
+          :key="group.monthYear"
           :initial="{ opacity: 0, x: -10 }"
           :animate="{ opacity: 1, x: 0 }"
           :exit="{ opacity: 0, x: 10 }"
-          :transition="{ duration: 0.1, ease: 'easeOut' }"
-          class="flex flex-col gap-4"
+          :transition="{ duration: 0.2, ease: 'easeOut' }"
+          layout
         >
-          <NewsGroup 
-            v-for="group in groupedNews" 
-            :key="group.monthYear"
-            :group="group" 
-          />
+          <NewsGroup :group="group" />
         </motion.div>
       </AnimatePresence>
     </div>
