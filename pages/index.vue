@@ -14,15 +14,9 @@ const newsDelay = { duration: 1, delay: 1.2 };
 </script>
 
 <template>
-  <div class="flex flex-col gap-1">
+  <div class="flex flex-col gap-1 mb-6">
     <ProfileHeader />
   </div>
-
-  <BioSection />
-  
-  <LinksSection :transition="MAIN_TRANSITION" />
-  
-  <SeparatorAnimated :transition="MAIN_TRANSITION" />
-  
+      
   <NewsSection :transition="newsDelay" />
 </template>
