@@ -20,5 +20,8 @@
     "@iconify-json/uil": "^1.2.1",
     "@unocss/nuxt": "^66.1.2",
     "unocss": "^66.1.2"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.44.2"
   }
 }
