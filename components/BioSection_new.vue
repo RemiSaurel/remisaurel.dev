@@ -1,3 +1,7 @@
+<script setup lang="ts">
+// Animation now handled by parent ProfileHeader component
+</script>
+
 <template>
   <div>
     👋 Hi! I'm Rémi, a French PhD student in Toulouse at the 
