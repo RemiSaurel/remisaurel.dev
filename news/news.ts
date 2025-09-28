@@ -12,6 +12,18 @@ interface News {
 }
 
 export const news: News[] = [
+        {
+        date: new Date("2025-09-15"),
+        title: "Went to ECTEL conference",
+        content: "Very nice conference in Newcastle & Durham! I presented our demo paper about MAESTRO. We had interesting discussions with other researchers about our approach and future work. Both keynotes from Mike Sharples and Dragan Gašević were very inspiring.",
+        categories: ["👥 conference", "📝 paper"],
+        links: [
+            {
+                text: "Paper",
+                url: "https://hal.science/hal-05141354"
+            },
+        ]
+    },
     {
         date: new Date("2025-07-06"),
         title: "MAESTRO demo paper is available!",
