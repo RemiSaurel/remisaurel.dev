@@ -13,6 +13,39 @@ interface News {
 
 export const news: News[] = [
     {
+        date: new Date("2025-11-12"),
+        title: "Beginning of 1st experiment!",
+        content: "Lot of pressure to handle, but we are ready to start the experiment with teachers and students. Around 400 K-12 students and 9 teachers will be involved. Fingers crossed!",
+        categories: ["😎 misc", "👨‍💻 project"],
+    },
+    {
+        date: new Date("2025-11-01"),
+        title: "Poster submission, waiting for reviews ",
+        content: "We submitted a poster about MAESTRO & MAESTRO-bench. Not much to expect, but who knows!",
+        categories: ["📝 paper"],
+    },
+    {
+        date: new Date("2025-10-15"),
+        title: "Coding like never before!",
+        content: "1st experiment is coming, so I am coding a lot!",
+        categories: ["😎 misc", "👨‍💻 project"],
+    },
+    {
+        date: new Date("2025-09-15"),
+        title: "ECTEL conference to present MAESTRO!",
+        categories: ["👥 conference"],
+        links: [
+            {
+                text: "Conference",
+                url: "https://ea-tel.eu/organization/ectel-2025"
+            },
+            {
+                text: "Paper",
+                url: "https://hal.science/hal-05141354"
+            },
+        ]
+    },
+    {
         date: new Date("2025-07-06"),
         title: "MAESTRO demo paper is available!",
         content: "We introduce 🪄 MAESTRO- a Multi-Agent Educational System for Tutoring and Recommendation Orchestration that orchestrates specialized agent teams tailored to various use cases, such as dynamic indicator selection, intuitive data visualization interpretation, and educator recommendations.",
