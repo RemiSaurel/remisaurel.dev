@@ -5,6 +5,7 @@ const navItems = [
   { route: '/', icon: 'lucide:house', label: "Home" },
   { route: '/posts', icon: 'uil:book-alt', label: "Posts" },
   { route: '/projects', icon: 'lucide:laptop', label: "Projects" },
+  { route: '/playground', icon: 'lucide:flask-conical', label: "Playground" },
   //{ route: '/teaching', icon: 'lucide:graduation-cap' },
 ];
 

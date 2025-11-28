@@ -154,30 +154,29 @@ const projectList = computed(() => {
         Here are some projects I've been working on. Feel free to check them
         out!
       </p>
-        <div class="mt-6 flex flex-col gap-1.5">
-    <div class="flex flex-wrap items-center gap-2">
-      <span class="font-semibold">Mainly programming</span> with
-      <IconLink iconName="i-logos-nuxt-icon" route="https://nuxtjs.org" external size="sm">Nuxt
-      </IconLink>
-      <IconLink iconName="i-logos-vue" route="https://vuejs.org" external size="sm">Vue
-      </IconLink>
-      <IconLink iconName="i-logos-typescript-icon" route="https://www.typescriptlang.org" external size="sm">TypeScript
-      </IconLink>
-      <IconLink iconName="uil-docker" route="https://www.java.com" external size="sm">Docker
-      </IconLink>
-      <IconLink iconName="i-logos-react" route="https://reactjs.org" external size="sm">React
-      </IconLink>
-      <IconLink iconName="i-logos-spring-icon" route="https://www.spring.io" external size="sm">Spring Boot
-      </IconLink>
-      <IconLink iconName="i-logos-adonisjs-icon" route="https://www.adonisjs.com" external size="sm">AdonisJS
-      </IconLink>
-      <IconLink iconName="i-logos-python" route="https://www.python.org" external size="sm">Python
-      </IconLink>
-
+      <div class="mt-6 flex flex-col gap-1.5">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="font-semibold">Mainly programming</span> with
+        <IconLink iconName="i-logos-nuxt-icon" route="https://nuxtjs.org" external size="sm">Nuxt
+        </IconLink>
+        <IconLink iconName="i-logos-vue" route="https://vuejs.org" external size="sm">Vue
+        </IconLink>
+        <IconLink iconName="i-logos-typescript-icon" route="https://www.typescriptlang.org" external size="sm">TypeScript
+        </IconLink>
+        <IconLink iconName="uil-docker" route="https://www.java.com" external size="sm">Docker
+        </IconLink>
+        <IconLink iconName="i-logos-react" route="https://reactjs.org" external size="sm">React
+        </IconLink>
+        <IconLink iconName="i-logos-spring-icon" route="https://www.spring.io" external size="sm">Spring Boot
+        </IconLink>
+        <IconLink iconName="i-logos-adonisjs-icon" route="https://www.adonisjs.com" external size="sm">AdonisJS
+        </IconLink>
+        <IconLink iconName="i-logos-python" route="https://www.python.org" external size="sm">Python
+        </IconLink>
+      </div>
     </div>
   </div>
-    </div>
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
       <ProjectCard v-for="project in projectList" :key="project.title" :project="project" />
     </div>
   </div>
