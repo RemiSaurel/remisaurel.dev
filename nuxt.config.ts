@@ -43,6 +43,7 @@ export default defineNuxtConfig({
     "@nuxtjs/color-mode",
     "@nuxt/icon",
     "@nuxt/image",
+    "@nuxt/eslint",
     "motion-v/nuxt",
   ],
   icon: {
