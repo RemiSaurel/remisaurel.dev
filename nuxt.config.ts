@@ -3,6 +3,13 @@ export default defineNuxtConfig({
   app: {
     head: {
       link: [{ rel: "icon", href: "/favicon.png" }],
+      script: [
+        {
+          src: 'https://app.rybbit.io/api/script.js',
+          defer: true,
+          'data-site-id': process.env.RYBBIT_SITE_ID || '',
+        },
+      ],
     },
   },
   colorMode: {
