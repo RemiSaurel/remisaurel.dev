@@ -7,7 +7,7 @@ export default defineNuxtConfig({
         {
           src: 'https://app.rybbit.io/api/script.js',
           defer: true,
-          'data-site-id': process.env.RYBBIT_SITE_ID || '',
+          'data-site-id': '5a7335eeadc5',
         },
       ],
     },
@@ -60,4 +60,22 @@ export default defineNuxtConfig({
     "/": { prerender: true },
   },
   compatibilityDate: "2024-10-04",
+  scripts: {
+    registry: {
+      rybbitAnalytics: true,
+    }
+  },
+  // you need to provide a runtime config to access the environment variables
+  runtimeConfig: {
+    public: {
+      scripts: {
+        rybbitAnalytics: {
+          // .env
+          // NUXT_PUBLIC_SCRIPTS_RYBBIT_ANALYTICS_SITE_ID=<your-site-id>
+          siteId: ''
+        },
+      },
+    },
+  },
+
 });
