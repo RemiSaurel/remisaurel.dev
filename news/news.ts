@@ -13,6 +13,12 @@ interface News {
 
 export const news: News[] = [
     {
+        date: new Date("2025-12-22"),
+        title: "LAK 2026 poster accepted!",
+        content: "Poster about 'Mind the Gap: Benchmarking AI vs. Human in Automatic Short Answer Grading'",
+        categories: ["📝 paper"],
+    },
+    {
         date: new Date("2025-11-12"),
         title: "Beginning of 1st experiment!",
         content: "Lot of pressure to handle, but we are ready to start the experiment with teachers and students. Around 400 K-12 students and 9 teachers will be involved. Fingers crossed!",
@@ -33,6 +39,7 @@ export const news: News[] = [
     {
         date: new Date("2025-09-15"),
         title: "ECTEL conference to present MAESTRO!",
+        content: "Nominated as Best Demo (unfortunately not the winner)!",
         categories: ["👥 conference"],
         links: [
             {
