@@ -16,10 +16,10 @@ const isActive = (path: string) => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100">
+  <div class="min-h-screen bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">
     <!-- Navigation -->
     <nav class="border-b border-neutral-200 dark:border-neutral-800">
-      <div class="max-w-5xl mx-auto px-6 py-4">
+      <div class="max-w-7xl mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
           <!-- Logo/Name -->
           <motion.div
@@ -64,13 +64,13 @@ const isActive = (path: string) => {
     </nav>
 
     <!-- Main Content -->
-    <main class="max-w-5xl mx-auto px-6 py-12">
+    <main class="max-w-7xl mx-auto px-6 py-12">
       <slot />
     </main>
 
     <!-- Footer -->
     <footer class="border-t border-neutral-200 dark:border-neutral-800 mt-auto">
-      <div class="max-w-5xl mx-auto px-6 py-6">
+      <div class="max-w-7xl mx-auto px-6 py-6">
         <p class="text-xs text-neutral-400 dark:text-neutral-600">
           &copy; {{ new Date().getFullYear() }} Rémi Saurel
         </p>

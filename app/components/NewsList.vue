@@ -81,7 +81,7 @@ const getFirstLink = (item: typeof news[0]) => {
         class="inline-block text-xs py-1 px-2 border-none cursor-pointer"
         :class="selectedCategory === category 
           ? ' bg-neutral-800 dark:bg-neutral-100 text-white dark:text-neutral-800' 
-          : ' text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-800'"
+          : ' text-neutral-500 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-800'"
         @click="toggleFilter(category)"
       >
         {{ category }}
@@ -97,7 +97,7 @@ const getFirstLink = (item: typeof news[0]) => {
         :href="hasLink(item) ? getFirstLink(item) : undefined"
         :target="hasLink(item) ? '_blank' : undefined"
         :rel="hasLink(item) ? 'noopener noreferrer' : undefined"
-        class="py-3 px-3 border-b border-neutral-200 dark:border-neutral-800"
+        class="py-3 px-3 border-b border-neutral-200 dark:border-neutral-800 transition-all duration-300 ease-out"
         :class="{ 'hover:bg-neutral-50 dark:hover:bg-neutral-900 cursor-pointer group': hasLink(item) }"
       >
         <!-- Mobile: Stacked layout -->
@@ -114,8 +114,8 @@ const getFirstLink = (item: typeof news[0]) => {
                 {{ cat }}
               </span>
               <svg 
-                class="w-2.5 h-2.5 shrink-0 ml-1"
-                :class="hasLink(item) ? 'opacity-30 group-hover:opacity-100' : 'opacity-0'"
+                class="w-2.5 h-2.5 shrink-0 ml-1 transition-all duration-300"
+                :class="hasLink(item) ? 'opacity-30 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5' : 'opacity-0'"
                 viewBox="0 0 11 11" 
                 fill="none"
               >
@@ -151,8 +151,8 @@ const getFirstLink = (item: typeof news[0]) => {
               {{ cat }}
             </span>
             <svg 
-              class="w-2.5 h-2.5 shrink-0 ml-1"
-              :class="hasLink(item) ? 'opacity-30 group-hover:opacity-100' : 'opacity-0'"
+              class="w-2.5 h-2.5 shrink-0 ml-1 transition-all duration-300"
+              :class="hasLink(item) ? 'opacity-30 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5' : 'opacity-0'"
               viewBox="0 0 11 11" 
               fill="none"
             >

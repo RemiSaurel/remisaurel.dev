@@ -42,10 +42,9 @@ const transition = {
           class="intro-text"
         >
           French PhD student at the 
-          <a href="https://www.irit.fr/" target="_blank" class="underline underline-offset-2">IRIT</a> lab in Toulouse, working in the 
-          <a href="https://www.irit.fr/TALENT/site/" target="_blank" class="underline underline-offset-2">TALENT</a> team.
-          Collaborating with 
-          <a href="https://www.kosmos-education.com/" target="_blank" class="underline underline-offset-2">Kosmos Education</a>.
+          <a href="https://www.irit.fr/" target="_blank" class="intro-link">IRIT</a> lab in Toulouse, working in the 
+          <a href="https://www.irit.fr/TALENT/site/" target="_blank" class="intro-link">TALENT</a> team, in collaboration with
+          <a href="https://www.kosmos-education.com/" target="_blank" class="intro-link">Kosmos Education</a>.
         </motion.p>
         <motion.p
           :initial="animate ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }"

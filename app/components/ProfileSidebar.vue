@@ -36,7 +36,7 @@ const transition = {
         <NuxtImg 
           src="/photo.png" 
           alt="Rémi Saurel"
-          class="size-40 object-cover shrink-0"
+          class="w-32 shrink-0"
         />
         
         <!-- Info on right -->
@@ -77,7 +77,7 @@ const transition = {
         <NuxtImg 
           src="/photo.png" 
           alt="Rémi Saurel"
-          class="w-full max-w-64 aspect-square object-cover transition-filter duration-300 hover:grayscale"
+          class="w-full max-w-48 transition-filter duration-300 hover:grayscale"
         />
       </motion.div>
 
@@ -89,8 +89,7 @@ const transition = {
         class="flex flex-col gap-0.5"
       >
         <h1 class="text-lg font-medium tracking-tight m-0">Rémi Saurel</h1>
-        <p class="text-sm text-neutral-500 dark:text-neutral-400 m-0">PhD Student</p>
-        <p class="text-sm text-neutral-400 dark:text-neutral-500 m-0">IRIT Lab, Toulouse</p>
+        <p class="text-sm text-neutral-500 dark:text-neutral-400 m-0">PhD Student at IRIT Lab, Toulouse</p>
       </motion.div>
 
       <!-- Contact -->
@@ -100,7 +99,6 @@ const transition = {
         :transition="animate ? { ...transition, delay: 0.25 } : { duration: 0 }"
         class="flex flex-col gap-1"
       >
-        <span class="text-xs uppercase tracking-wider text-neutral-400 dark:text-neutral-500">Contact</span>
         <span class="text-sm text-neutral-500 dark:text-neutral-400">
           remi.saurel [at] irit.fr
         </span>

@@ -2,37 +2,56 @@
 interface Publication {
   date: string;
   title: string;
+  authors: string[];
   subtitle?: string;
   venue: string;
   url?: string;
+  image?: string;
 }
+
+const defaultAuthors = ['Rémi Saurel', 'Franck Silvestre', 'Jean-Baptiste Raclet', 'Emmanuel Lescure'];
 
 // Publications data
 const publications: Publication[] = [
   {
-    date: 'Dec. 2025',
+    date: 'Apr. 2026',
     title: 'Mind the Gap: Benchmarking AI vs. Human in Automatic Short Answer Grading',
+    authors: defaultAuthors,
     subtitle: 'A benchmarking tool for AI systems to evaluate their performance on several configurations (model, prompts, architecture).',
     venue: 'LAK 2026',
-    url: undefined // No link yet
+    url: undefined,
+    image: '/publications/lak2026.jpg'
   },
   {
     date: 'Sep. 2025',
     title: 'MAESTRO: Multi-Agent Educational System for Tutoring and Recommendation Orchestration',
+    authors: defaultAuthors,
     subtitle: 'A multi-agent system to provide teachers with AI-powered recommendations based on learning analytics.',
     venue: 'ECTEL 2025',
-    url: 'https://hal.science/hal-05141354'
+    url: 'https://hal.science/hal-05141354',
+    image: '/publications/ectel2025.jpg'
   },
   {
     date: 'Jun. 2025',
     title: 'Responsible Integration of Generative AI in Education: Proposal for a Strategic Action Plan Guided by Ethical Risk Considerations',
+    authors: defaultAuthors,
     subtitle: 'A strategic action plan for the responsible integration of generative AI in educational contexts, addressing ethical risks and challenges.',
     venue: 'EIAH 2025',
-    url: 'https://hal.science/hal-05070808'
+    url: 'https://hal.science/hal-05070808',
+    image: '/publications/eiah2025.jpg'
   },
 ];
 
 const hasLink = (pub: Publication) => !!pub.url;
+
+const formatAuthors = (authors: string[]) => {
+  return authors.map((author, index) => {
+    if (author === 'Rémi Saurel') {
+      return { name: author, isMe: true };
+    }
+    return { name: author, isMe: false };
+  });
+};
 </script>
 
 <template>
@@ -44,8 +63,8 @@ const hasLink = (pub: Publication) => !!pub.url;
       :href="hasLink(pub) ? pub.url : undefined"
       :target="hasLink(pub) ? '_blank' : undefined"
       :rel="hasLink(pub) ? 'noopener noreferrer' : undefined"
-      class="py-3 px-3 border-b border-neutral-200 dark:border-neutral-800"
-      :class="{ 'hover:bg-neutral-50 dark:hover:bg-neutral-900 cursor-pointer group': hasLink(pub) }"
+      class="py-4 px-3 border-b border-neutral-200 dark:border-neutral-800 transition-all duration-300 ease-out"
+      :class="{ 'hover:bg-neutral-50 dark:hover:bg-neutral-800 cursor-pointer group': hasLink(pub) }"
     >
       <!-- Mobile: Stacked layout -->
       <div class="flex flex-col gap-2 md:hidden">
@@ -55,8 +74,8 @@ const hasLink = (pub: Publication) => !!pub.url;
           <div class="flex items-center gap-2">
             <span class="text-xs py-0.5 px-1.5 border border-neutral-300 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400">{{ pub.venue }}</span>
             <svg 
-              class="w-2.5 h-2.5"
-              :class="hasLink(pub) ? 'opacity-30 group-hover:opacity-100' : 'opacity-0'"
+              class="w-2.5 h-2.5 transition-all duration-300"
+              :class="hasLink(pub) ? 'opacity-30 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5' : 'opacity-0'"
               viewBox="0 0 11 11" 
               fill="none"
             >
@@ -67,29 +86,45 @@ const hasLink = (pub: Publication) => !!pub.url;
             </svg>
           </div>
         </div>
-        <!-- Title + Subtitle -->
+        <!-- Title + Authors + Subtitle -->
         <div class="flex flex-col gap-1">
           <span class="font-medium leading-snug">{{ pub.title }}</span>
+          <span class="text-xs text-neutral-500 dark:text-neutral-400">
+            <template v-for="(author, index) in formatAuthors(pub.authors)" :key="author.name">
+              <span :class="author.isMe ? 'font-medium text-neutral-700 dark:text-neutral-300' : ''">{{ author.name }}</span><span v-if="index < pub.authors.length - 1">, </span>
+            </template>
+          </span>
           <span v-if="pub.subtitle" class="text-sm text-neutral-500 dark:text-neutral-400">{{ pub.subtitle }}</span>
         </div>
       </div>
 
       <!-- Desktop: Grid layout -->
-      <div class="hidden md:grid grid-cols-[70px_1fr_auto] gap-4 items-baseline">
-        <span class="text-xs text-neutral-400 dark:text-neutral-500 tabular-nums">{{ pub.date }}</span>
+      <div class="hidden md:grid grid-cols-[60px_1fr_auto] gap-4 items-start">
+        <span class="text-xs text-neutral-400 dark:text-neutral-500 tabular-nums pt-1">{{ pub.date }}</span>
         
-        <div class="flex flex-col gap-1">
-          <div class="flex items-baseline gap-1 flex-wrap">
+        <div class="flex gap-4">
+          <NuxtImg 
+            v-if="pub.image" 
+            :src="pub.image" 
+            :alt="pub.title"
+            class="w-28 h-18 object-cover rounded shrink-0 bg-neutral-100 dark:bg-neutral-800"
+          />
+          <div class="flex flex-col gap-1">
             <span class="font-medium leading-snug">{{ pub.title }}</span>
+            <span class="text-xs text-neutral-500 dark:text-neutral-400">
+              <template v-for="(author, index) in formatAuthors(pub.authors)" :key="author.name">
+                <span :class="author.isMe ? 'font-medium text-neutral-700 dark:text-neutral-300' : ''">{{ author.name }}</span><span v-if="index < pub.authors.length - 1">, </span>
+              </template>
+            </span>
             <span v-if="pub.subtitle" class="text-sm text-neutral-500 dark:text-neutral-400">{{ pub.subtitle }}</span>
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 pt-1">
           <span class="text-xs py-0.5 px-1.5 border border-neutral-300 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400">{{ pub.venue }}</span>
           <svg 
-            class="w-2.5 h-2.5"
-            :class="hasLink(pub) ? 'opacity-30 group-hover:opacity-100' : 'opacity-0'"
+            class="w-2.5 h-2.5 transition-all duration-300"
+            :class="hasLink(pub) ? 'opacity-30 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5' : 'opacity-0'"
             viewBox="0 0 11 11" 
             fill="none"
           >

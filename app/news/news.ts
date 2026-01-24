@@ -107,7 +107,7 @@ export const news: News[] = [
         date: new Date("2025-05-10"),
         title: "1st paper accepted (full paper) !!! (EIAH 2025)",
         categories: ["paper"],
-        content: " 📄 Intégration responsable de l’IA Générative dans l’Éducation : proposition d’un plan d’actions stratégiques dirigé par les risques liés aux questions éthiques.",
+        content: " Intégration responsable de l’IA Générative dans l’Éducation : proposition d’un plan d’actions stratégiques dirigé par les risques liés aux questions éthiques.",
         links: [
             {
                 text: "Paper",
@@ -171,12 +171,6 @@ export const news: News[] = [
         title: "Teaching assistant for the 1st time (Kotlin / Spring Boot / Web)",
         categories: ["misc"],
         content: "Working on Kotlin and Spring Boot at IUT de Toulouse for 3rd year students. More details on the teaching page.",
-        links: [
-            {
-                text: "Teaching",
-                url: "https://remisaurel.dev/teaching"
-            }
-        ]
     },
     {
         date: new Date("2025-01-15"),

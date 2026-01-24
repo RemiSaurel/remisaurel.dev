@@ -34,7 +34,7 @@ const transition = {
       v-if="title"
       :is="link ? 'a' : 'div'" 
       :href="link"
-      class="flex items-center justify-between pb-1 border-b border-neutral-200 dark:border-neutral-800 mb-2 group"
+      class="flex items-center justify-between pb-1 border-b border-neutral-200 dark:border-neutral-800 my-2 group"
     >
       <div class="text-xl font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-400">{{ title }}</div>
       <svg 
