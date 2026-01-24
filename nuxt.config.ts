@@ -56,26 +56,5 @@ export default defineNuxtConfig({
     serverBundle: "remote",
   },
 
-  routeRules: {
-    "/": { prerender: true },
-  },
   compatibilityDate: "2024-10-04",
-  scripts: {
-    registry: {
-      rybbitAnalytics: true,
-    }
-  },
-  // you need to provide a runtime config to access the environment variables
-  runtimeConfig: {
-    public: {
-      scripts: {
-        rybbitAnalytics: {
-          // .env
-          // NUXT_PUBLIC_SCRIPTS_RYBBIT_ANALYTICS_SITE_ID=<your-site-id>
-          siteId: ''
-        },
-      },
-    },
-  },
-
 });
