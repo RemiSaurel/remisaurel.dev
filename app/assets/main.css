@@ -1,0 +1,177 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  font-family: "Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+html {
+  overflow-y: scroll;
+  background-color: white;
+}
+
+html.dark {
+  background-color: #0a0a0a; /* neutral-950 */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Base link styles */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Divider line */
+.divider {
+  width: 100%;
+  height: 1px;
+}
+
+/* Section headers */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Typography */
+h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+h3 {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* Code blocks */
+pre {
+  overflow: auto;
+  padding: 1rem;
+}
+
+figcaption {
+  font-size: 0.85rem;
+  font-style: italic;
+  text-align: center;
+}
+
+/* Navigation */
+.nav-link {
+  font-size: 0.85rem;
+}
+
+/* Intro text */
+.intro-text {
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+/* ===========================================
+   Article/Content Styles (Blog Posts)
+   =========================================== */
+
+article {
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+article h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.03em;
+}
+
+article h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+
+article h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+article p {
+  font-size: 1rem;
+  line-height: 1.8;
+  margin-bottom: 1.25rem;
+}
+
+article ul,
+article ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+}
+
+article li {
+  font-size: 1rem;
+  line-height: 1.8;
+  margin-bottom: 0.5rem;
+}
+
+article blockquote {
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  border-left-width: 3px;
+  font-style: italic;
+}
+
+article img {
+  max-width: 100%;
+  height: auto;
+  margin: 1.5rem 0;
+  border-radius: 4px;
+}
+
+article code:not(pre code) {
+  font-size: 0.9em;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+}
+
+article pre {
+  margin: 1.5rem 0;
+  padding: 1.25rem;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  border-radius: 6px;
+}
+
+article hr {
+  margin: 2rem 0;
+  border: none;
+  border-top-width: 1px;
+}

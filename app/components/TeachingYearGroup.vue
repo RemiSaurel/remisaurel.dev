@@ -22,7 +22,7 @@ const sortedYears = Object.keys(groupedTeaching).sort((a, b) => parseInt(b) - pa
 
         <div class="mt-2 flex flex-col gap-3">
             <div v-for="subject in groupedTeaching[year]" :key="subject.subject"
-                class="flex flex-col border border-gray-2 bg-gray-1 gap-4 p-4 rounded-lg dark:bg-zinc-8 transition-all duration-500">
+                class="flex flex-col border border-zinc-2 bg-zinc-1 gap-4 p-4 rounded-lg dark:border-zinc-7 dark:bg-zinc-8">
                 <div class="flex justify-between gap-8 items-baseline">
                     <div class="font-500 text-lg">
                         <a v-if="subject.link" :href="subject.link" target="_blank" rel="noopener noreferrer">

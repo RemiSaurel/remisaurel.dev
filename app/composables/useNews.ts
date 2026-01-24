@@ -33,7 +33,7 @@ export const useNews = () => {
     });
     
     // Define the order as in NewsCategory type
-    const categoryOrder: NewsCategory[] = ["📝 paper", "👨‍💻 project", "👥 conference", "😎 misc"];
+    const categoryOrder: NewsCategory[] = ["paper", "project", "conference", "misc"];
     
     // Filter and sort according to the predefined order
     return categoryOrder.filter(category => categoriesSet.has(category));

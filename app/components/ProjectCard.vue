@@ -19,7 +19,7 @@ const getIconName = (key: string) => {
 
 <template>
   <div
-    class="relative min-w-42 min-h-24 dark:bg-zinc-7 border-t-solid bg-zinc-1/60 border-zinc-1 dark:border-zinc-5 rounded-lg p-4 flex flex-col gap-2 group overflow-clip hover:bg-zinc-2/60 dark:hover:bg-zinc-6 transition-all duration-500"
+    class="relative min-w-42 min-h-24 dark:bg-zinc-7 border-t-solid bg-zinc-1/60 border-zinc-1 dark:border-zinc-5 pt-4 px-4 pb-2 flex flex-col gap-2 group overflow-clip hover:bg-zinc-2/60 dark:hover:bg-zinc-6 transition-all duration-500"
   >
     <div
       class="absolute -top-3 opacity-40 -right-3 -rotate-30 group-hover:-rotate-10 group-hover:translate-x--3 group-hover:translate-y-2 group-hover:opacity-50 group-hover:scale-120 transition-all duration-400 text-5xl"
