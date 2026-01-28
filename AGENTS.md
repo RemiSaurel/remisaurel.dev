@@ -207,5 +207,5 @@ import { motion } from 'motion-v';
 
 1. This is a static site (SSG) - uses `nuxt generate`
 2. No backend API - content is static
-3. Font: "Teachers" from Google Fonts
+3. Font: "Instrument Sans" from Google Fonts
 4. Icons: @iconify-json/logos, @iconify-json/uil via @nuxt/icon

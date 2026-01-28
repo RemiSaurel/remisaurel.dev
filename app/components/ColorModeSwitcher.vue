@@ -2,11 +2,11 @@
 const colorMode = useColorMode();
 
 const toggleColorMode = () => {
-  colorMode.preference = colorMode.value === "light" ? "dark" : "light";
+  colorMode.preference = colorMode.preference === "light" ? "dark" : "light";
 };
 
 // Use colorMode.value to get the actual current mode (resolves 'system' to actual value)
-const isDark = computed(() => colorMode.value === 'dark');
+const isDark = computed(() => colorMode.preference === 'dark');
 </script>
 
 <template>

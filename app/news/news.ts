@@ -13,9 +13,15 @@ interface News {
 
 export const news: News[] = [
     {
+        date: new Date("2026-01-28"),
+        title: "2 papers (1 full, 1 poster) submission, waiting for reviews",
+        content: "Both papers focus on our co-conception methodology with teachers to design Learning Analytics Dashboards.",
+        categories: ["paper"],
+    },
+    {
         date: new Date("2025-12-22"),
         title: "LAK 2026 poster accepted!",
-        content: "Poster about 'Mind the Gap: Benchmarking AI vs. Human in Automatic Short Answer Grading'",
+        content: "Poster about 'Mind the Gap: Benchmarking AI vs. Human in Automatic Short Answer Grading'.",
         categories: ["paper"],
     },
     {
