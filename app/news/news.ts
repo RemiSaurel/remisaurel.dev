@@ -17,6 +17,12 @@ export const news: News[] = [
         title: "2 papers (1 full, 1 poster) submission, waiting for reviews",
         content: "Both papers focus on our co-conception methodology with teachers to design Learning Analytics Dashboards.",
         categories: ["paper"],
+        links: [
+            {
+                text: "Paper",
+                url: "https://hal.science/hal-05481914"
+            }
+        ]
     },
     {
         date: new Date("2025-12-22"),
