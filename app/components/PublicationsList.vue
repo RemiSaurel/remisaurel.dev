@@ -19,7 +19,7 @@ const publications: Publication[] = [
     authors: defaultAuthors,
     subtitle: 'A benchmarking tool for AI systems to evaluate their performance on several configurations (model, prompts, architecture).',
     venue: 'LAK 2026',
-    url: undefined,
+    url: "https://hal.science/hal-05481914",
     image: '/publications/lak2026.jpg'
   },
   {
