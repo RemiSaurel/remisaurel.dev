@@ -80,8 +80,8 @@ const getFirstLink = (item: typeof news[0]) => {
         :key="category"
         class="inline-block text-xs py-1 px-2 border-none cursor-pointer"
         :class="selectedCategory === category 
-          ? ' bg-neutral-800 dark:bg-neutral-100 text-white dark:text-neutral-800' 
-          : ' text-neutral-500 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-800'"
+          ? ' bg-neutral-800 dark:bg-neutral-400 text-white dark:text-neutral-800' 
+          : ' text-neutral-500 dark:bg-neutral-700 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'"
         @click="toggleFilter(category)"
       >
         {{ category }}
