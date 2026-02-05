@@ -13,6 +13,18 @@ interface News {
 
 export const news: News[] = [
     {
+        date: new Date("2026-02-05"),
+        title: "Organization of a workshop with +50 teachers about AI in education with a focus on evaluation",
+        content: "Great experience to discuss with teachers about the evaluation of AI in education. We had a lot of interesting discussions!",
+        categories: ["misc"],
+        links: [
+            {
+                text: "Workshop website",
+                url: "https://atelierjdn.remisaurel.dev/"
+            }
+        ]
+    },
+    {
         date: new Date("2026-01-28"),
         title: "2 papers (1 full, 1 poster) submission, waiting for reviews",
         content: "Both papers focus on our co-conception methodology with teachers to design Learning Analytics Dashboards.",
