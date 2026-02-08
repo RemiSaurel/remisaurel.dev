@@ -11,7 +11,29 @@ export interface Project {
 }
 
 const PROJECTS: Project[] = [
-    {
+  {
+    title: "colleges-france",
+    description:
+      "A dataset of all the colleges in France, with their location and some other information. The data is collected from the official website of the Ministry of Education.",
+    icon: "🗺️",
+    links: {
+      github: "https://github.com/RemiSaurel/colleges-france",
+      demo: "https://remisaurel.github.io/colleges-france/",
+    },
+    date: 2026,
+  },
+  {
+    title: "paper-web",
+    description:
+      "A template to publish scientific papers on the web. Built with Nuxt Content.",
+    icon: "📃",
+    links: {
+      github: "https://github.com/RemiSaurel/paper-web",
+      demo: "https://remisaurel.github.io/paper-web/",
+    },
+    date: 2026,
+  },
+  {
     title: "evalbuddy",
     description:
       "A tool to easily evaluate answers",
@@ -38,7 +60,6 @@ const PROJECTS: Project[] = [
     icon: "🧠",
     links: {
       github: "https://github.com/memoire-app",
-      demo: "https://memoire.cloud",
     },
     date: 2024,
   },
@@ -80,7 +101,6 @@ const PROJECTS: Project[] = [
     icon: "🎮",
     links: {
       github: "https://github.com/datastrike",
-      demo: "https://datastrike.cloud/",
     },
     date: 2024,
   },
