@@ -65,13 +65,13 @@ remisaurel.dev/
 ```vue
 <script setup lang="ts">
 interface MyProps {
-  title: string;
-  count?: number;
+  title: string
+  count?: number
 }
 
-defineProps<MyProps>();
+defineProps<MyProps>()
 
-const { someValue } = useSomeComposable();
+const { someValue } = useSomeComposable()
 </script>
 
 <template>
@@ -91,10 +91,10 @@ const { someValue } = useSomeComposable();
 ```typescript
 // In composables or data files
 export interface NewsItem {
-  date: Date;
-  title: string;
-  content?: string;
-  categories?: NewsCategory[];
+  date: Date
+  title: string
+  content?: string
+  categories?: NewsCategory[]
 }
 ```
 
@@ -106,21 +106,21 @@ export interface NewsItem {
 - Place in `app/composables/` directory for auto-import
 
 ```typescript
-export const useMyFeature = () => {
-  const state = ref<string[]>([]);
-  
-  const derivedValue = computed(() => state.value.length);
-  
+export function useMyFeature() {
+  const state = ref<string[]>([])
+
+  const derivedValue = computed(() => state.value.length)
+
   function doSomething() {
     // implementation
   }
-  
+
   return {
     state,
     derivedValue,
     doSomething,
-  };
-};
+  }
+}
 ```
 
 ### Styling with UnoCSS
@@ -151,7 +151,7 @@ export const useMyFeature = () => {
 
 ```vue
 <script setup lang="ts">
-import { motion } from 'motion-v';
+import { motion } from 'motion-v'
 </script>
 
 <template>

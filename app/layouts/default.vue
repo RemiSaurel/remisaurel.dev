@@ -1,25 +1,26 @@
 <script setup lang="ts">
-import { motion } from 'motion-v';
+import { motion } from 'motion-v'
 
-const route = useRoute();
+const route = useRoute()
 
 const navItems = [
   { route: '/', label: 'About' },
   { route: '/posts', label: 'Posts' },
   { route: '/projects', label: 'Projects' },
-];
+]
 
-const isActive = (path: string) => {
-  if (path === '/') return route.path === '/';
-  return route.path.startsWith(path);
-};
+function isActive(path: string) {
+  if (path === '/')
+    return route.path === '/'
+  return route.path.startsWith(path)
+}
 </script>
 
 <template>
-  <div class="min-h-screen bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">
+  <div class="min-h-screen bg-white text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100">
     <!-- Navigation -->
     <nav class="border-b border-neutral-200 dark:border-neutral-800">
-      <div class="max-w-7xl mx-auto px-6 py-4">
+      <div class="mx-auto max-w-7xl px-6 py-4">
         <div class="flex items-center justify-between">
           <!-- Logo/Name -->
           <motion.div
@@ -64,13 +65,13 @@ const isActive = (path: string) => {
     </nav>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-6 py-12">
+    <main class="mx-auto max-w-7xl px-6 py-12">
       <slot />
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-neutral-200 dark:border-neutral-800 mt-auto">
-      <div class="max-w-7xl mx-auto px-6 py-6">
+    <footer class="mt-auto border-t border-neutral-200 dark:border-neutral-800">
+      <div class="mx-auto max-w-7xl px-6 py-6">
         <p class="text-xs text-neutral-400 dark:text-neutral-600">
           &copy; {{ new Date().getFullYear() }} Rémi Saurel
         </p>

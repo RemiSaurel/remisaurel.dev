@@ -1,52 +1,53 @@
 <script setup lang="ts">
 defineProps<{
-  type: "info" | "warning" | "danger" | "note" | "important";
-}>();
+  type: 'info' | 'warning' | 'danger' | 'note' | 'important'
+}>()
 
 const color = {
-  info: "border-blue-500",
-  warning: "border-yellow-500",
-  danger: "border-red-500",
-  note: "border-green-500",
-  important: "border-purple-500",
-};
+  info: 'border-blue-500',
+  warning: 'border-yellow-500',
+  danger: 'border-red-500',
+  note: 'border-green-500',
+  important: 'border-purple-500',
+}
 
 const icon = {
   info: {
-    name: "uil:info-circle",
-    color: "text-blue-500",
+    name: 'uil:info-circle',
+    color: 'text-blue-500',
   },
   warning: {
-    name: "uil:exclamation-triangle",
-    color: "text-yellow-600",
+    name: 'uil:exclamation-triangle',
+    color: 'text-yellow-600',
   },
   danger: {
-    name: "uil:exclamation-octagon",
-    color: "text-red-600",
+    name: 'uil:exclamation-octagon',
+    color: 'text-red-600',
   },
   note: {
-    name: "uil:pen",
-    color: "text-green-600",
+    name: 'uil:pen',
+    color: 'text-green-600',
   },
   important: {
-    name: "uil:star",
-    color: "text-purple-600",
+    name: 'uil:star',
+    color: 'text-purple-600',
   },
-};
+}
 
-const formatTitle = (type: string) => {
-  return type.charAt(0).toUpperCase() + type.slice(1);
-};
+function formatTitle(type: string) {
+  return type.charAt(0).toUpperCase() + type.slice(1)
+}
 </script>
+
 <template>
-  <div class="border-l-solid border-3 m-0 my-6" :class="color[type]">
-    <div class="flex gap-2 pl-4 pb-2 items-center">
+  <div class="m-0 my-6 border-3 border-l-solid" :class="color[type]">
+    <div class="flex items-center gap-2 pb-2 pl-4">
       <Icon :name="icon[type].name" :class="icon[type].color" />
       <span class="font-semibold" :class="icon[type].color">{{
         formatTitle(type)
-        }}</span>
+      }}</span>
     </div>
-    <blockquote class="m-0 px-4 opacity-70 font-300">
+    <blockquote class="m-0 px-4 font-300 opacity-70">
       <ContentSlot :use="$slots.default" unwrap="p" />
     </blockquote>
   </div>

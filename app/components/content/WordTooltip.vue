@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { ref } from "vue"; // Import ref to track hover state
+import { ref } from 'vue' // Import ref to track hover state
 
 defineProps<{
-  tooltip: string;
-}>();
+  tooltip: string
+}>()
 
-const isHovering = ref(false);
+const isHovering = ref(false)
 </script>
 
 <template>
   <ClientOnly>
-    <div class="inline-flex relative">
+    <div class="relative inline-flex">
       <Transition name="fade-slide" appear>
         <div
           v-if="isHovering"
@@ -18,7 +18,7 @@ const isHovering = ref(false);
           style="left: 50%; transform: translateX(-50%)"
         >
           <div
-            class="bg-zinc-500 dark:bg-zinc-700 text-zinc-100 dark:text-zinc-200 text-xs p-2 rounded-md shadow-md"
+            class="rounded-md bg-zinc-500 p-2 text-xs text-zinc-100 shadow-md dark:bg-zinc-700 dark:text-zinc-200"
           >
             {{ tooltip }}
           </div>
@@ -27,7 +27,7 @@ const isHovering = ref(false);
 
       <!-- Hoverable element -->
       <span
-        class="text-zinc-500 dark:text-zinc-400 relative"
+        class="relative text-zinc-500 dark:text-zinc-400"
         @mouseover="isHovering = true"
         @mouseleave="isHovering = false"
       >

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 useSeoMeta({
-  ogImage: "/blog.png",
-});
+  ogImage: '/blog.png',
+})
 </script>
 
 <template>

@@ -1,17 +1,8 @@
-<template>
-  <span class="text-sm mb-1 text-gray-500 dark:text-gray-400">{{
-    filename
-  }}</span>
-  <div class="p-1 px-4 mt-1 bg-zinc-1 dark:bg-zinc-800 rounded">
-    <pre :class="$props.class"><slot /></pre>
-  </div>
-</template>
-
 <script setup lang="ts">
 defineProps({
   code: {
     type: String,
-    default: "",
+    default: '',
   },
   language: {
     type: String,
@@ -37,8 +28,17 @@ defineProps({
     type: Object,
     default: null,
   },
-});
+})
 </script>
+
+<template>
+  <span class="mb-1 text-sm text-gray-500 dark:text-gray-400">{{
+    filename
+  }}</span>
+  <div class="mt-1 rounded bg-zinc-1 p-1 px-4 dark:bg-zinc-800">
+    <pre :class="$props.class"><slot /></pre>
+  </div>
+</template>
 
 <style>
 pre code .line {

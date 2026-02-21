@@ -57,16 +57,12 @@ Due to anonymity reasons, I can't share or talk about the content of the paper. 
 
 ## From divergence to convergence
 
-I think one of the main difficulty in the writing exercise has been to quickly switch from a divergent way of thinking (by exploring different papers and ideas) to a convergent way (by identifying gaps in the literature and proposing positions). This writing exercise was really helpful and I learned a lot from it. 
+I think one of the main difficulty in the writing exercise has been to quickly switch from a divergent way of thinking (by exploring different papers and ideas) to a convergent way (by identifying gaps in the literature and proposing positions). This writing exercise was really helpful and I learned a lot from it.
 
 If I had the opportunity to go back 2 years ago, I'd probably focus more on writing exercises. I felt I had lacked practice in this area. I think it's really important to be able to write effectively and efficiently while being able to convey strong messages in a clear way. Reading papers helps you find out formulas, expressions or a basis for your writing. But I think practicing writing is **really** important.
 
 # Teaching experience
-During this period, I also had the opportunity to teach a course on :tag{color="wine"}[Kotlin] and :tag{color="green"}[Spring Boot] to 3rd year students. It was a really interesting experience and definitely something I'd like to do again. 
-
-::blockquote{type="info"}
-You can find all my teaching experience on my <ProseA href="/teaching">teaching page</ProseA>.
-::
+During this period, I also had the opportunity to teach a course on :tag{color="wine"}[Kotlin] and :tag{color="green"}[Spring Boot] to 3rd year students. It was a really interesting experience and definitely something I'd like to do again.
 
 I've always liked the "learning by teaching". During my first university years, I had the opportunity to participate in tutoring sessions. I really liked it and I think it helped me a lot in my learning process. I think it's a great way to learn and to understand concepts.
 

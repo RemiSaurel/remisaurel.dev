@@ -23,8 +23,8 @@ I'll also be able to share code snippets, and maybe some projects I'm working on
 Here's an example of a code snippet:
 
 ```js [main.js]
-const hello = "world";
-console.log(hello);
+const hello = 'world'
+console.log(hello)
 ```
 
 # When ?

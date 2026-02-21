@@ -1,14 +1,14 @@
-export const useFirstVisit = () => {
-  const hasVisited = useState('hasVisited', () => false);
-  
-  const isFirstVisit = computed(() => !hasVisited.value);
-  
+export function useFirstVisit() {
+  const hasVisited = useState('hasVisited', () => false)
+
+  const isFirstVisit = computed(() => !hasVisited.value)
+
   const markAsVisited = () => {
-    hasVisited.value = true;
-  };
-  
+    hasVisited.value = true
+  }
+
   return {
     isFirstVisit,
-    markAsVisited
-  };
-};
+    markAsVisited,
+  }
+}

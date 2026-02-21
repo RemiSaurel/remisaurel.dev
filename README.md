@@ -2,7 +2,7 @@
 
 My portfolio / blog built with Nuxt and Nuxt content.
 
-Inspiration: 
+Inspiration:
 - [Estbéan Soubiran website](https://soubiran.dev/)
 - [Anthony Fu website](https://antfu.me/)
 - [Julien Ripouteau website](https://julr.dev/projects)

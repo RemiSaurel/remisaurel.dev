@@ -22,12 +22,11 @@ Timeline was as follows:
 - **June 12**: 2nd day of paper presentations. José and Luis from our [TALENT team](https://irit.fr/TALENT/site) also presented their paper that had been accepted. The evening was dedicated to a social event with a dinner in the city center.
 - **June 13**: Last day of the conference, with a few more paper presentations and a keynote by Engin Bumbacher.
 
-
 I particularly enjoyed the keynote by :icon-link{icon-name='i-academicons:google-scholar' route='https://scholar.google.com/citations?user=yu5GSC4AAAAJ&hl=en' external}[Engin Bumbacher] about "The design of pedagogical tools as a mediator between learning theories and teachers". Although the learning theories are still a bit abstract for me, I found the talk very interesting and it gave me some ideas for my future work.
 
 ## Our paper
 
-I presented  [our paper](https://hal.science/hal-05070808/) on the Responsible Integration of Generative AI in Education, which was a **position paper**. After identifying 3 trends on GenAI in Education (1. Use of GenAI is increasing, especially on student side; 2. The gap between students and teachers on GenAI use is widening; 3. Students use GenAI in a context not controlled by teachers and not always by their parents.), we proposed an integration of risk management in the design of GenAI tools for education applied to my PhD project on Konsolidation Dashboards (KDo). 
+I presented  [our paper](https://hal.science/hal-05070808/) on the Responsible Integration of Generative AI in Education, which was a **position paper**. After identifying 3 trends on GenAI in Education (1. Use of GenAI is increasing, especially on student side; 2. The gap between students and teachers on GenAI use is widening; 3. Students use GenAI in a context not controlled by teachers and not always by their parents.), we proposed an integration of risk management in the design of GenAI tools for education applied to my PhD project on Konsolidation Dashboards (KDo).
 
 A contribution was also the Enriched Design-Based Research (DBR) (see figure below). This enriched-DBR contribution has been added to next papers. The one I presented at EIAH 2025 was still in an early stage and it was not yet fully integrated.
 
@@ -37,7 +36,7 @@ It was kind of unexpected to have a position paper accepted since we didn't see 
 
 # Retro
 
-Now, let's talk about the conference experience itself. Although it was my first conference, I felt quite comfortable. I had the opportunity to meet many people, PhD students / postdocs / researchers from different universities and research labs, and I was able to discuss my work with them. 
+Now, let's talk about the conference experience itself. Although it was my first conference, I felt quite comfortable. I had the opportunity to meet many people, PhD students / postdocs / researchers from different universities and research labs, and I was able to discuss my work with them.
 Networking was a key aspect of the conference, and I was able to exchange ideas and experiences with other researchers from different fields and backgrounds, which was very enriching.
 
 The first day on the workshops was a bit weird, activity-wise. I think I didn't got lucky on the ones I attended since both had some techical issues resulting in delay and not doing the activities as planned. It was still a great introduction to the conference, people and the first discussions.

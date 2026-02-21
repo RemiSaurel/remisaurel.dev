@@ -1,40 +1,40 @@
 <script setup lang="ts">
-import type { Project } from "~/pages/projects/index.vue";
+import type { Project } from '~/pages/projects/index.vue'
 
 defineProps<{
-  project: Project;
-}>();
+  project: Project
+}>()
 
-const getIconName = (key: string) => {
+function getIconName(key: string) {
   switch (key) {
-    case "github":
-      return "lucide:github";
-    case "demo":
-      return "lucide:globe";
+    case 'github':
+      return 'lucide:github'
+    case 'demo':
+      return 'lucide:globe'
     default:
-      return "";
+      return ''
   }
-};
+}
 </script>
 
 <template>
   <div
-    class="relative min-w-42 min-h-24 dark:bg-zinc-7 border-t-solid bg-zinc-1/60 border-zinc-1 dark:border-zinc-5 pt-4 px-4 pb-2 flex flex-col gap-2 group overflow-clip hover:bg-zinc-2/60 dark:hover:bg-zinc-6 transition-all duration-500"
+    class="group relative min-h-24 min-w-42 flex flex-col gap-2 overflow-clip border-zinc-1 border-t-solid bg-zinc-1/60 px-4 pb-2 pt-4 transition-all duration-500 dark:border-zinc-5 dark:bg-zinc-7 hover:bg-zinc-2/60 dark:hover:bg-zinc-6"
   >
     <div
-      class="absolute -top-3 opacity-40 -right-3 -rotate-30 group-hover:-rotate-10 group-hover:translate-x--3 group-hover:translate-y-2 group-hover:opacity-50 group-hover:scale-120 transition-all duration-400 text-5xl"
+      class="absolute text-5xl opacity-40 transition-all duration-400 -right-3 -top-3 group-hover:translate-x--3 group-hover:translate-y-2 -rotate-30 group-hover:scale-120 group-hover:opacity-50 group-hover:-rotate-10"
     >
       {{ project.icon }}
     </div>
-    <div class="flex flex-col gap-8 justify-between h-full">
+    <div class="h-full flex flex-col justify-between gap-8">
       <div
-        class="flex flex-col gap-2 justify-between dark:text-zinc-3 text-zinc-5 group-hover:text-zinc-8 dark:group-hover:text-zinc-1 transition-all duration-500"
+        class="flex flex-col justify-between gap-2 text-zinc-5 transition-all duration-500 dark:text-zinc-3 group-hover:text-zinc-8 dark:group-hover:text-zinc-1"
       >
-        <h2 class="text-xl font-semibold m-0">
+        <h2 class="m-0 text-xl font-semibold">
           {{ project.title }}
         </h2>
 
-        <div class="flex opacity-70 text-sm leading-tight">
+        <div class="flex text-sm leading-tight opacity-70">
           {{ project.description }}
         </div>
       </div>
@@ -49,12 +49,12 @@ const getIconName = (key: string) => {
             :key="key"
             :href="link"
             target="_blank"
-            class="hover:text-zinc-700 dark:hover:text-zinc-2 transition"
+            class="transition hover:text-zinc-700 dark:hover:text-zinc-2"
           >
             <Icon :name="getIconName(key)" class="size-5" />
           </a>
         </div>
-        <div class="ml-auto" v-else></div>
+        <div v-else class="ml-auto" />
         <div>
           {{ project.date }}
         </div>
