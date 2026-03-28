@@ -13,6 +13,18 @@ interface News {
 
 export const news: News[] = [
   {
+    date: new Date('2026-03-20'),
+    title: 'Learners & Teachers focus groups on the 1st experiment on Konsolidation',
+    content: 'Preparation of focus groups (will take place between March and April 2026) with teachers and learners (aged 13-14) to gather their feedback on the first experiment of Konsolidation.',
+    categories: ['project', 'misc'],
+  },
+  {
+    date: new Date('2026-03-28'),
+    title: 'Long Paper accepted (with maximum score) at RJC EIAH 2026!',
+    content: 'Paper will soon be available on HAL. We propose a dual-approach to co-design Learning Analytics Dashboards.',
+    categories: ['paper'],
+  },
+  {
     date: new Date('2026-02-05'),
     title: 'Organization of a workshop with +50 teachers about AI in education with a focus on evaluation',
     content: 'Great experience to discuss with teachers about the evaluation of AI in education. We had a lot of interesting discussions!',
@@ -203,6 +215,7 @@ export const news: News[] = [
   {
     date: new Date('2024-12-04'),
     title: 'Reading mode: activated',
+    content: 'I am reading a lot of papers to get a better understanding of the state of the art in Learning Analytics and AI in education. I am also trying to find some inspiration for my future research.',
     categories: ['misc'],
   },
   {
