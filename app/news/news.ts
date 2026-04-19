@@ -105,7 +105,7 @@ export const news: News[] = [
       },
       {
         text: 'Website',
-        url: 'https://evalbuddy.nuxt.dev/',
+        url: 'https://evalbuddy.remisaurel.dev/',
       },
     ],
   },

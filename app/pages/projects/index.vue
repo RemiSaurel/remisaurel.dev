@@ -51,7 +51,7 @@ const PROJECTS: Project[] = [
     icon: '🧑‍🏫',
     links: {
       github: 'https://github.com/RemiSaurel/evalbuddy',
-      demo: 'https://evalbuddy.nuxt.dev',
+      demo: 'https://evalbuddy.remisaurel.dev/',
     },
     date: 2025,
   },
