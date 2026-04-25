@@ -13,6 +13,14 @@ const defaultAuthors = ['Rémi Saurel', 'Franck Silvestre', 'Jean-Baptiste Racle
 
 export const publications: Publication[] = [
   {
+    date: 'Jun. 2026',
+    title: 'Une double approche pour la co-conception de tableaux de bord d\'apprentissage : validation avec des prototypes, exploration avec un chatbot',
+    authors: ['Rémi Saurel', 'Esther Félix', 'Franck Silvestre', 'Jean-Baptiste Raclet', 'Emmanuel Lescure'],
+    subtitle: 'An approach combining prototype validation and chatbot exploration to co-design Learning Analytics Dashboards with teachers.',
+    venue: 'RJC EIAH 2026',
+    image: '/publications/rjceiah2026.avif',
+  },
+  {
     date: 'Apr. 2026',
     title: 'Mind the Gap: Benchmarking AI vs. Human in Automatic Short Answer Grading',
     authors: defaultAuthors,
@@ -33,7 +41,7 @@ export const publications: Publication[] = [
   },
   {
     date: 'Jun. 2025',
-    title: 'Responsible Integration of Generative AI in Education: Proposal for a Strategic Action Plan Guided by Ethical Risk Considerations',
+    title: 'Intégration responsable de l\'IA Générative dans l\'Éducation : proposition d\'un plan d\'actions stratégiques dirigé par les risques liés aux questions éthiques',
     authors: defaultAuthors,
     subtitle: 'A strategic action plan for the responsible integration of generative AI in educational contexts, addressing ethical risks and challenges.',
     venue: 'EIAH 2025',

@@ -13,6 +13,12 @@ interface News {
 
 export const news: News[] = [
   {
+    date: new Date('2026-04-25'),
+    title: 'First experiment on Konsolidation / KDo is coming to an end!',
+    content: 'Currently analyzing the data collected during the first experiment on Konsolidation. We will soon have some interesting insights to share!',
+    categories: ['project', 'misc'],
+  },
+  {
     date: new Date('2026-03-20'),
     title: 'Learners & Teachers focus groups on the 1st experiment on Konsolidation',
     content: 'Preparation of focus groups (will take place between March and April 2026) with teachers and learners (aged 13-14) to gather their feedback on the first experiment of Konsolidation.',
