@@ -40,6 +40,9 @@ export default defineNuxtConfig({
         'vue',
       ],
     },
+    experimental: {
+      sqlite: false
+    }
   },
 
   css: ['~/assets/main.css'],
