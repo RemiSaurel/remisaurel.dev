@@ -12,6 +12,18 @@ interface News {
 }
 
 export const news: News[] = [
+    {
+    date: new Date('2026-05-01'),
+    title: 'Went to the LAK26 conference in Bergen, Norway!',
+    content: 'Amazing first time at LAK! I had the opportunity to present a poster about our work on automatic short answer grading, attend interesting talks, and meet many people. More details on a blog post.',
+    categories: ['conference'],
+    links: [
+      {
+        text: 'LAK website',
+        url: 'https://www.solaresearch.org/events/lak/lak26/',
+      },
+    ],
+  },
   {
     date: new Date('2026-04-25'),
     title: 'First experiment on Konsolidation / KDo is coming to an end!',

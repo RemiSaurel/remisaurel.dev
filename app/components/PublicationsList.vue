@@ -86,7 +86,7 @@ function formatAuthors(authors: string[]) {
           </div>
         </div>
 
-        <div class="flex items-center gap-2 pt-1">
+        <div class="flex items-center gap-2">
           <span class="border border-neutral-300 px-1.5 py-0.5 text-xs text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">{{ pub.venue }}</span>
           <svg
             class="h-2.5 w-2.5 transition-all duration-300"
