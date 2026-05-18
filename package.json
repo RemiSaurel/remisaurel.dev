@@ -14,7 +14,6 @@
     "@nuxt/icon": "^2.2.0",
     "@nuxt/image": "^2.0.0",
     "@nuxtjs/color-mode": "^4.0.0",
-    "better-sqlite3": "^12.10.0",
     "motion-v": "1.1.0-alpha.1",
     "nuxt": "^4.4.6"
   },
