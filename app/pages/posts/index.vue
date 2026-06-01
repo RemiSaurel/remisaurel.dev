@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { ParsedContent } from '@nuxt/content'
-
 useSeoMeta({
   title: 'RemiSaurel',
   ogTitle: 'RemiSaurel',
@@ -9,53 +7,29 @@ useSeoMeta({
   twitterCard: 'summary_large_image',
 })
 
-const { data } = await useAsyncData('navigation', () =>
-  queryContent('/').find())
-
-// Get all unique MM/YY from the projects
-const monthYears = ref<string[]>([])
-
-onMounted(() => {
-  if (!data.value)
-    return
-  data.value.forEach((project) => {
-    const date = new Date(project.date)
-    const monthYear = `${date.getMonth() + 1}/${date
-      .getFullYear()
-      .toString()
-      .slice(2)}`
-    if (!monthYears.value.includes(monthYear)) {
-      monthYears.value.push(monthYear)
-    }
-  })
-})
+const { data } = await useAsyncData('posts', () =>
+  queryCollection('posts').all())
 
 // Create an array of projects grouped by MM/YY
 const projects = computed(() => {
   if (!data.value)
     return []
-  const projects = data.value.map(project => ({
-    ...project,
-  }))
 
-  // Sort projects by date
-  projects.sort((a, b) => {
-    const dateA = new Date(a.date)
-    const dateB = new Date(b.date)
-    return dateB.getTime() - dateA.getTime()
+  const sorted = [...data.value].sort((a, b) => {
+    return new Date(b.date).getTime() - new Date(a.date).getTime()
   })
 
-  const groupedProjects = projects.reduce((acc, project: ParsedContent) => {
-    const date = new Date(project.date)
+  const groupedProjects = sorted.reduce((acc, post) => {
+    const date = new Date(post.date)
     const monthYear = `${String(date.getMonth() + 1).padStart(2, '0')}/${date
       .getFullYear()
       .toString()
       .slice(2)}`
     if (!acc[monthYear])
       acc[monthYear] = []
-    acc[monthYear].push(project)
+    acc[monthYear].push(post)
     return acc
-  }, {} as Record<string, ParsedContent[]>)
+  }, {} as Record<string, typeof sorted>)
 
   return Object.entries(groupedProjects).map(([monthYear, projects]) => ({
     monthYear,
@@ -83,11 +57,11 @@ const projects = computed(() => {
           {{ group.monthYear }}
         </h2>
         <div class="flex flex-col gap-2">
-          <div v-for="p in group.projects" :key="p._path">
+          <div v-for="p in group.projects" :key="p.path">
             <PostLine
-              :to="p._path!"
-              :title="p.title!"
-              :description="p.description!"
+              :to="p.path"
+              :title="p.title"
+              :description="p.description"
               :disabled="p.disabled"
             />
           </div>

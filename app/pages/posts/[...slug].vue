@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const route = useRoute()
 const headings = ref<{ level: number, text: string, anchor: string }[]>([])
 
 function slugify(text: string) {
@@ -9,6 +10,10 @@ function slugify(text: string) {
 }
 
 const showToC = ref(false)
+
+const { data: page } = await useAsyncData(route.path, () => {
+  return queryCollection('posts').path(route.path).first()
+})
 
 onMounted(() => {
   const allHeadings = document.querySelectorAll('h1, h2, h3')
@@ -51,14 +56,12 @@ function to(anchor: string) {
 <template>
   <div>
     <main>
-      <ContentDoc v-slot="{ doc }">
-        <article class="leading-6">
-          <h1 class="mb-4 text-4xl">
-            {{ doc.title }}
-          </h1>
-          <ContentRenderer :value="doc" />
-        </article>
-      </ContentDoc>
+      <article v-if="page" class="leading-6">
+        <h1 class="mb-4 text-4xl">
+          {{ page.title }}
+        </h1>
+        <ContentRenderer :value="page" />
+      </article>
     </main>
   </div>
 </template>

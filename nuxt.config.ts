@@ -21,24 +21,28 @@ export default defineNuxtConfig({
   },
 
   content: {
-    highlight: {
-      theme: {
-        default: 'catppuccin-latte',
-        dark: 'catppuccin-mocha',
+    build: {
+      markdown: {
+        highlight: {
+          theme: {
+            default: 'catppuccin-latte',
+            dark: 'catppuccin-mocha',
+          },
+          langs: [
+            'c',
+            'cpp',
+            'css',
+            'java',
+            'javascript',
+            'html',
+            'python',
+            'sql',
+            'typescript',
+            'typst',
+            'vue',
+          ],
+        },
       },
-      langs: [
-        'c',
-        'cpp',
-        'css',
-        'java',
-        'javascript',
-        'html',
-        'python',
-        'sql',
-        'typescript',
-        'typst',
-        'vue',
-      ],
     },
     experimental: { sqliteConnector: 'native' },
   },
