@@ -18,6 +18,7 @@ export const publications: Publication[] = [
     authors: ['Rémi Saurel', 'Esther Félix', 'Franck Silvestre', 'Jean-Baptiste Raclet', 'Emmanuel Lescure'],
     subtitle: 'An approach combining prototype validation and chatbot exploration to co-design Learning Analytics Dashboards with teachers.',
     venue: 'RJC EIAH 2026',
+    url: "https://hal.science/hal-05641999",
     image: '/publications/rjceiah2026.avif',
   },
   {
