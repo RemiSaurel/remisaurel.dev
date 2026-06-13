@@ -5,7 +5,7 @@ interface Props {
   animate?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   animate: true,
 })
 
@@ -16,9 +16,24 @@ const socialLinks = [
   { icon: 'i-simple-icons-x', url: 'https://twitter.com/remisaurel', label: 'X' },
 ]
 
+const socialHover = useMotionHover({ scale: 1.08, y: -2 })
+
 const transition = {
   duration: 0.6,
   ease: [0.25, 0.46, 0.45, 0.94],
+}
+
+const { prefersReducedMotion } = usePrefersReducedMotion()
+
+const computedTransition = (delay: number) => {
+  if (prefersReducedMotion.value) {
+    return { duration: 0 }
+  }
+  return props.animate ? { ...transition, delay } : { duration: 0 }
+}
+
+const computedInitial = (y: number) => {
+  return props.animate && !prefersReducedMotion.value ? { opacity: 0, y } : { opacity: 1, y: 0 }
 }
 </script>
 
@@ -26,9 +41,9 @@ const transition = {
   <aside class="relative lg:sticky lg:top-8">
     <!-- Mobile: Horizontal layout with large photo -->
     <motion.div
-      :initial="animate ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }"
+      :initial="computedInitial(15)"
       :animate="{ opacity: 1, y: 0 }"
-      :transition="animate ? { ...transition, delay: 0.1 } : { duration: 0 }"
+      :transition="computedTransition(0.1)"
       class="lg:hidden"
     >
       <div class="flex items-start gap-4">
@@ -58,17 +73,19 @@ const transition = {
 
       <!-- Social links below -->
       <div class="mt-4 flex items-center gap-2">
-        <a
+        <motion.a
           v-for="link in socialLinks"
           :key="link.url"
           :href="link.url"
           target="_blank"
           rel="noopener noreferrer"
           :aria-label="link.label"
-          class="size-8 inline-flex items-center justify-center border border-neutral-300 dark:border-neutral-700 hover:border-neutral-900 hover:bg-neutral-900 hover:text-white dark:hover:border-neutral-100 dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
+          class="pressable size-8 inline-flex items-center justify-center border border-neutral-300 dark:border-neutral-700 hover:border-neutral-900 hover:bg-neutral-900 hover:text-white dark:hover:border-neutral-100 dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
+          :while-hover="socialHover"
+          :transition="{ type: 'spring', stiffness: 400, damping: 17 }"
         >
           <Icon :name="link.icon" class="size-4" />
-        </a>
+        </motion.a>
       </div>
     </motion.div>
 
@@ -76,22 +93,22 @@ const transition = {
     <div class="hidden flex-col gap-3 lg:flex">
       <!-- Photo -->
       <motion.div
-        :initial="animate ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }"
+        :initial="computedInitial(15)"
         :animate="{ opacity: 1, y: 0 }"
-        :transition="animate ? { ...transition, delay: 0.1 } : { duration: 0 }"
+        :transition="computedTransition(0.1)"
       >
         <NuxtImg
           src="/photo.png"
           alt="Rémi Saurel"
-          class="hover:grayscale max-w-48 w-full transition-filter duration-300"
+          class="hover:grayscale hover:scale-[1.02] max-w-48 w-full transition-all duration-300"
         />
       </motion.div>
 
       <!-- Name & Title -->
       <motion.div
-        :initial="animate ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }"
+        :initial="computedInitial(15)"
         :animate="{ opacity: 1, y: 0 }"
-        :transition="animate ? { ...transition, delay: 0.2 } : { duration: 0 }"
+        :transition="computedTransition(0.2)"
         class="flex flex-col gap-0.5"
       >
         <h1 class="m-0 text-lg font-medium tracking-tight">
@@ -104,9 +121,9 @@ const transition = {
 
       <!-- Contact -->
       <motion.div
-        :initial="animate ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }"
+        :initial="computedInitial(15)"
         :animate="{ opacity: 1, y: 0 }"
-        :transition="animate ? { ...transition, delay: 0.25 } : { duration: 0 }"
+        :transition="computedTransition(0.25)"
         class="flex flex-col gap-1"
       >
         <span class="text-sm text-neutral-500 dark:text-neutral-400">
@@ -116,22 +133,24 @@ const transition = {
 
       <!-- Social Links -->
       <motion.div
-        :initial="animate ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }"
+        :initial="computedInitial(15)"
         :animate="{ opacity: 1, y: 0 }"
-        :transition="animate ? { ...transition, delay: 0.3 } : { duration: 0 }"
+        :transition="computedTransition(0.3)"
         class="flex gap-2"
       >
-        <a
+        <motion.a
           v-for="link in socialLinks"
           :key="link.url"
           :href="link.url"
           target="_blank"
           rel="noopener noreferrer"
           :aria-label="link.label"
-          class="size-8 inline-flex items-center justify-center border border-neutral-300 dark:border-neutral-700 hover:border-neutral-900 hover:bg-neutral-900 hover:text-white dark:hover:border-neutral-100 dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
+          class="pressable size-8 inline-flex items-center justify-center border border-neutral-300 dark:border-neutral-700 hover:border-neutral-900 hover:bg-neutral-900 hover:text-white dark:hover:border-neutral-100 dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
+          :while-hover="socialHover"
+          :transition="{ type: 'spring', stiffness: 400, damping: 17 }"
         >
           <Icon :name="link.icon" class="size-4" />
-        </a>
+        </motion.a>
       </motion.div>
     </div>
   </aside>

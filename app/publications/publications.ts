@@ -16,6 +16,7 @@ export const publications: Publication[] = [
     date: 'Jun. 2026',
     title: 'Une double approche pour la co-conception de tableaux de bord d\'apprentissage : validation avec des prototypes, exploration avec un chatbot',
     authors: ['Rémi Saurel', 'Esther Félix', 'Franck Silvestre', 'Jean-Baptiste Raclet', 'Emmanuel Lescure'],
+    award: '🏆 Best Paper Nominee',
     subtitle: 'An approach combining prototype validation and chatbot exploration to co-design Learning Analytics Dashboards with teachers.',
     venue: 'RJC EIAH 2026',
     url: "https://hal.science/hal-05641999",

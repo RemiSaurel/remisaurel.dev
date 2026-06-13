@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { motion } from 'motion-v'
+
+const { prefersReducedMotion } = usePrefersReducedMotion()
+
 export interface Project {
   title: string
   description: string
@@ -218,7 +222,16 @@ const projectList = computed(() => {
       </div>
     </div>
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
-      <ProjectCard v-for="project in projectList" :key="project.title" :project="project" />
+      <motion.div
+        v-for="(project, index) in projectList"
+        :key="project.title"
+        :initial="prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }"
+        :while-in-view="prefersReducedMotion ? undefined : { opacity: 1, y: 0 }"
+        :viewport="{ once: true, margin: '-50px' }"
+        :transition="prefersReducedMotion ? { duration: 0 } : { duration: 0.5, delay: index * 0.05, ease: [0.23, 1, 0.32, 1] }"
+      >
+        <ProjectCard :project="project" />
+      </motion.div>
     </div>
   </div>
 </template>

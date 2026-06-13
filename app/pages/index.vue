@@ -24,6 +24,8 @@ const transition = {
   duration: 0.6,
   ease: [0.25, 0.46, 0.45, 0.94],
 }
+
+const { prefersReducedMotion } = usePrefersReducedMotion()
 </script>
 
 <template>
@@ -36,20 +38,20 @@ const transition = {
       <!-- Intro Section -->
       <ContentSection :animate="animate" :delay="0.3">
         <motion.p
-          :initial="animate ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }"
+          :initial="(animate.value && !prefersReducedMotion.value) ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }"
           :animate="{ opacity: 1, y: 0 }"
-          :transition="animate ? { ...transition, delay: 0.4 } : { duration: 0 }"
+          :transition="prefersReducedMotion.value ? { duration: 0 } : (animate.value ? { ...transition, delay: 0.4 } : { duration: 0 })"
           class="intro-text"
         >
           French PhD student at the
-          <a href="https://www.irit.fr/" target="_blank" class="intro-link">IRIT</a> lab in Toulouse, working in the
-          <a href="https://www.irit.fr/TALENT/site/" target="_blank" class="intro-link">TALENT</a> team, in collaboration with
-          <a href="https://www.kosmos-education.com/" target="_blank" class="intro-link">Kosmos Education</a>.
+          <a href="https://www.irit.fr/" target="_blank" class="intro-link pressable">IRIT</a> lab in Toulouse, working in the
+          <a href="https://www.irit.fr/TALENT/site/" target="_blank" class="intro-link pressable">TALENT</a> team, in collaboration with
+          <a href="https://www.kosmos-education.com/" target="_blank" class="intro-link pressable">Kosmos Education</a>.
         </motion.p>
         <motion.p
-          :initial="animate ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }"
+          :initial="(animate.value && !prefersReducedMotion.value) ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }"
           :animate="{ opacity: 1, y: 0 }"
-          :transition="animate ? { ...transition, delay: 0.5 } : { duration: 0 }"
+          :transition="prefersReducedMotion.value ? { duration: 0 } : (animate.value ? { ...transition, delay: 0.5 } : { duration: 0 })"
           class="mt-4 text-zinc-500 dark:text-zinc-400"
         >
           I develop dashboards powered by AI and learning analytics to help teachers

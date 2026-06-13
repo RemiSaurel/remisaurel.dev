@@ -50,15 +50,17 @@ export default defineNuxtConfig({
   css: ['~/assets/main.css'],
   devtools: { enabled: true },
   modules: [
+    '@nuxt/ui',
     '@nuxt/content',
     '@unocss/nuxt',
-    '@nuxtjs/color-mode',
-    '@nuxt/icon',
     '@nuxt/image',
     'motion-v/nuxt',
   ],
   icon: {
     serverBundle: 'remote',
+  },
+  ui: {
+    fonts: false,
   },
 
   compatibilityDate: '2024-10-04',

@@ -23,7 +23,7 @@ function formatAuthors(authors: string[]) {
       :href="hasLink(pub) ? pub.url : undefined"
       :target="hasLink(pub) ? '_blank' : undefined"
       :rel="hasLink(pub) ? 'noopener noreferrer' : undefined"
-      class="border-b border-neutral-200 px-3 py-4 transition-all duration-300 ease-out dark:border-neutral-800"
+      class="pressable border-b border-neutral-200 px-3 py-4 transition-all duration-300 ease-out dark:border-neutral-800"
       :class="{ 'hover:bg-neutral-50 dark:hover:bg-neutral-800 cursor-pointer group': hasLink(pub) }"
     >
       <!-- Mobile: Stacked layout -->

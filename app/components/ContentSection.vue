@@ -8,7 +8,7 @@ interface Props {
   delay?: number
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   animate: true,
   delay: 0,
 })
@@ -17,24 +17,31 @@ const transition = {
   duration: 0.6,
   ease: [0.25, 0.46, 0.45, 0.94],
 }
+
+const { prefersReducedMotion } = usePrefersReducedMotion()
+
+const computedTransition = computed(() => {
+  if (prefersReducedMotion.value) {
+    return { duration: 0 }
+  }
+  return props.animate ? { ...transition, delay: props.delay } : { duration: 0 }
+})
 </script>
 
 <template>
   <motion.section
-    :initial="animate ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }"
+    :initial="props.animate && !prefersReducedMotion ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }"
     :animate="{ opacity: 1, y: 0 }"
-    :transition="animate ? { ...transition, delay } : { duration: 0 }"
+    :transition="computedTransition"
     class="flex flex-col"
   >
-    <!-- Divider line -->
-    <div class="divider mb-4 bg-neutral-200 dark:bg-neutral-800" />
-
     <!-- Section header (optional) -->
     <component
       :is="link ? 'a' : 'div'"
       v-if="title"
       :href="link"
       class="group my-2 flex items-center justify-between border-b border-neutral-200 pb-1 dark:border-neutral-800"
+      :class="{ 'pressable': link }"
     >
       <div class="uppercase text-xl text-neutral-600 font-medium tracking-wide dark:text-neutral-400">
         {{ title }}

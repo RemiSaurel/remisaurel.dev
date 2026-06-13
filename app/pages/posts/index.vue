@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { motion } from 'motion-v'
+
+const { prefersReducedMotion } = usePrefersReducedMotion()
+
 useSeoMeta({
-  title: 'RemiSaurel',
-  ogTitle: 'RemiSaurel',
   description: 'Yet another blog with projects, ideas, thoughts, and more.',
   ogImage: '/blog.png',
   twitterCard: 'summary_large_image',
@@ -50,7 +52,15 @@ const projects = computed(() => {
       </p>
     </div>
     <div class="flex flex-col gap-12 pl-4">
-      <div v-for="group in projects" :key="group.monthYear" class="relative">
+      <motion.div
+        v-for="(group, groupIndex) in projects"
+        :key="group.monthYear"
+        class="relative"
+        :initial="prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }"
+        :while-in-view="prefersReducedMotion ? undefined : { opacity: 1, y: 0 }"
+        :viewport="{ once: true, margin: '-50px' }"
+        :transition="prefersReducedMotion ? { duration: 0 } : { duration: 0.5, delay: groupIndex * 0.1, ease: [0.23, 1, 0.32, 1] }"
+      >
         <h2
           class="absolute z-0 my-1 cursor-default text-lg text-zinc-400/70 tracking-tight -left-4 -top-8 dark:text-zinc-6"
         >
@@ -66,7 +76,7 @@ const projects = computed(() => {
             />
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   </div>
 </template>

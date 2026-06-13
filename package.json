@@ -13,9 +13,11 @@
     "@nuxt/content": "^3.14.0",
     "@nuxt/icon": "^2.2.0",
     "@nuxt/image": "^2.0.0",
+    "@nuxt/ui": "^4.8.2",
     "@nuxtjs/color-mode": "^4.0.0",
     "motion-v": "2.2.1",
-    "nuxt": "^4.4.6"
+    "nuxt": "^4.4.6",
+    "tailwindcss": "^4.3.0"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "4.60.4"

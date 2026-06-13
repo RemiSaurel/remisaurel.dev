@@ -10,20 +10,30 @@ const transition = {
   duration: 0.6,
   ease: [0.25, 0.46, 0.45, 0.94],
 }
+
+const { prefersReducedMotion } = usePrefersReducedMotion()
+
+const computedTransition = computed(() => {
+  return prefersReducedMotion.value ? { duration: 0 } : transition
+})
+
+const computedInitial = computed(() => {
+  return prefersReducedMotion.value ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
+})
 </script>
 
 <template>
   <div class="min-h-[60vh] flex flex-col items-center justify-center gap-8">
     <motion.div
-      :initial="{ opacity: 0, y: 20 }"
+      :initial="computedInitial"
       :animate="{ opacity: 1, y: 0 }"
-      :transition="transition"
+      :transition="computedTransition"
       class="flex flex-col items-center gap-4"
     >
       <motion.span
-        :initial="{ opacity: 0, scale: 0.8 }"
+        :initial="prefersReducedMotion ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }"
         :animate="{ opacity: 1, scale: 1 }"
-        :transition="{ ...transition, delay: 0.1 }"
+        :transition="prefersReducedMotion ? { duration: 0 } : { ...transition, delay: 0.1 }"
         class="text-9xl text-neutral-300 font-light dark:text-neutral-700"
       >
         404
@@ -35,9 +45,9 @@ const transition = {
 
       <NuxtLink
         to="/"
-        class="mt-2 inline-flex items-center gap-2 text-sm text-neutral-500 transition-colors dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200"
+        class="pressable group mt-2 inline-flex items-center gap-2 text-sm text-neutral-500 transition-colors dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200"
       >
-        <Icon name="uil:arrow-left" class="h-4 w-4" />
+        <Icon name="uil:arrow-left" class="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1" />
         Back to home
       </NuxtLink>
     </motion.div>

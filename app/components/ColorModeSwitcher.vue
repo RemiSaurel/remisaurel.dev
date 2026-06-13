@@ -11,7 +11,7 @@ const isDark = computed(() => colorMode.preference === 'dark')
 
 <template>
   <button
-    class="h-8 w-8 flex items-center justify-center border border-neutral-300 bg-transparent transition-colors duration-200 dark:border-neutral-700 hover:border-neutral-900 dark:hover:border-neutral-100"
+    class="pressable h-8 w-8 flex items-center justify-center border border-neutral-300 bg-transparent transition-colors duration-200 dark:border-neutral-700 hover:border-neutral-900 dark:hover:border-neutral-100"
     aria-label="Toggle color mode"
     @click="toggleColorMode"
   >

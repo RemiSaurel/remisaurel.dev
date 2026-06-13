@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { motion } from 'motion-v'
 import type { Project } from '~/pages/projects/index.vue'
 
 defineProps<{
   project: Project
 }>()
+
+const cardHover = useMotionHover({ y: -4 })
+const linkHover = useMotionHover({ scale: 1.15 })
 
 function getIconName(key: string) {
   switch (key) {
@@ -18,8 +22,10 @@ function getIconName(key: string) {
 </script>
 
 <template>
-  <div
+  <motion.div
     class="group relative min-h-24 min-w-42 flex flex-col gap-2 overflow-clip border-zinc-1 border-t-solid bg-zinc-1/60 px-4 pb-2 pt-4 transition-all duration-500 dark:border-zinc-5 dark:bg-zinc-7 hover:bg-zinc-2/60 dark:hover:bg-zinc-6"
+    :while-hover="cardHover"
+    :transition="{ type: 'spring', stiffness: 300, damping: 20 }"
   >
     <div
       class="absolute text-5xl opacity-40 transition-all duration-400 -right-3 -top-3 group-hover:translate-x--3 group-hover:translate-y-2 -rotate-30 group-hover:scale-120 group-hover:opacity-50 group-hover:-rotate-10"
@@ -44,15 +50,17 @@ function getIconName(key: string) {
           v-if="project.links && Object.keys(project.links).length"
           class="flex gap-4"
         >
-          <a
+          <motion.a
             v-for="(link, key) in project.links"
             :key="key"
             :href="link"
             target="_blank"
-            class="transition hover:text-zinc-700 dark:hover:text-zinc-2"
+            class="pressable transition hover:text-zinc-700 dark:hover:text-zinc-2"
+            :while-hover="linkHover"
+            :transition="{ type: 'spring', stiffness: 400, damping: 17 }"
           >
             <Icon :name="getIconName(key)" class="size-5" />
-          </a>
+          </motion.a>
         </div>
         <div v-else class="ml-auto" />
         <div>
@@ -60,5 +68,5 @@ function getIconName(key: string) {
         </div>
       </div>
     </div>
-  </div>
+  </motion.div>
 </template>
