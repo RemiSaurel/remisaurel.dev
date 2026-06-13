@@ -11,13 +11,13 @@
   },
   "dependencies": {
     "@nuxt/content": "^3.14.0",
-    "@nuxt/icon": "^2.2.0",
+    "@nuxt/icon": "^2.2.3",
     "@nuxt/image": "^2.0.0",
     "@nuxt/ui": "^4.8.2",
-    "@nuxtjs/color-mode": "^4.0.0",
+    "@nuxtjs/color-mode": "^4.0.1",
     "motion-v": "2.2.1",
-    "nuxt": "^4.4.6",
-    "tailwindcss": "^4.3.0"
+    "nuxt": "^4.4.8",
+    "tailwindcss": "^4.3.1"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "4.60.4"
@@ -26,9 +26,9 @@
     "@antfu/eslint-config": "^9.0.0",
     "@iconify-json/logos": "^1.2.11",
     "@iconify-json/uil": "^1.2.3",
-    "@unocss/eslint-plugin": "^66.6.8",
-    "@unocss/nuxt": "^66.6.8",
-    "eslint": "^10.4.0",
-    "unocss": "^66.6.8"
+    "@unocss/eslint-plugin": "^66.7.2",
+    "@unocss/nuxt": "^66.7.2",
+    "eslint": "^10.5.0",
+    "unocss": "^66.7.2"
   }
 }
