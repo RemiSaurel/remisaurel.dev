@@ -1,36 +1,40 @@
 <script setup lang="ts">
-defineProps<{
-  type: 'info' | 'warning' | 'danger' | 'note' | 'important'
-}>()
+withDefaults(defineProps<{
+  type?: 'info' | 'warning' | 'danger' | 'note' | 'important'
+}>(), {
+  type: 'info',
+})
 
-const color = {
-  info: 'border-blue-500',
-  warning: 'border-yellow-500',
-  danger: 'border-red-500',
-  note: 'border-green-500',
-  important: 'border-purple-500',
-}
-
-const icon = {
+const styles = {
   info: {
-    name: 'uil:info-circle',
-    color: 'text-blue-500',
+    border: 'border-blue-500',
+    bg: 'bg-blue-50/60 dark:bg-blue-950/25',
+    icon: 'uil:info-circle',
+    color: 'text-blue-600 dark:text-blue-300',
   },
   warning: {
-    name: 'uil:exclamation-triangle',
-    color: 'text-yellow-600',
+    border: 'border-yellow-500',
+    bg: 'bg-yellow-50/60 dark:bg-yellow-950/25',
+    icon: 'uil:exclamation-triangle',
+    color: 'text-yellow-600 dark:text-yellow-300',
   },
   danger: {
-    name: 'uil:exclamation-octagon',
-    color: 'text-red-600',
+    border: 'border-red-500',
+    bg: 'bg-red-50/60 dark:bg-red-950/25',
+    icon: 'uil:exclamation-octagon',
+    color: 'text-red-600 dark:text-red-300',
   },
   note: {
-    name: 'uil:pen',
-    color: 'text-green-600',
+    border: 'border-green-500',
+    bg: 'bg-green-50/60 dark:bg-green-950/25',
+    icon: 'uil:pen',
+    color: 'text-green-600 dark:text-green-300',
   },
   important: {
-    name: 'uil:star',
-    color: 'text-purple-600',
+    border: 'border-purple-500',
+    bg: 'bg-purple-50/60 dark:bg-purple-950/25',
+    icon: 'uil:star',
+    color: 'text-purple-600 dark:text-purple-300',
   },
 }
 
@@ -40,15 +44,18 @@ function formatTitle(type: string) {
 </script>
 
 <template>
-  <div class="m-0 my-6 border-3 border-l-solid" :class="color[type]">
-    <div class="flex items-center gap-2 pb-2 pl-4">
-      <Icon :name="icon[type].name" :class="icon[type].color" />
-      <span class="font-semibold" :class="icon[type].color">{{
-        formatTitle(type)
-      }}</span>
+  <blockquote
+    class="not-italic my-6 border-l-4 rounded-r-lg py-4 px-4 text-neutral-800 dark:text-neutral-200"
+    :class="[styles[type].border, styles[type].bg]"
+  >
+    <div class="mb-2 flex items-center gap-2" :class="styles[type].color">
+      <Icon :name="styles[type].icon" class="size-5" />
+      <span class="text-sm font-semibold tracking-wide">
+        {{ formatTitle(type) }}
+      </span>
     </div>
-    <blockquote class="m-0 px-4 font-300 opacity-70">
-      <ContentSlot :use="$slots.default" unwrap="p" />
-    </blockquote>
-  </div>
+    <div class="text-base leading-relaxed">
+      <slot mdc-unwrap="p" />
+    </div>
+  </blockquote>
 </template>

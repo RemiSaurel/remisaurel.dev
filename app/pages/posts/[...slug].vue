@@ -1,56 +1,15 @@
 <script setup lang="ts">
+import { withoutTrailingSlash } from 'ufo'
+
 const route = useRoute()
-const headings = ref<{ level: number, text: string, anchor: string }[]>([])
 
-function slugify(text: string) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-}
+const path = computed(() => withoutTrailingSlash(route.path))
 
-const showToC = ref(false)
-
-const { data: page } = await useAsyncData(route.path, () => {
-  return queryCollection('posts').path(route.path).first()
-})
-
-onMounted(() => {
-  const allHeadings = document.querySelectorAll('h1, h2, h3')
-  allHeadings.forEach((heading) => {
-    const level = Number.parseInt(heading.tagName.slice(1))
-    const textContent = heading.textContent?.trim()
-    if (textContent) {
-      const anchor = slugify(textContent)
-      headings.value.push({ level, text: textContent, anchor })
-      heading.id = anchor
-    }
-  })
-  headings.value.shift() // Remove first heading from ToC
-
-  const handleClickOutside = (event: MouseEvent) => {
-    const tocElement = document.querySelector('.relative')
-    if (tocElement && !tocElement.contains(event.target as Node)) {
-      showToC.value = false
-    }
-  }
-
-  document.addEventListener('click', handleClickOutside)
-
-  onUnmounted(() => {
-    document.removeEventListener('click', handleClickOutside)
-  })
-})
-
-const toggleToC = () => (showToC.value = !showToC.value)
-
-function to(anchor: string) {
-  const element = document.getElementById(anchor)
-  if (element) {
-    element.scrollIntoView({ behavior: 'smooth' })
-  }
-  showToC.value = false
-}
+const { data: page, status } = await useAsyncData(
+  `post-${path.value}`,
+  () => queryCollection('posts').path(path.value).first(),
+  { watch: [path] },
+)
 </script>
 
 <template>
@@ -62,6 +21,23 @@ function to(anchor: string) {
         </h1>
         <ContentRenderer :value="page" />
       </article>
+
+      <div v-else-if="status === 'pending'" class="py-12 text-center text-neutral-500 dark:text-neutral-400">
+        Loading post…
+      </div>
+
+      <div v-else class="py-12 text-center">
+        <p class="text-lg text-neutral-600 dark:text-neutral-400">
+          Post not found.
+        </p>
+        <NuxtLink
+          to="/posts"
+          class="pressable mt-4 inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-neutral-200"
+        >
+          <Icon name="uil:arrow-left" class="h-4 w-4" />
+          Back to posts
+        </NuxtLink>
+      </div>
     </main>
   </div>
 </template>

@@ -24,7 +24,7 @@ const c = {
       :class="color"
     >
       <div class="mr-2 size-2 rounded-full" :class="c[color]" />
-      <ContentSlot :use="$slots.default" unwrap="p" />
+      <slot mdc-unwrap="p" />
     </div>
   </ClientOnly>
 </template>

@@ -28,7 +28,7 @@ function getIconName(key: string) {
     :transition="{ type: 'spring', stiffness: 300, damping: 20 }"
   >
     <div
-      class="absolute text-5xl opacity-40 transition-all duration-400 -right-3 -top-3 group-hover:translate-x--3 group-hover:translate-y-2 -rotate-30 group-hover:scale-120 group-hover:opacity-50 group-hover:-rotate-10"
+      class="absolute text-5xl opacity-40 transition-all duration-400 -right-3 -top-3 group-hover:translate-x--5 group-hover:translate-y-2.5 -rotate-20 group-hover:scale-105 group-hover:opacity-50 group-hover:-rotate-0"
     >
       {{ project.icon }}
     </div>

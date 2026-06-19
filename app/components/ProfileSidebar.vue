@@ -100,7 +100,7 @@ const computedInitial = (y: number) => {
         <NuxtImg
           src="/photo.png"
           alt="Rémi Saurel"
-          class="hover:grayscale hover:scale-[1.02] max-w-48 w-full transition-all duration-300"
+          class="max-w-48 w-full transition-all duration-300"
         />
       </motion.div>
 
