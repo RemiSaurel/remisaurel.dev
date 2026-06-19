@@ -1,15 +1,22 @@
 <script setup lang="ts">
-import { withoutTrailingSlash } from 'ufo'
-
 const route = useRoute()
 
-const path = computed(() => withoutTrailingSlash(route.path))
+const slug = computed(() => {
+  const s = route.params.slug
+  return Array.isArray(s) ? s.join('/') : s
+})
 
 const { data: page, status } = await useAsyncData(
-  `post-${path.value}`,
-  () => queryCollection('posts').path(path.value).first(),
-  { watch: [path] },
+  () => `post-${slug.value}`,
+  () => queryCollection('posts').path(`/posts/${slug.value}`).first(),
 )
+
+useSeoMeta(() => ({
+  title: page.value?.title,
+  description: page.value?.description,
+  ogTitle: page.value?.title,
+  ogDescription: page.value?.description,
+}))
 </script>
 
 <template>

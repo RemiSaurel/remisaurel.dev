@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { motion } from 'motion-v'
+import { motion, AnimatePresence } from 'motion-v'
 import type { NewsCategory } from '~/news/news'
 import { news } from '~/news/news'
 
@@ -108,7 +108,7 @@ function getFirstLink(item: typeof news[0]) {
 
     <!-- News list -->
     <div class="flex flex-col">
-      <Presence>
+      <AnimatePresence>
         <motion.div
           v-for="(item, index) in displayedNews"
           :key="item.title + item.date.toString()"
@@ -188,7 +188,7 @@ function getFirstLink(item: typeof news[0]) {
             </div>
           </component>
         </motion.div>
-      </Presence>
+      </AnimatePresence>
     </div>
 
     <!-- Load more button -->
