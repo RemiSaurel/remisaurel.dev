@@ -20,7 +20,7 @@
     "tailwindcss": "^4.3.1"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "4.60.4"
+    "@rollup/rollup-linux-x64-gnu": "4.62.2"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.0.0",
