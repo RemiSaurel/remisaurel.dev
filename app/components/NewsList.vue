@@ -51,10 +51,6 @@ const hasMoreItems = computed(() => {
   return displayLimit.value < filteredNews.value.length
 })
 
-const remainingCount = computed(() => {
-  return filteredNews.value.length - displayLimit.value
-})
-
 function loadMore() {
   displayLimit.value += 5
 }
@@ -96,7 +92,7 @@ function getFirstLink(item: typeof news[0]) {
         as="button"
         :variant="selectedCategory === category ? 'solid' : 'outline'"
         color="neutral"
-        class="pressable cursor-pointer capitalize"
+        class="capitalize pressable cursor-pointer"
         @click="toggleFilter(category)"
       >
         {{ category }} ({{ categoryCounts[category] }})
@@ -184,7 +180,7 @@ function getFirstLink(item: typeof news[0]) {
     <!-- Load more button -->
     <button
       v-if="hasMoreItems"
-      class="pressable group mt-2 cursor-pointer self-center inline-flex items-center gap-1 rounded-full border border-neutral-300 bg-transparent px-3 py-2 text-xs text-neutral-600 transition-colors duration-200 dark:border-neutral-600 dark:text-neutral-400 hover:border-neutral-900 hover:bg-neutral-50 dark:hover:border-neutral-200 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
+      class="group mt-2 inline-flex pressable cursor-pointer items-center self-center gap-1 border border-neutral-300 rounded-full bg-transparent px-3 py-2 text-xs text-neutral-600 transition-colors duration-200 dark:border-neutral-600 hover:border-neutral-900 hover:bg-neutral-50 dark:text-neutral-400 dark:hover:border-neutral-200 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
       @click="loadMore"
     >
       <span>Show more</span>

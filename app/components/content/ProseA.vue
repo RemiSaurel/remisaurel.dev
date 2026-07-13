@@ -26,7 +26,7 @@ const props = defineProps({
   <NuxtLink
     :href="props.href"
     :target="props.target"
-    class="pressable group inline-flex items-center gap-0.5 underline underline-offset-2 decoration-zinc-400 transition-colors duration-300 hover:text-blue-600 hover:decoration-blue-500 dark:decoration-zinc-500 dark:hover:text-blue-300"
+    class="group inline-flex pressable items-center gap-0.5 underline decoration-zinc-400 underline-offset-2 transition-colors duration-300 hover:text-blue-600 dark:decoration-zinc-500 hover:decoration-blue-500 dark:hover:text-blue-300"
   >
     <slot />
     <Icon

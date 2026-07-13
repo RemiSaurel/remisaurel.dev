@@ -45,7 +45,7 @@ function formatTitle(type: string) {
 
 <template>
   <blockquote
-    class="not-italic my-6 border-l-4 rounded-r-lg py-4 px-4 text-neutral-800 dark:text-neutral-200"
+    class="my-6 border-l-4 rounded-r-lg px-4 py-4 text-neutral-800 not-italic dark:text-neutral-200"
     :class="[styles[type].border, styles[type].bg]"
   >
     <div class="mb-2 flex items-center gap-2" :class="styles[type].color">

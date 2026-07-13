@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { motion } from 'motion-v'
 import type { Project } from '~/pages/projects/index.vue'
+import { motion } from 'motion-v'
 
 defineProps<{
   project: Project
