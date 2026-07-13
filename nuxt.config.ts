@@ -63,5 +63,12 @@ export default defineNuxtConfig({
     fonts: false,
   },
 
+  nitro: {
+    output: {
+      dir: '{{ rootDir }}/.output/public',
+      publicDir: '{{ output.dir }}',
+    },
+  },
+
   compatibilityDate: '2024-10-04',
 })

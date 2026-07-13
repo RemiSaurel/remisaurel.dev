@@ -25,14 +25,14 @@ const transition = {
 
 const { prefersReducedMotion } = usePrefersReducedMotion()
 
-const computedTransition = (delay: number) => {
+function computedTransition(delay: number) {
   if (prefersReducedMotion.value) {
     return { duration: 0 }
   }
   return props.animate ? { ...transition, delay } : { duration: 0 }
 }
 
-const computedInitial = (y: number) => {
+function computedInitial(y: number) {
   return props.animate && !prefersReducedMotion.value ? { opacity: 0, y } : { opacity: 1, y: 0 }
 }
 </script>
@@ -80,7 +80,7 @@ const computedInitial = (y: number) => {
           target="_blank"
           rel="noopener noreferrer"
           :aria-label="link.label"
-          class="pressable size-8 inline-flex items-center justify-center border border-neutral-300 dark:border-neutral-700 hover:border-neutral-900 hover:bg-neutral-900 hover:text-white dark:hover:border-neutral-100 dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
+          class="size-8 inline-flex pressable items-center justify-center border border-neutral-300 dark:border-neutral-700 hover:border-neutral-900 hover:bg-neutral-900 hover:text-white dark:hover:border-neutral-100 dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
           :while-hover="socialHover"
           :transition="{ type: 'spring', stiffness: 400, damping: 17 }"
         >
@@ -145,7 +145,7 @@ const computedInitial = (y: number) => {
           target="_blank"
           rel="noopener noreferrer"
           :aria-label="link.label"
-          class="pressable size-8 inline-flex items-center justify-center border border-neutral-300 dark:border-neutral-700 hover:border-neutral-900 hover:bg-neutral-900 hover:text-white dark:hover:border-neutral-100 dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
+          class="size-8 inline-flex pressable items-center justify-center border border-neutral-300 dark:border-neutral-700 hover:border-neutral-900 hover:bg-neutral-900 hover:text-white dark:hover:border-neutral-100 dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
           :while-hover="socialHover"
           :transition="{ type: 'spring', stiffness: 400, damping: 17 }"
         >

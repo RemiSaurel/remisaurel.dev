@@ -45,7 +45,7 @@ const computedInitial = computed(() => {
 
       <NuxtLink
         to="/"
-        class="pressable group mt-2 inline-flex items-center gap-2 text-sm text-neutral-500 transition-colors dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200"
+        class="group mt-2 inline-flex pressable items-center gap-2 text-sm text-neutral-500 transition-colors dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200"
       >
         <Icon name="uil:arrow-left" class="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1" />
         Back to home

@@ -39,7 +39,7 @@ useSeoMeta(() => ({
         </p>
         <NuxtLink
           to="/posts"
-          class="pressable mt-4 inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-neutral-200"
+          class="mt-4 inline-flex pressable items-center gap-2 text-sm text-neutral-500 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200"
         >
           <Icon name="uil:arrow-left" class="h-4 w-4" />
           Back to posts

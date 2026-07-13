@@ -43,7 +43,7 @@ const hover = useMotionHover({ scale: 1.03, y: -1 })
 
 <template>
   <motion.div
-    class="pressable group relative w-fit inline-flex items-center gap-1 rounded bg-gray-400/10 px-2 text-zinc-5 font-light transition duration-500 hover:cursor-pointer hover:bg-gray-400/20 dark:text-zinc-4 hover:text-zinc-700 dark:hover:text-zinc-2"
+    class="group relative w-fit inline-flex pressable items-center gap-1 rounded bg-gray-400/10 px-2 text-zinc-5 font-light transition duration-500 hover:cursor-pointer hover:bg-gray-400/20 dark:text-zinc-4 hover:text-zinc-700 dark:hover:text-zinc-2"
     :class="[size === 'sm' ? 'py-0.5 text-sm' : 'py-1']"
     :while-hover="hover"
     :transition="{ type: 'spring', stiffness: 400, damping: 17 }"

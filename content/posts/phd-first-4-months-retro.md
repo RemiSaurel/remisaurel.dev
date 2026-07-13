@@ -16,15 +16,15 @@ Yes, I learned a lot. On the PhD itself, on teaching and learning, but also on m
 This post is about my experience and my feelings. It's not a "how-to" guide or a "best practices" post. It's just me sharing my thoughts and experiences I had during the first 4 months of my PhD.
 ::
 
-# Reading, reading and rea- writing?
+## Reading, reading and rea- writing?
 
-## Introduction
+### Introduction
 
 Although I started to "read" (it was more likely just skimming through articles) scientific papers a few years ago, I've never actually had the opportunity to organize and synthesize my findings effectively. The first weeks of my thesis has been very intense in terms of reading. I think there are a few reasons behind this.
 
 First, my thesis subject Technology-enhanced regulation of learning: what contributions from GenAI? <ProseA href="https://theses.fr/s403597" target="_blank">(see here)</ProseA> is by definition interdisciplinary. It means there are different fields to explore, such as cognitive psychology, educational sciences but also AI and computer science. Second, the Generative AI era is moving **really** fast. Every day, new papers are published on arXiv but also on famous and relevant journals. There are also different papers coming from UNESCO, governments, and other organizations. So, how to keep up with all of this?
 
-## Iterative improvements
+### Iterative improvements
 
 Iterative improvements. By testing different methods and refine them, I found a way to be more efficient in my reading process. The goal was to try methods, see what works and what doesn't, and then refine them. Here is what I first did:
 
@@ -55,16 +55,16 @@ After a few weeks of reading papers, we had the opportunity to write a first pap
 Due to anonymity reasons, I can't share or talk about the content of the paper. It'll be the subject for another post 🤓. I'll still share the main difficulties I had during this exercice and how I dealt with it.
 ::
 
-## From divergence to convergence
+### From divergence to convergence
 
 I think one of the main difficulty in the writing exercise has been to quickly switch from a divergent way of thinking (by exploring different papers and ideas) to a convergent way (by identifying gaps in the literature and proposing positions). This writing exercise was really helpful and I learned a lot from it.
 
 If I had the opportunity to go back 2 years ago, I'd probably focus more on writing exercises. I felt I had lacked practice in this area. I think it's really important to be able to write effectively and efficiently while being able to convey strong messages in a clear way. Reading papers helps you find out formulas, expressions or a basis for your writing. But I think practicing writing is **really** important.
 
-# Teaching experience
+## Teaching experience
 During this period, I also had the opportunity to teach a course on :tag{color="wine"}[Kotlin] and :tag{color="green"}[Spring Boot] to 3rd year students. It was a really interesting experience and definitely something I'd like to do again.
 
 I've always liked the "learning by teaching". During my first university years, I had the opportunity to participate in tutoring sessions. I really liked it and I think it helped me a lot in my learning process. I think it's a great way to learn and to understand concepts.
 
-# What's next?
+## What's next?
 After submitting my first paper, the goal is to gather stakeholders' feedback and to start working on application. Antoine will join us as a full-stack intern and will help us in the development of the application. Stay tuned for more updates on this topic! (Pssst, I'm writing this way later than expected. I should have written this post a few weeks ago... but keep this as a secret 🤫)
