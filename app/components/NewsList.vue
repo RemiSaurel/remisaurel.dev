@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { motion, AnimatePresence } from 'motion-v'
 import type { NewsCategory } from '~/news/news'
 import { news } from '~/news/news'
 
@@ -10,8 +9,6 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   limit: 5,
 })
-
-const loadMoreHover = useMotionHover({ scale: 1.02 })
 
 // Available categories for filtering
 const categories: NewsCategory[] = ['paper', 'project', 'conference', 'misc']
@@ -108,15 +105,8 @@ function getFirstLink(item: typeof news[0]) {
 
     <!-- News list -->
     <div class="flex flex-col">
-      <AnimatePresence>
-        <motion.div
-          v-for="(item, index) in displayedNews"
-          :key="item.title + item.date.toString()"
-          :initial="{ opacity: 0, y: 12 }"
-          :animate="{ opacity: 1, y: 0 }"
-          :exit="{ opacity: 0, y: -12 }"
-          :transition="{ duration: 0.2, delay: Math.min(index * 0.03, 0.15), ease: [0.23, 1, 0.32, 1] }"
-        >
+      <template v-for="item in displayedNews" :key="item.title + item.date.toString()">
+        <div>
           <component
             :is="hasLink(item) ? 'a' : 'div'"
             :href="hasLink(item) ? getFirstLink(item) : undefined"
@@ -187,20 +177,18 @@ function getFirstLink(item: typeof news[0]) {
               </div>
             </div>
           </component>
-        </motion.div>
-      </AnimatePresence>
+        </div>
+      </template>
     </div>
 
     <!-- Load more button -->
-    <motion.button
+    <button
       v-if="hasMoreItems"
       class="pressable group mt-2 cursor-pointer self-center inline-flex items-center gap-1 rounded-full border border-neutral-300 bg-transparent px-3 py-2 text-xs text-neutral-600 transition-colors duration-200 dark:border-neutral-600 dark:text-neutral-400 hover:border-neutral-900 hover:bg-neutral-50 dark:hover:border-neutral-200 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
-      :while-hover="loadMoreHover"
-      :transition="{ type: 'spring', stiffness: 400, damping: 17 }"
       @click="loadMore"
     >
       <span>Show more</span>
       <Icon name="uil:angle-down" class="size-5" />
-    </motion.button>
+    </button>
   </div>
 </template>

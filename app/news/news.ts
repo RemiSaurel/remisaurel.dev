@@ -12,7 +12,25 @@ interface News {
 }
 
 export const news: News[] = [
-    {
+  {
+    date: new Date('2026-07-05'),
+    title: 'Submitted my first journal article!',
+    content: 'Main contribution is about a mixed-methods study on Learning Analytics Dashboards.',
+    categories: ['paper'],
+  },
+  {
+    date: new Date('2026-06-15'),
+    title: 'Went to RJC EIAH in Grenoble, France!',
+    content: 'Very nice French-speaking conference on TEL with some nice presentations. Nominee for best paper!',
+    categories: ['paper', 'conference'],
+    links: [
+      {
+        text: 'RJC EIAH Website',
+        url: 'https://rjc-eiah2026.sciencesconf.org/',
+      },
+    ],
+  },
+  {
     date: new Date('2026-05-01'),
     title: 'Went to the LAK26 conference in Bergen, Norway!',
     content: 'Amazing first time at LAK! I had the opportunity to present a poster about our work on automatic short answer grading, attend interesting talks, and meet many people. More details on a blog post.',
