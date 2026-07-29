@@ -15,7 +15,7 @@ function formatAuthors(authors: string[]) {
 </script>
 
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col gap-1">
     <component
       :is="hasLink(pub) ? 'a' : 'div'"
       v-for="pub in publications"
@@ -23,8 +23,8 @@ function formatAuthors(authors: string[]) {
       :href="hasLink(pub) ? pub.url : undefined"
       :target="hasLink(pub) ? '_blank' : undefined"
       :rel="hasLink(pub) ? 'noopener noreferrer' : undefined"
-      class="pressable border-b border-neutral-200 px-3 py-4 transition-all duration-300 ease-out dark:border-neutral-800 first:pt-6"
-      :class="{ 'hover:bg-neutral-50 dark:hover:bg-neutral-800 cursor-pointer group': hasLink(pub) }"
+      class="pressable px-3 py-4 transition-all duration-300 ease-out"
+      :class="{ 'hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer group': hasLink(pub) }"
     >
       <!-- Mobile: Stacked layout -->
       <div class="flex flex-col gap-2 md:hidden">
@@ -32,7 +32,7 @@ function formatAuthors(authors: string[]) {
         <div class="flex items-center justify-between">
           <span class="tabular-nums text-xs text-neutral-400 dark:text-neutral-500">{{ formatDate(pub.date) }}</span>
           <div class="flex items-center gap-2">
-            <span class="border border-neutral-300 px-1.5 py-0.5 text-xs text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">{{ pub.venue }}</span>
+            <span class="bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">{{ pub.venue }}</span>
             <svg
               class="h-2.5 w-2.5 transition-all duration-300"
               :class="hasLink(pub) ? 'opacity-30 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5' : 'opacity-0'"

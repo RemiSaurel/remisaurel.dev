@@ -80,7 +80,7 @@ function computedInitial(y: number) {
           target="_blank"
           rel="noopener noreferrer"
           :aria-label="link.label"
-          class="size-8 inline-flex pressable items-center justify-center border border-neutral-300 dark:border-neutral-700 hover:border-neutral-900 hover:bg-neutral-900 hover:text-white dark:hover:border-neutral-100 dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
+          class="size-8 inline-flex pressable items-center justify-center bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
           :while-hover="socialHover"
           :transition="{ type: 'spring', stiffness: 400, damping: 17 }"
         >
@@ -145,7 +145,7 @@ function computedInitial(y: number) {
           target="_blank"
           rel="noopener noreferrer"
           :aria-label="link.label"
-          class="size-8 inline-flex pressable items-center justify-center border border-neutral-300 dark:border-neutral-700 hover:border-neutral-900 hover:bg-neutral-900 hover:text-white dark:hover:border-neutral-100 dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
+          class="size-8 inline-flex pressable items-center justify-center bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
           :while-hover="socialHover"
           :transition="{ type: 'spring', stiffness: 400, damping: 17 }"
         >

@@ -64,8 +64,8 @@ function reveal(delay: number) {
       :transition="reveal(0.1).transition"
       class="flex flex-col"
     >
-      <div class="my-2 flex items-center justify-between border-b border-neutral-200 pb-1 dark:border-neutral-800">
-        <h2 class="uppercase m-0 text-xl text-neutral-600 font-medium tracking-wide dark:text-neutral-400">
+      <div class="mb-3 mt-2 flex items-center justify-between">
+        <h2 class="m-0 text-xl text-neutral-700 font-medium tracking-tight dark:text-neutral-300">
           Research Landscape
         </h2>
       </div>
@@ -82,8 +82,8 @@ function reveal(delay: number) {
       :transition="reveal(0.3).transition"
       class="flex flex-col"
     >
-      <div class="my-2 flex items-center justify-between border-b border-neutral-200 pb-1 dark:border-neutral-800">
-        <h2 class="uppercase m-0 text-xl text-neutral-600 font-medium tracking-wide dark:text-neutral-400">
+      <div class="mb-3 mt-2 flex items-center justify-between">
+        <h2 class="m-0 text-xl text-neutral-700 font-medium tracking-tight dark:text-neutral-300">
           Approach
         </h2>
       </div>
@@ -106,8 +106,8 @@ function reveal(delay: number) {
       :transition="reveal(0.4).transition"
       class="flex flex-col"
     >
-      <div class="my-2 flex items-center justify-between border-b border-neutral-200 pb-1 dark:border-neutral-800">
-        <h2 class="uppercase m-0 text-xl text-neutral-600 font-medium tracking-wide dark:text-neutral-400">
+      <div class="mb-3 mt-2 flex items-center justify-between">
+        <h2 class="m-0 text-xl text-neutral-700 font-medium tracking-tight dark:text-neutral-300">
           Context
         </h2>
       </div>

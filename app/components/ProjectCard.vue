@@ -19,7 +19,7 @@ function getIconName(key: string) {
 
 <template>
   <div
-    class="group h-full flex flex-col justify-between gap-3 border border-neutral-200 px-4 pb-2 pt-4 transition-all duration-300 ease-out dark:border-neutral-800 hover:border-neutral-400 hover:bg-neutral-50 dark:hover:border-neutral-600 dark:hover:bg-neutral-900"
+    class="group h-full flex flex-col justify-between gap-3 bg-neutral-100/60 px-4 pb-2 pt-4 transition-all duration-300 ease-out dark:bg-neutral-800/60 hover:bg-neutral-100 dark:hover:bg-neutral-800"
   >
     <div class="flex flex-col gap-2">
       <div class="flex items-start justify-between gap-3">

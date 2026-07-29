@@ -74,8 +74,8 @@ function isActive(path: string) {
     </main>
 
     <!-- Footer -->
-    <footer class="mt-auto border-t border-neutral-200 dark:border-neutral-800">
-      <div class="mx-auto max-w-7xl px-6 py-6">
+    <footer class="mt-auto">
+      <div class="mx-auto max-w-7xl px-6 py-10">
         <p class="text-xs text-neutral-400 dark:text-neutral-600">
           &copy; {{ new Date().getFullYear() }} Rémi Saurel
         </p>

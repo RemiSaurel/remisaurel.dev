@@ -83,7 +83,7 @@ function getFirstLink(item: typeof news[0]) {
         v-for="category in categories"
         :key="category"
         as="button"
-        :variant="selectedCategory === category ? 'solid' : 'outline'"
+        :variant="selectedCategory === category ? 'solid' : 'subtle'"
         color="neutral"
         class="rounded-none capitalize pressable cursor-pointer"
         @click="toggleFilter(category)"
@@ -93,7 +93,7 @@ function getFirstLink(item: typeof news[0]) {
     </div>
 
     <!-- News list -->
-    <div class="flex flex-col">
+    <div class="flex flex-col gap-1">
       <template v-for="item in displayedNews" :key="item.title + item.date.toString()">
         <div>
           <component
@@ -101,8 +101,8 @@ function getFirstLink(item: typeof news[0]) {
             :href="hasLink(item) ? getFirstLink(item) : undefined"
             :target="hasLink(item) ? '_blank' : undefined"
             :rel="hasLink(item) ? 'noopener noreferrer' : undefined"
-            class="block border-b border-neutral-200 px-3 py-3 transition-all duration-300 ease-out dark:border-neutral-800"
-            :class="{ 'pressable hover:bg-neutral-50 dark:hover:bg-neutral-900 cursor-pointer group': hasLink(item) }"
+            class="block px-3 py-3 transition-all duration-300 ease-out"
+            :class="{ 'pressable hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer group': hasLink(item) }"
           >
             <!-- Mobile: Stacked layout -->
             <div class="flex flex-col gap-2 md:hidden">
@@ -114,7 +114,7 @@ function getFirstLink(item: typeof news[0]) {
                     <span
                       v-for="cat in item.categories?.slice(0, 2)"
                       :key="cat"
-                      class="whitespace-nowrap border border-neutral-300 px-1.5 py-0.5 text-xs text-neutral-500 dark:border-neutral-700 dark:text-neutral-400"
+                      class="whitespace-nowrap bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400"
                     >
                       {{ cat }}
                     </span>
@@ -173,7 +173,7 @@ function getFirstLink(item: typeof news[0]) {
     <!-- Load more button -->
     <button
       v-if="hasMoreItems"
-      class="group mt-2 inline-flex pressable cursor-pointer items-center self-center gap-1 border border-neutral-300 rounded-none bg-transparent px-3 py-2 text-xs text-neutral-600 transition-colors duration-200 dark:border-neutral-600 hover:border-neutral-900 hover:bg-neutral-50 dark:text-neutral-400 dark:hover:border-neutral-200 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
+      class="group mt-2 inline-flex pressable cursor-pointer items-center self-center gap-1 rounded-none bg-neutral-100 px-3 py-2 text-xs text-neutral-600 transition-colors duration-200 dark:bg-neutral-800 hover:bg-neutral-200 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200"
       @click="loadMore"
     >
       <span>Show more</span>
