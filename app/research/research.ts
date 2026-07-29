@@ -44,7 +44,7 @@ export interface ResearchLink {
 
 /** Design space of the graph. Node coordinates live in this system. */
 export const VIEW_W = 1000
-export const VIEW_H = 560
+export const VIEW_H = 460
 
 export const clusters: Cluster[] = [
   {
@@ -289,32 +289,32 @@ export const researchLinks: ResearchLink[] = [
 interface Vec { x: number, y: number }
 
 const LAYOUT: Record<string, Vec> = {
-  tel: { x: 499, y: 362 },
+  tel: { x: 499, y: 297 },
 
   // Learning Analytics
-  la: { x: 337, y: 112 },
-  indicators: { x: 160, y: 43 },
-  dashboards: { x: 54, y: 122 },
-  rjceiah: { x: 185, y: 244 },
+  la: { x: 337, y: 92 },
+  indicators: { x: 160, y: 35 },
+  dashboards: { x: 54, y: 100 },
+  rjceiah: { x: 185, y: 200 },
 
   // Human-AI Interaction
-  hai: { x: 287, y: 383 },
-  'co-design': { x: 163, y: 333 },
-  decisions: { x: 94, y: 418 },
+  hai: { x: 287, y: 380 },
+  'co-design': { x: 163, y: 339 },
+  decisions: { x: 94, y: 408 },
 
   // AI in Education
-  aied: { x: 644, y: 180 },
-  llm: { x: 746, y: 88 },
-  'multi-agent': { x: 586, y: 123 },
-  asag: { x: 905, y: 175 },
-  ectel: { x: 551, y: 53 },
-  lak: { x: 914, y: 52 },
+  aied: { x: 644, y: 148 },
+  llm: { x: 746, y: 72 },
+  'multi-agent': { x: 586, y: 101 },
+  asag: { x: 905, y: 144 },
+  ectel: { x: 551, y: 44 },
+  lak: { x: 914, y: 43 },
 
   // AI & Ethics
-  ethics: { x: 711, y: 356 },
-  eiah: { x: 789, y: 276 },
-  'responsible-ai': { x: 894, y: 356 },
-  governance: { x: 841, y: 436 },
+  ethics: { x: 711, y: 357 },
+  eiah: { x: 789, y: 227 },
+  'responsible-ai': { x: 894, y: 357 },
+  governance: { x: 841, y: 423 },
 }
 
 function findPublication(id: string): Publication | undefined {

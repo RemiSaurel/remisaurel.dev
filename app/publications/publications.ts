@@ -1,7 +1,7 @@
 export interface Publication {
   /** Short stable slug, used to reference this publication from elsewhere (e.g. the research graph). */
   id: string
-  date: string
+  date: Date
   title: string
   authors: string[]
   award?: string
@@ -16,7 +16,7 @@ const defaultAuthors = ['Rémi Saurel', 'Franck Silvestre', 'Jean-Baptiste Racle
 export const publications: Publication[] = [
   {
     id: 'rjceiah-2026',
-    date: 'Jun. 2026',
+    date: new Date('2026-06-01'),
     title: 'Une double approche pour la co-conception de tableaux de bord d\'apprentissage : validation avec des prototypes, exploration avec un chatbot',
     authors: ['Rémi Saurel', 'Esther Félix', 'Franck Silvestre', 'Jean-Baptiste Raclet', 'Emmanuel Lescure'],
     award: '🏆 Best Paper Nominee',
@@ -27,7 +27,7 @@ export const publications: Publication[] = [
   },
   {
     id: 'lak-2026',
-    date: 'Apr. 2026',
+    date: new Date('2026-04-01'),
     title: 'Mind the Gap: Benchmarking AI vs. Human in Automatic Short Answer Grading',
     authors: defaultAuthors,
     subtitle: 'A benchmarking tool for AI systems to evaluate their performance on several configurations (model, prompts, architecture).',
@@ -37,7 +37,7 @@ export const publications: Publication[] = [
   },
   {
     id: 'ectel-2025',
-    date: 'Sep. 2025',
+    date: new Date('2025-09-01'),
     title: 'MAESTRO: Multi-Agent Educational System for Tutoring and Recommendation Orchestration',
     authors: defaultAuthors,
     award: '🏆 Best Demo Nominee',
@@ -48,7 +48,7 @@ export const publications: Publication[] = [
   },
   {
     id: 'eiah-2025',
-    date: 'Jun. 2025',
+    date: new Date('2025-06-01'),
     title: 'Intégration responsable de l\'IA Générative dans l\'Éducation : proposition d\'un plan d\'actions stratégiques dirigé par les risques liés aux questions éthiques',
     authors: defaultAuthors,
     subtitle: 'A strategic action plan for the responsible integration of generative AI in educational contexts, addressing ethical risks and challenges.',

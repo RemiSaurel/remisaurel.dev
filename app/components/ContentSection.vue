@@ -40,7 +40,7 @@ const computedTransition = computed(() => {
       :is="link ? 'a' : 'div'"
       v-if="title"
       :href="link"
-      class="group my-2 flex items-center justify-between border-b border-neutral-200 pb-1 dark:border-neutral-800"
+      class="group mt-2 flex items-center justify-between border-b border-neutral-200 pb-1 dark:border-neutral-800"
       :class="{ pressable: link }"
     >
       <div class="uppercase text-xl text-neutral-600 font-medium tracking-wide dark:text-neutral-400">

@@ -66,13 +66,6 @@ function toggleFilter(category: NewsCategory) {
   displayLimit.value = props.limit
 }
 
-function formatDate(date: Date) {
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(date))
-}
-
 function hasLink(item: typeof news[0]) {
   return item.links && item.links.length > 0
 }
@@ -85,14 +78,14 @@ function getFirstLink(item: typeof news[0]) {
 <template>
   <div class="flex flex-col gap-4">
     <!-- Tag filters -->
-    <div class="flex flex-wrap gap-2">
+    <div class="mt-2 flex flex-wrap gap-2">
       <UBadge
         v-for="category in categories"
         :key="category"
         as="button"
         :variant="selectedCategory === category ? 'solid' : 'outline'"
         color="neutral"
-        class="capitalize pressable cursor-pointer"
+        class="rounded-none capitalize pressable cursor-pointer"
         @click="toggleFilter(category)"
       >
         {{ category }} ({{ categoryCounts[category] }})
@@ -180,7 +173,7 @@ function getFirstLink(item: typeof news[0]) {
     <!-- Load more button -->
     <button
       v-if="hasMoreItems"
-      class="group mt-2 inline-flex pressable cursor-pointer items-center self-center gap-1 border border-neutral-300 rounded-full bg-transparent px-3 py-2 text-xs text-neutral-600 transition-colors duration-200 dark:border-neutral-600 hover:border-neutral-900 hover:bg-neutral-50 dark:text-neutral-400 dark:hover:border-neutral-200 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
+      class="group mt-2 inline-flex pressable cursor-pointer items-center self-center gap-1 border border-neutral-300 rounded-none bg-transparent px-3 py-2 text-xs text-neutral-600 transition-colors duration-200 dark:border-neutral-600 hover:border-neutral-900 hover:bg-neutral-50 dark:text-neutral-400 dark:hover:border-neutral-200 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
       @click="loadMore"
     >
       <span>Show more</span>

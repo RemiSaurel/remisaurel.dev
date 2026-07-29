@@ -23,14 +23,14 @@ function formatAuthors(authors: string[]) {
       :href="hasLink(pub) ? pub.url : undefined"
       :target="hasLink(pub) ? '_blank' : undefined"
       :rel="hasLink(pub) ? 'noopener noreferrer' : undefined"
-      class="pressable border-b border-neutral-200 px-3 py-4 transition-all duration-300 ease-out dark:border-neutral-800"
+      class="pressable border-b border-neutral-200 px-3 py-4 transition-all duration-300 ease-out dark:border-neutral-800 first:pt-6"
       :class="{ 'hover:bg-neutral-50 dark:hover:bg-neutral-800 cursor-pointer group': hasLink(pub) }"
     >
       <!-- Mobile: Stacked layout -->
       <div class="flex flex-col gap-2 md:hidden">
         <!-- Date + Venue row -->
         <div class="flex items-center justify-between">
-          <span class="tabular-nums text-xs text-neutral-400 dark:text-neutral-500">{{ pub.date }}</span>
+          <span class="tabular-nums text-xs text-neutral-400 dark:text-neutral-500">{{ formatDate(pub.date) }}</span>
           <div class="flex items-center gap-2">
             <span class="border border-neutral-300 px-1.5 py-0.5 text-xs text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">{{ pub.venue }}</span>
             <svg
@@ -63,7 +63,7 @@ function formatAuthors(authors: string[]) {
 
       <!-- Desktop: Grid layout -->
       <div class="grid-cols-[60px_1fr_auto] hidden items-start gap-4 md:grid">
-        <span class="tabular-nums pt-1 text-xs text-neutral-400 dark:text-neutral-500">{{ pub.date }}</span>
+        <span class="tabular-nums pt-1 text-xs text-neutral-400 dark:text-neutral-500">{{ formatDate(pub.date) }}</span>
 
         <div class="flex gap-4">
           <NuxtImg

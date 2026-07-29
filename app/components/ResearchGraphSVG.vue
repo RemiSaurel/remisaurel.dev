@@ -20,7 +20,7 @@ function clusterClass(ids: ClusterId[]) {
 <template>
   <svg
     class="absolute inset-0 h-full w-full overflow-visible"
-    viewBox="0 0 1000 560"
+    viewBox="0 0 1000 460"
     preserveAspectRatio="none"
   >
     <!-- Cluster regions -->
@@ -38,16 +38,22 @@ function clusterClass(ids: ClusterId[]) {
     />
 
     <!-- Links -->
-    <path
-      v-for="edge in edges"
-      :key="edge.id"
-      :d="edge.d"
-      class="rl-edge pointer-events-none fill-none stroke-1 stroke-[var(--rl-edge)] transition-[opacity,stroke]"
-      :class="[
-        edge.cluster ? `rl-${edge.cluster}` : '',
-        { 'rl-edge-active stroke-[rgb(var(--c)/0.7)]': edge.highlight, 'rl-edge-dimmed opacity-30': edge.dimmed },
-      ]"
-    />
+    <template v-for="edge in edges" :key="edge.id">
+      <path
+        :d="edge.d"
+        class="rl-edge pointer-events-none fill-none stroke-1 stroke-[var(--rl-edge)] transition-[opacity,stroke]"
+        :class="[
+          edge.cluster ? `rl-${edge.cluster}` : '',
+          { 'rl-edge-active stroke-[rgb(var(--c)/0.7)]': edge.highlight, 'rl-edge-dimmed opacity-30': edge.dimmed },
+        ]"
+      />
+      <path
+        v-if="edge.highlight"
+        :d="edge.d"
+        class="rl-edge-flow pointer-events-none fill-none stroke-[rgb(var(--c)/0.8)]"
+        :class="edge.cluster ? `rl-${edge.cluster}` : ''"
+      />
+    </template>
   </svg>
 </template>
 
@@ -55,5 +61,18 @@ function clusterClass(ids: ClusterId[]) {
 .rl-region {
   fill: rgb(var(--c) / var(--rl-region-fill));
   stroke: rgb(var(--c) / var(--rl-region-stroke));
+}
+
+.rl-edge-flow {
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-dasharray: 4 26;
+  animation: rl-edge-flow 1.1s linear infinite;
+}
+
+@keyframes rl-edge-flow {
+  to {
+    stroke-dashoffset: -30;
+  }
 }
 </style>

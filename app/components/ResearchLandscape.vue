@@ -317,7 +317,7 @@ const enter = computed(() =>
     >
       <div
         ref="container"
-        class="relative aspect-[1000/560] w-full select-none"
+        class="relative aspect-[1000/460] w-full select-none"
         @mouseleave="activeId = null"
       >
         <!-- SVG: regions + edges -->

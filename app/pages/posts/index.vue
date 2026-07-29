@@ -44,7 +44,7 @@ const projects = computed(() => {
   <div>
     <div class="mb-16">
       <h5 class="m-0 text-2xl font-semibold">
-        Blog
+        Posts
       </h5>
       <p>
         You'll find here some blog posts I've written. <br>

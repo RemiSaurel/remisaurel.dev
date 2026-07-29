@@ -32,6 +32,7 @@ html.dark {
    child components, so they must be global (Vue's scoped CSS doesn't reach
    into nested elements of child components). */
 .rl-root {
+  font-family: "Geist Sans", -apple-system, BlinkMacSystemFont, sans-serif;
   --rl-on: #ffffff;
   --rl-region-fill: 0.05;
   --rl-region-stroke: 0.26;
@@ -86,6 +87,16 @@ a {
 /* Remove mobile tap highlight */
 * {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Neutral text-selection highlight (override browser default blue) */
+::selection {
+  background-color: rgb(64 64 64 / 0.25); /* neutral-700 */
+  color: inherit;
+}
+
+.dark ::selection {
+  background-color: rgb(212 212 212 / 0.25); /* neutral-300 */
 }
 
 /* Divider line */
