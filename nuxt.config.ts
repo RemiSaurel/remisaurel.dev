@@ -55,12 +55,18 @@ export default defineNuxtConfig({
     '@unocss/nuxt',
     '@nuxt/image',
     'motion-v/nuxt',
+    '@nuxt/fonts',
   ],
   icon: {
     serverBundle: 'remote',
   },
   ui: {
     fonts: false,
+  },
+  fonts: {
+    families: [
+      { name: 'Geist Sans', provider: 'npm', weights: [400, 500, 600, 700] },
+    ],
   },
 
   nitro: {
