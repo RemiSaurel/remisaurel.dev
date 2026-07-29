@@ -221,7 +221,7 @@ const projectList = computed(() => {
         </div>
       </div>
     </div>
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+    <div class="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
       <motion.div
         v-for="(project, index) in projectList"
         :key="project.title"
