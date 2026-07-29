@@ -13,7 +13,7 @@
     "@nuxt/content": "^3.14.0",
     "@nuxt/icon": "^2.2.3",
     "@nuxt/image": "^2.0.0",
-    "@nuxt/ui": "^4.8.2",
+    "@nuxt/ui": "^4.10.0",
     "@nuxtjs/color-mode": "^4.0.1",
     "@vueuse/core": "^14.3.0",
     "motion-v": "2.2.1",
