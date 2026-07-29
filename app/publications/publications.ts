@@ -1,4 +1,6 @@
 export interface Publication {
+  /** Short stable slug, used to reference this publication from elsewhere (e.g. the research graph). */
+  id: string
   date: string
   title: string
   authors: string[]
@@ -13,6 +15,7 @@ const defaultAuthors = ['Rémi Saurel', 'Franck Silvestre', 'Jean-Baptiste Racle
 
 export const publications: Publication[] = [
   {
+    id: 'rjceiah-2026',
     date: 'Jun. 2026',
     title: 'Une double approche pour la co-conception de tableaux de bord d\'apprentissage : validation avec des prototypes, exploration avec un chatbot',
     authors: ['Rémi Saurel', 'Esther Félix', 'Franck Silvestre', 'Jean-Baptiste Raclet', 'Emmanuel Lescure'],
@@ -23,6 +26,7 @@ export const publications: Publication[] = [
     image: '/publications/rjceiah2026.avif',
   },
   {
+    id: 'lak-2026',
     date: 'Apr. 2026',
     title: 'Mind the Gap: Benchmarking AI vs. Human in Automatic Short Answer Grading',
     authors: defaultAuthors,
@@ -32,6 +36,7 @@ export const publications: Publication[] = [
     image: '/publications/lak2026.jpg',
   },
   {
+    id: 'ectel-2025',
     date: 'Sep. 2025',
     title: 'MAESTRO: Multi-Agent Educational System for Tutoring and Recommendation Orchestration',
     authors: defaultAuthors,
@@ -42,6 +47,7 @@ export const publications: Publication[] = [
     image: '/publications/ectel2025.jpg',
   },
   {
+    id: 'eiah-2025',
     date: 'Jun. 2025',
     title: 'Intégration responsable de l\'IA Générative dans l\'Éducation : proposition d\'un plan d\'actions stratégiques dirigé par les risques liés aux questions éthiques',
     authors: defaultAuthors,

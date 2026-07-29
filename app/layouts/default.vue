@@ -6,6 +6,7 @@ const { prefersReducedMotion } = usePrefersReducedMotion()
 
 const navItems = [
   { route: '/', label: 'About' },
+  { route: '/research', label: 'Research' },
   { route: '/posts', label: 'Posts' },
   { route: '/projects', label: 'Projects' },
 ]

@@ -28,6 +28,37 @@ html.dark {
   box-sizing: border-box;
 }
 
+/* Research landscape cluster color tokens — shared across ResearchLandscape's
+   child components, so they must be global (Vue's scoped CSS doesn't reach
+   into nested elements of child components). */
+.rl-root {
+  --rl-on: #ffffff;
+  --rl-region-fill: 0.05;
+  --rl-region-stroke: 0.26;
+  --rl-surface: #ffffff;
+  --rl-edge: rgb(115 115 115 / 0.22);
+}
+
+.dark .rl-root {
+  --rl-on: #171717;
+  --rl-region-fill: 0.08;
+  --rl-region-stroke: 0.24;
+  --rl-surface: #171717;
+  --rl-edge: rgb(163 163 163 / 0.18);
+}
+
+.rl-la { --c: 59 110 170; }
+.rl-hai { --c: 178 126 54; }
+.rl-aied { --c: 176 84 106; }
+.rl-ethics { --c: 70 140 108; }
+.rl-hub { --c: 64 64 64; }
+
+.dark .rl-la { --c: 138 178 226; }
+.dark .rl-hai { --c: 222 178 106; }
+.dark .rl-aied { --c: 219 145 163; }
+.dark .rl-ethics { --c: 126 194 162; }
+.dark .rl-hub { --c: 212 212 212; }
+
 /* Respect reduced motion: keep opacity/color, remove transform/position motion */
 @media (prefers-reduced-motion: reduce) {
   *,
