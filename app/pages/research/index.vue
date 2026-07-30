@@ -36,6 +36,12 @@ function reveal(delay: number) {
     return { initial: { opacity: 1, y: 0 }, transition: { duration: 0 } }
   return { initial: { opacity: 0, y: 15 }, transition: { ...transition, delay } }
 }
+
+function itemReveal(index: number) {
+  if (prefersReducedMotion.value)
+    return { initial: { opacity: 1, y: 0 }, transition: { duration: 0 } }
+  return { initial: { opacity: 0, y: 10 }, transition: { duration: 0.4, delay: Math.min(index, 7) * 0.04, ease: [0.23, 1, 0.32, 1] } }
+}
 </script>
 
 <template>
@@ -88,14 +94,21 @@ function reveal(delay: number) {
         </h2>
       </div>
       <div class="grid mt-4 gap-6 md:grid-cols-3">
-        <div v-for="item in approach" :key="item.title" class="flex flex-col gap-1.5">
+        <motion.div
+          v-for="(item, index) in approach"
+          :key="item.title"
+          :initial="itemReveal(index).initial"
+          :animate="{ opacity: 1, y: 0 }"
+          :transition="itemReveal(index).transition"
+          class="flex flex-col gap-1.5"
+        >
           <h3 class="m-0 text-sm font-medium">
             {{ item.title }}
           </h3>
           <p class="m-0 text-sm text-neutral-500 leading-relaxed dark:text-neutral-400">
             {{ item.body }}
           </p>
-        </div>
+        </motion.div>
       </div>
     </motion.section>
 

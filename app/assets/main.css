@@ -99,6 +99,17 @@ a {
   background-color: rgb(212 212 212 / 0.25); /* neutral-300 */
 }
 
+/* Page route transition */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity var(--duration-short) var(--ease-out);
+}
+
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+}
+
 /* Divider line */
 .divider {
   width: 100%;

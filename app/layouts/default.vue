@@ -47,7 +47,7 @@ function isActive(path: string) {
             >
               <NuxtLink
                 :to="item.route"
-                class="pressable whitespace-nowrap rounded-sm text-xs text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 sm:text-sm"
+                class="pressable whitespace-nowrap rounded-sm text-xs text-neutral-500 transition-colors duration-200 sm:text-sm dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
                 :class="{ 'text-neutral-900! dark:text-neutral-100!': isActive(item.route) }"
               >
                 {{ item.label }}

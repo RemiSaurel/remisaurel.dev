@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { NewsCategory } from '~/news/news'
+import { motion } from 'motion-v'
+import { useFirstVisit } from '~/composables/useFirstVisit'
 import { news } from '~/news/news'
 
 interface Props {
@@ -73,6 +75,15 @@ function hasLink(item: typeof news[0]) {
 function getFirstLink(item: typeof news[0]) {
   return item.links?.[0]?.url || '#'
 }
+
+const { prefersReducedMotion } = usePrefersReducedMotion()
+const { isFirstVisit } = useFirstVisit()
+
+function itemMotion(index: number) {
+  if (prefersReducedMotion.value || !isFirstVisit.value)
+    return { initial: { opacity: 1, y: 0 }, transition: { duration: 0 } }
+  return { initial: { opacity: 0, y: 10 }, transition: { duration: 0.4, delay: Math.min(index, 7) * 0.04, ease: [0.23, 1, 0.32, 1] } }
+}
 </script>
 
 <template>
@@ -85,7 +96,7 @@ function getFirstLink(item: typeof news[0]) {
         as="button"
         :variant="selectedCategory === category ? 'solid' : 'subtle'"
         color="neutral"
-        class="rounded-none capitalize pressable cursor-pointer"
+        class="capitalize pressable cursor-pointer rounded-none"
         @click="toggleFilter(category)"
       >
         {{ category }} ({{ categoryCounts[category] }})
@@ -94,8 +105,12 @@ function getFirstLink(item: typeof news[0]) {
 
     <!-- News list -->
     <div class="flex flex-col gap-1">
-      <template v-for="item in displayedNews" :key="item.title + item.date.toString()">
-        <div>
+      <template v-for="(item, index) in displayedNews" :key="item.title + item.date.toString()">
+        <motion.div
+          :initial="itemMotion(index).initial"
+          :animate="{ opacity: 1, y: 0 }"
+          :transition="itemMotion(index).transition"
+        >
           <component
             :is="hasLink(item) ? 'a' : 'div'"
             :href="hasLink(item) ? getFirstLink(item) : undefined"
@@ -166,7 +181,7 @@ function getFirstLink(item: typeof news[0]) {
               </div>
             </div>
           </component>
-        </div>
+        </motion.div>
       </template>
     </div>
 
