@@ -14,6 +14,15 @@ export interface Publication {
 const defaultAuthors = ['Rémi Saurel', 'Franck Silvestre', 'Jean-Baptiste Raclet', 'Emmanuel Lescure']
 
 export const publications: Publication[] = [
+    {
+    id: 'ectel-2026',
+    date: new Date('2026-09-16'),
+    title: 'Spaced Testing in French Secondary Education: A Quantitative Analysis of Students’ Revision Practices Using an Interactive System',
+    authors: ['Denis Ollivier', 'Rémi Saurel', 'Jean-Baptiste Raclet', 'Emmanuel Lescure', 'Julien Broisin', 'Franck Silvestre'],
+    subtitle: 'A quantitative analysis during the experimentation of Denis\' PhD.',
+    venue: 'ECTEL 2026',
+    image: '/publications/ectel2026.avif',
+  },
   {
     id: 'rjceiah-2026',
     date: new Date('2026-06-01'),
