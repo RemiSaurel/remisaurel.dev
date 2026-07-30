@@ -1,13 +1,9 @@
 <script setup lang="ts">
 import type { Project } from '~/pages/projects/index.vue'
-import { motion } from 'motion-v'
 
 defineProps<{
   project: Project
 }>()
-
-const cardHover = useMotionHover({ y: -4 })
-const linkHover = useMotionHover({ scale: 1.15 })
 
 function getIconName(key: string) {
   switch (key) {
@@ -22,51 +18,40 @@ function getIconName(key: string) {
 </script>
 
 <template>
-  <motion.div
-    class="group relative min-h-24 min-w-42 flex flex-col gap-2 overflow-clip border-zinc-1 border-t-solid bg-zinc-1/60 px-4 pb-2 pt-4 transition-all duration-500 dark:border-zinc-5 dark:bg-zinc-7 hover:bg-zinc-2/60 dark:hover:bg-zinc-6"
-    :while-hover="cardHover"
-    :transition="{ type: 'spring', stiffness: 300, damping: 20 }"
+  <div
+    class="group h-full flex flex-col justify-between gap-3 bg-neutral-100/60 px-4 pb-2 pt-4 transition-all duration-300 ease-out dark:bg-neutral-800/60 hover:bg-neutral-100 dark:hover:bg-neutral-800"
   >
-    <div
-      class="absolute text-5xl opacity-40 transition-all duration-400 -right-3 -top-3 group-hover:translate-x--5 group-hover:translate-y-2.5 -rotate-20 group-hover:scale-105 group-hover:opacity-50 group-hover:-rotate-0"
-    >
-      {{ project.icon }}
-    </div>
-    <div class="h-full flex flex-col justify-between gap-8">
-      <div
-        class="flex flex-col justify-between gap-2 text-zinc-5 transition-all duration-500 dark:text-zinc-3 group-hover:text-zinc-8 dark:group-hover:text-zinc-1"
-      >
-        <h2 class="m-0 text-xl font-semibold">
+    <div class="flex flex-col gap-2">
+      <div class="flex items-start justify-between gap-3">
+        <h2 class="m-0 text-base text-neutral-900 font-semibold leading-snug dark:text-neutral-100">
           {{ project.title }}
         </h2>
-
-        <div class="flex text-sm leading-tight opacity-70">
-          {{ project.description }}
-        </div>
+        <span v-if="project.icon" class="shrink-0 text-lg leading-none opacity-70">{{ project.icon }}</span>
       </div>
 
-      <div class="flex justify-between text-zinc-500 dark:text-zinc-400">
-        <div
-          v-if="project.links && Object.keys(project.links).length"
-          class="flex gap-4"
-        >
-          <motion.a
-            v-for="(link, key) in project.links"
-            :key="key"
-            :href="link"
-            target="_blank"
-            class="pressable transition hover:text-zinc-700 dark:hover:text-zinc-2"
-            :while-hover="linkHover"
-            :transition="{ type: 'spring', stiffness: 400, damping: 17 }"
-          >
-            <Icon :name="getIconName(key)" class="size-5" />
-          </motion.a>
-        </div>
-        <div v-else class="ml-auto" />
-        <div>
-          {{ project.date }}
-        </div>
-      </div>
+      <p class="m-0 text-sm text-neutral-500 leading-relaxed dark:text-neutral-400">
+        {{ project.description }}
+      </p>
     </div>
-  </motion.div>
+
+    <div class="flex items-center justify-between">
+      <div
+        v-if="project.links && Object.keys(project.links).length"
+        class="flex gap-3"
+      >
+        <a
+          v-for="(link, key) in project.links"
+          :key="key"
+          :href="link"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="pressable text-neutral-400 transition-colors duration-200 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100"
+        >
+          <Icon :name="getIconName(key)" class="size-4" />
+        </a>
+      </div>
+      <div v-else />
+      <span class="tabular-nums text-xs text-neutral-400 dark:text-neutral-500">{{ project.date }}</span>
+    </div>
+  </div>
 </template>

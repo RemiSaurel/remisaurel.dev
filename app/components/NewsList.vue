@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { NewsCategory } from '~/news/news'
+import { motion } from 'motion-v'
+import { useFirstVisit } from '~/composables/useFirstVisit'
 import { news } from '~/news/news'
 
 interface Props {
@@ -66,13 +68,6 @@ function toggleFilter(category: NewsCategory) {
   displayLimit.value = props.limit
 }
 
-function formatDate(date: Date) {
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(date))
-}
-
 function hasLink(item: typeof news[0]) {
   return item.links && item.links.length > 0
 }
@@ -80,19 +75,28 @@ function hasLink(item: typeof news[0]) {
 function getFirstLink(item: typeof news[0]) {
   return item.links?.[0]?.url || '#'
 }
+
+const { prefersReducedMotion } = usePrefersReducedMotion()
+const { isFirstVisit } = useFirstVisit()
+
+function itemMotion(index: number) {
+  if (prefersReducedMotion.value || !isFirstVisit.value)
+    return { initial: { opacity: 1, y: 0 }, transition: { duration: 0 } }
+  return { initial: { opacity: 0, y: 10 }, transition: { duration: 0.4, delay: Math.min(index, 7) * 0.04, ease: [0.23, 1, 0.32, 1] } }
+}
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
     <!-- Tag filters -->
-    <div class="flex flex-wrap gap-2">
+    <div class="mt-2 flex flex-wrap gap-2">
       <UBadge
         v-for="category in categories"
         :key="category"
         as="button"
-        :variant="selectedCategory === category ? 'solid' : 'outline'"
+        :variant="selectedCategory === category ? 'solid' : 'subtle'"
         color="neutral"
-        class="capitalize pressable cursor-pointer"
+        class="capitalize pressable cursor-pointer rounded-none"
         @click="toggleFilter(category)"
       >
         {{ category }} ({{ categoryCounts[category] }})
@@ -100,16 +104,20 @@ function getFirstLink(item: typeof news[0]) {
     </div>
 
     <!-- News list -->
-    <div class="flex flex-col">
-      <template v-for="item in displayedNews" :key="item.title + item.date.toString()">
-        <div>
+    <div class="flex flex-col gap-1">
+      <template v-for="(item, index) in displayedNews" :key="item.title + item.date.toString()">
+        <motion.div
+          :initial="itemMotion(index).initial"
+          :animate="{ opacity: 1, y: 0 }"
+          :transition="itemMotion(index).transition"
+        >
           <component
             :is="hasLink(item) ? 'a' : 'div'"
             :href="hasLink(item) ? getFirstLink(item) : undefined"
             :target="hasLink(item) ? '_blank' : undefined"
             :rel="hasLink(item) ? 'noopener noreferrer' : undefined"
-            class="block border-b border-neutral-200 px-3 py-3 transition-all duration-300 ease-out dark:border-neutral-800"
-            :class="{ 'pressable hover:bg-neutral-50 dark:hover:bg-neutral-900 cursor-pointer group': hasLink(item) }"
+            class="block px-3 py-3 transition-all duration-300 ease-out"
+            :class="{ 'pressable hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer group': hasLink(item) }"
           >
             <!-- Mobile: Stacked layout -->
             <div class="flex flex-col gap-2 md:hidden">
@@ -121,7 +129,7 @@ function getFirstLink(item: typeof news[0]) {
                     <span
                       v-for="cat in item.categories?.slice(0, 2)"
                       :key="cat"
-                      class="whitespace-nowrap border border-neutral-300 px-1.5 py-0.5 text-xs text-neutral-500 dark:border-neutral-700 dark:text-neutral-400"
+                      class="whitespace-nowrap bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400"
                     >
                       {{ cat }}
                     </span>
@@ -173,14 +181,14 @@ function getFirstLink(item: typeof news[0]) {
               </div>
             </div>
           </component>
-        </div>
+        </motion.div>
       </template>
     </div>
 
     <!-- Load more button -->
     <button
       v-if="hasMoreItems"
-      class="group mt-2 inline-flex pressable cursor-pointer items-center self-center gap-1 border border-neutral-300 rounded-full bg-transparent px-3 py-2 text-xs text-neutral-600 transition-colors duration-200 dark:border-neutral-600 hover:border-neutral-900 hover:bg-neutral-50 dark:text-neutral-400 dark:hover:border-neutral-200 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
+      class="group mt-2 inline-flex pressable cursor-pointer items-center self-center gap-1 rounded-none bg-neutral-100 px-3 py-2 text-xs text-neutral-600 transition-colors duration-200 dark:bg-neutral-800 hover:bg-neutral-200 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200"
       @click="loadMore"
     >
       <span>Show more</span>

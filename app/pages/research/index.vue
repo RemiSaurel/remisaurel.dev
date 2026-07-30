@@ -10,6 +10,7 @@ useSeoMeta({
 })
 
 const { prefersReducedMotion } = usePrefersReducedMotion()
+const { setCursorLogo, clearCursorLogo } = useCursorLogo()
 
 const approach = [
   {
@@ -35,6 +36,12 @@ function reveal(delay: number) {
   if (prefersReducedMotion.value)
     return { initial: { opacity: 1, y: 0 }, transition: { duration: 0 } }
   return { initial: { opacity: 0, y: 15 }, transition: { ...transition, delay } }
+}
+
+function itemReveal(index: number) {
+  if (prefersReducedMotion.value)
+    return { initial: { opacity: 1, y: 0 }, transition: { duration: 0 } }
+  return { initial: { opacity: 0, y: 10 }, transition: { duration: 0.4, delay: Math.min(index, 7) * 0.04, ease: [0.23, 1, 0.32, 1] } }
 }
 </script>
 
@@ -64,8 +71,8 @@ function reveal(delay: number) {
       :transition="reveal(0.1).transition"
       class="flex flex-col"
     >
-      <div class="my-2 flex items-center justify-between border-b border-neutral-200 pb-1 dark:border-neutral-800">
-        <h2 class="uppercase m-0 text-xl text-neutral-600 font-medium tracking-wide dark:text-neutral-400">
+      <div class="mb-3 mt-2 flex items-center justify-between">
+        <h2 class="m-0 text-xl text-neutral-700 font-medium tracking-tight dark:text-neutral-300">
           Research Landscape
         </h2>
       </div>
@@ -82,20 +89,27 @@ function reveal(delay: number) {
       :transition="reveal(0.3).transition"
       class="flex flex-col"
     >
-      <div class="my-2 flex items-center justify-between border-b border-neutral-200 pb-1 dark:border-neutral-800">
-        <h2 class="uppercase m-0 text-xl text-neutral-600 font-medium tracking-wide dark:text-neutral-400">
+      <div class="mb-3 mt-2 flex items-center justify-between">
+        <h2 class="m-0 text-xl text-neutral-700 font-medium tracking-tight dark:text-neutral-300">
           Approach
         </h2>
       </div>
       <div class="grid mt-4 gap-6 md:grid-cols-3">
-        <div v-for="item in approach" :key="item.title" class="flex flex-col gap-1.5">
+        <motion.div
+          v-for="(item, index) in approach"
+          :key="item.title"
+          :initial="itemReveal(index).initial"
+          :animate="{ opacity: 1, y: 0 }"
+          :transition="itemReveal(index).transition"
+          class="flex flex-col gap-1.5"
+        >
           <h3 class="m-0 text-sm font-medium">
             {{ item.title }}
           </h3>
           <p class="m-0 text-sm text-neutral-500 leading-relaxed dark:text-neutral-400">
             {{ item.body }}
           </p>
-        </div>
+        </motion.div>
       </div>
     </motion.section>
 
@@ -106,18 +120,33 @@ function reveal(delay: number) {
       :transition="reveal(0.4).transition"
       class="flex flex-col"
     >
-      <div class="my-2 flex items-center justify-between border-b border-neutral-200 pb-1 dark:border-neutral-800">
-        <h2 class="uppercase m-0 text-xl text-neutral-600 font-medium tracking-wide dark:text-neutral-400">
+      <div class="mb-3 mt-2 flex items-center justify-between">
+        <h2 class="m-0 text-xl text-neutral-700 font-medium tracking-tight dark:text-neutral-300">
           Context
         </h2>
       </div>
       <p class="mt-4 max-w-2xl text-neutral-500 dark:text-neutral-400">
         PhD student at the
-        <a href="https://www.irit.fr/" target="_blank" rel="noopener noreferrer" class="intro-link pressable text-neutral-900 dark:text-neutral-100">IRIT</a>
+        <a
+          href="https://www.irit.fr/" target="_blank" rel="noopener noreferrer"
+          class="intro-link pressable text-neutral-900 dark:text-neutral-100"
+          @mouseenter="setCursorLogo(ENTITY_LOGOS.irit)"
+          @mouseleave="clearCursorLogo"
+        >IRIT</a>
         lab in Toulouse, in the
-        <a href="https://www.irit.fr/TALENT/site/" target="_blank" rel="noopener noreferrer" class="intro-link pressable text-neutral-900 dark:text-neutral-100">TALENT</a>
+        <a
+          href="https://www.irit.fr/TALENT/site/" target="_blank" rel="noopener noreferrer"
+          class="intro-link pressable text-neutral-900 dark:text-neutral-100"
+          @mouseenter="setCursorLogo(ENTITY_LOGOS.talent)"
+          @mouseleave="clearCursorLogo"
+        >TALENT</a>
         team, in collaboration with
-        <a href="https://www.kosmos-education.com/" target="_blank" rel="noopener noreferrer" class="intro-link pressable text-neutral-900 dark:text-neutral-100">Kosmos Education</a>.
+        <a
+          href="https://www.kosmos-education.com/" target="_blank" rel="noopener noreferrer"
+          class="intro-link pressable text-neutral-900 dark:text-neutral-100"
+          @mouseenter="setCursorLogo(ENTITY_LOGOS.kosmos)"
+          @mouseleave="clearCursorLogo"
+        >Kosmos Education</a>.
         Field work happens in French K-12 schools, currently around
         <span class="text-neutral-900 dark:text-neutral-100">Konsolidation</span>, an
         out-of-class study app.

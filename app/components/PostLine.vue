@@ -13,7 +13,7 @@ const nuxtLink = resolveComponent('NuxtLink')
 
 // Computed classes for better maintainability
 const containerClasses = computed(() => [
-  'pressable w-full flex flex-col gap-1',
+  'origin-left w-full flex flex-col gap-1',
   props.disabled ? 'opacity-40' : 'group',
 ])
 

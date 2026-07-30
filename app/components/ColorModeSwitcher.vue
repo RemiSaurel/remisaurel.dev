@@ -11,21 +11,32 @@ const isDark = computed(() => colorMode.preference === 'dark')
 
 <template>
   <button
-    class="h-8 w-8 flex pressable items-center justify-center border border-neutral-300 bg-transparent transition-colors duration-200 dark:border-neutral-700 hover:border-neutral-900 dark:hover:border-neutral-100"
+    class="relative h-8 w-8 flex pressable items-center justify-center bg-neutral-100 transition-colors duration-200 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700"
     aria-label="Toggle color mode"
     @click="toggleColorMode"
   >
     <ClientOnly>
       <Icon
-        v-if="isDark"
         name="uil:sun"
-        class="h-4 w-4 text-white"
+        class="theme-icon text-white"
+        :style="{ opacity: isDark ? 1 : 0 }"
       />
       <Icon
-        v-else
         name="uil:moon"
-        class="h-4 w-4"
+        class="theme-icon"
+        :style="{ opacity: isDark ? 0 : 1 }"
       />
     </ClientOnly>
   </button>
 </template>
+
+<style scoped>
+.theme-icon {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  height: 1rem;
+  width: 1rem;
+  transition: opacity var(--duration-micro) var(--ease-out);
+}
+</style>

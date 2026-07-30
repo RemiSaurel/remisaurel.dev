@@ -9,5 +9,7 @@ useSeoMeta({
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
+    <CursorLogo />
+    <TetrisGame />
   </UApp>
 </template>

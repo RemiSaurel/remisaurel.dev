@@ -12,6 +12,10 @@ minimumReleaseAgeExclude:
   - '@nuxt/vite-builder@4.4.6'
   - isomorphic-git@1.38.1
   - nuxt@4.4.6
+  - '@nuxt/image@2.1.0'
+  - '@vueuse/core@14.4.0'
+  - '@vueuse/metadata@14.4.0'
+  - '@vueuse/shared@14.4.0'
 shellEmulator: true
 
 trustPolicy: no-downgrade

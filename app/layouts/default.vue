@@ -22,21 +22,22 @@ function isActive(path: string) {
   <div class="min-h-screen bg-white text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100">
     <!-- Navigation -->
     <nav>
-      <div class="mx-auto max-w-7xl px-6 py-4">
-        <div class="flex items-center justify-between">
+      <div class="mx-auto max-w-7xl px-4 py-3 sm:px-6 sm:py-4">
+        <div class="flex items-center justify-between gap-3">
           <!-- Logo/Name -->
           <motion.div
+            class="shrink-0"
             :initial="prefersReducedMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }"
             :animate="{ opacity: 1, x: 0 }"
             :transition="prefersReducedMotion ? { duration: 0 } : { duration: 0.4 }"
           >
-            <NuxtLink to="/" class="pressable rounded-sm text-sm font-medium tracking-tight">
+            <NuxtLink to="/" class="pressable whitespace-nowrap rounded-sm text-xs font-medium tracking-tight sm:text-sm">
               Rémi Saurel
             </NuxtLink>
           </motion.div>
 
           <!-- Nav Links -->
-          <div class="flex items-center gap-6">
+          <div class="flex items-center gap-2 sm:gap-6">
             <motion.div
               v-for="(item, index) in navItems"
               :key="item.route"
@@ -46,7 +47,7 @@ function isActive(path: string) {
             >
               <NuxtLink
                 :to="item.route"
-                class="pressable rounded-sm text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+                class="pressable whitespace-nowrap rounded-sm text-xs text-neutral-500 transition-colors duration-200 sm:text-sm dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
                 :class="{ 'text-neutral-900! dark:text-neutral-100!': isActive(item.route) }"
               >
                 {{ item.label }}
@@ -55,6 +56,7 @@ function isActive(path: string) {
 
             <!-- Theme Toggle -->
             <motion.div
+              class="shrink-0"
               :initial="prefersReducedMotion ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }"
               :animate="{ opacity: 1, scale: 1 }"
               :transition="prefersReducedMotion ? { duration: 0 } : { duration: 0.3, delay: 0.3 }"
@@ -72,8 +74,8 @@ function isActive(path: string) {
     </main>
 
     <!-- Footer -->
-    <footer class="mt-auto border-t border-neutral-200 dark:border-neutral-800">
-      <div class="mx-auto max-w-7xl px-6 py-6">
+    <footer class="mt-auto">
+      <div class="mx-auto max-w-7xl px-6 py-10">
         <p class="text-xs text-neutral-400 dark:text-neutral-600">
           &copy; {{ new Date().getFullYear() }} Rémi Saurel
         </p>

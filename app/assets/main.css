@@ -32,6 +32,7 @@ html.dark {
    child components, so they must be global (Vue's scoped CSS doesn't reach
    into nested elements of child components). */
 .rl-root {
+  font-family: "Geist Sans", -apple-system, BlinkMacSystemFont, sans-serif;
   --rl-on: #ffffff;
   --rl-region-fill: 0.05;
   --rl-region-stroke: 0.26;
@@ -58,6 +59,29 @@ html.dark {
 .dark .rl-aied { --c: 219 145 163; }
 .dark .rl-ethics { --c: 126 194 162; }
 .dark .rl-hub { --c: 212 212 212; }
+
+/* Tetris piece colors — same "muted RGB triple, lightened for dark mode" recipe
+   as the research landscape clusters above, kept as its own token set so the
+   two features can evolve independently. */
+.tetris-root {
+  --tetris-i: 64 152 178;
+  --tetris-o: 185 140 58;
+  --tetris-t: 140 92 176;
+  --tetris-s: 70 140 108;
+  --tetris-z: 176 84 96;
+  --tetris-j: 64 108 176;
+  --tetris-l: 191 122 56;
+}
+
+.dark .tetris-root {
+  --tetris-i: 138 202 224;
+  --tetris-o: 224 186 118;
+  --tetris-t: 200 164 224;
+  --tetris-s: 126 194 162;
+  --tetris-z: 224 148 158;
+  --tetris-j: 148 178 226;
+  --tetris-l: 224 168 110;
+}
 
 /* Respect reduced motion: keep opacity/color, remove transform/position motion */
 @media (prefers-reduced-motion: reduce) {
@@ -86,6 +110,27 @@ a {
 /* Remove mobile tap highlight */
 * {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Neutral text-selection highlight (override browser default blue) */
+::selection {
+  background-color: rgb(64 64 64 / 0.25); /* neutral-700 */
+  color: inherit;
+}
+
+.dark ::selection {
+  background-color: rgb(212 212 212 / 0.25); /* neutral-300 */
+}
+
+/* Page route transition */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity var(--duration-short) var(--ease-out);
+}
+
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
 }
 
 /* Divider line */
