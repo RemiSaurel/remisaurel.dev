@@ -36,12 +36,12 @@ onBeforeUnmount(() => {
     <div
       v-if="enabled"
       class="cursor-logo-follower pointer-events-none fixed left-0 top-0 z-100"
-      :style="{ transform: `translate3d(${x+12}px, ${y-16}px, 0)` }"
+      :style="{ transform: `translate3d(${x + 12}px, ${y - 16}px, 0)` }"
     >
       <Transition name="cursor-logo">
         <div
           v-if="activeLogo"
-          class="relative h-9 w-13 p-0 flex items-center justify-center rounded-xl shadow-lg bg-white ring-1 ring-black/5"
+          class="relative h-9 w-13 flex items-center justify-center rounded-xl bg-white p-0 shadow-lg ring-1 ring-black/5"
         >
           <img :src="activeLogo.src" :alt="activeLogo.alt" class="max-h-6 max-w-9">
           <span

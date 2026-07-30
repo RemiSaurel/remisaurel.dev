@@ -4,7 +4,7 @@ import { defineConfig } from 'unocss'
 export default defineConfig({
   presets: [presetMini()],
   shortcuts: {
-    pressable: 'transition-transform duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97]',
+    'pressable': 'transition-transform duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97]',
     'rl-node-theme': 'block py-[0.4rem] px-[0.75rem] text-[0.68rem] font-600 leading-[1.35] tracking-[0.09em] case-upper',
     'rl-node-hub': 'rl-node-theme',
     'rl-node-topic': 'block py-[0.34rem] px-[0.7rem] text-[0.78rem] leading-[1.35]',

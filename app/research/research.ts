@@ -289,32 +289,32 @@ export const researchLinks: ResearchLink[] = [
 interface Vec { x: number, y: number }
 
 const LAYOUT: Record<string, Vec> = {
-  tel: { x: 499, y: 297 },
+  'tel': { x: 499, y: 297 },
 
   // Learning Analytics
-  la: { x: 337, y: 92 },
-  indicators: { x: 160, y: 35 },
-  dashboards: { x: 54, y: 100 },
-  rjceiah: { x: 185, y: 200 },
+  'la': { x: 337, y: 92 },
+  'indicators': { x: 160, y: 35 },
+  'dashboards': { x: 54, y: 100 },
+  'rjceiah': { x: 185, y: 200 },
 
   // Human-AI Interaction
-  hai: { x: 287, y: 380 },
+  'hai': { x: 287, y: 380 },
   'co-design': { x: 163, y: 339 },
-  decisions: { x: 94, y: 408 },
+  'decisions': { x: 94, y: 408 },
 
   // AI in Education
-  aied: { x: 644, y: 148 },
-  llm: { x: 746, y: 72 },
+  'aied': { x: 644, y: 148 },
+  'llm': { x: 746, y: 72 },
   'multi-agent': { x: 586, y: 101 },
-  asag: { x: 905, y: 144 },
-  ectel: { x: 551, y: 44 },
-  lak: { x: 914, y: 43 },
+  'asag': { x: 905, y: 144 },
+  'ectel': { x: 551, y: 44 },
+  'lak': { x: 914, y: 43 },
 
   // AI & Ethics
-  ethics: { x: 711, y: 357 },
-  eiah: { x: 789, y: 227 },
+  'ethics': { x: 711, y: 357 },
+  'eiah': { x: 789, y: 227 },
   'responsible-ai': { x: 894, y: 357 },
-  governance: { x: 841, y: 423 },
+  'governance': { x: 841, y: 423 },
 }
 
 function findPublication(id: string): Publication | undefined {

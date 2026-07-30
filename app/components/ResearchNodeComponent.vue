@@ -32,7 +32,7 @@ function pct(value: number, total: number) {
       :target="node.url ? '_blank' : undefined"
       :rel="node.url ? 'noopener noreferrer' : undefined"
       :draggable="false"
-      class="rl-node relative touch-none transition-opacity active:cursor-grabbing"
+      class="rl-node touch-none relative transition-opacity active:cursor-grabbing"
       :class="[
         node.url ? 'intro-link pressable cursor-pointer' : 'cursor-grab text-center',
         `rl-node-${node.kind}`,

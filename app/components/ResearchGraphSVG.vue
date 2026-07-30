@@ -32,7 +32,7 @@ function clusterClass(ids: ClusterId[]) {
       :y="region.rect.y"
       :width="region.rect.width"
       :height="region.rect.height"
-      class="rl-region touch-none cursor-grab active:cursor-grabbing stroke-1 transition-opacity"
+      class="rl-region touch-none cursor-grab stroke-1 transition-opacity active:cursor-grabbing"
       :class="clusterClass([region.id])"
       :style="{ opacity: focusedClusters ? (focusedClusters.has(region.id) ? 1 : 0.3) : 1 }"
     />
