@@ -26,6 +26,7 @@ const transition = {
 }
 
 const { prefersReducedMotion } = usePrefersReducedMotion()
+const { setCursorLogo, clearCursorLogo } = useCursorLogo()
 </script>
 
 <template>
@@ -44,9 +45,21 @@ const { prefersReducedMotion } = usePrefersReducedMotion()
           class="intro-text"
         >
           French PhD student at the
-          <a href="https://www.irit.fr/" target="_blank" class="intro-link pressable">IRIT</a> lab in Toulouse, working in the
-          <a href="https://www.irit.fr/TALENT/site/" target="_blank" class="intro-link pressable">TALENT</a> team, in collaboration with
-          <a href="https://www.kosmos-education.com/" target="_blank" class="intro-link pressable">Kosmos Education</a>.
+          <a
+            href="https://www.irit.fr/" target="_blank" class="intro-link pressable"
+            @mouseenter="setCursorLogo(ENTITY_LOGOS.irit)"
+            @mouseleave="clearCursorLogo"
+          >IRIT</a> lab in Toulouse, working in the
+          <a
+            href="https://www.irit.fr/TALENT/site/" target="_blank" class="intro-link pressable"
+            @mouseenter="setCursorLogo(ENTITY_LOGOS.talent)"
+            @mouseleave="clearCursorLogo"
+          >TALENT</a> team, in collaboration with
+          <a
+            href="https://www.kosmos-education.com/" target="_blank" class="intro-link pressable"
+            @mouseenter="setCursorLogo(ENTITY_LOGOS.kosmos)"
+            @mouseleave="clearCursorLogo"
+          >Kosmos Education</a>.
         </motion.p>
         <motion.p
           :initial="(animate.value && !prefersReducedMotion.value) ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }"

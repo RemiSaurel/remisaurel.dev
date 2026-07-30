@@ -10,6 +10,7 @@ useSeoMeta({
 })
 
 const { prefersReducedMotion } = usePrefersReducedMotion()
+const { setCursorLogo, clearCursorLogo } = useCursorLogo()
 
 const approach = [
   {
@@ -126,11 +127,26 @@ function itemReveal(index: number) {
       </div>
       <p class="mt-4 max-w-2xl text-neutral-500 dark:text-neutral-400">
         PhD student at the
-        <a href="https://www.irit.fr/" target="_blank" rel="noopener noreferrer" class="intro-link pressable text-neutral-900 dark:text-neutral-100">IRIT</a>
+        <a
+          href="https://www.irit.fr/" target="_blank" rel="noopener noreferrer"
+          class="intro-link pressable text-neutral-900 dark:text-neutral-100"
+          @mouseenter="setCursorLogo(ENTITY_LOGOS.irit)"
+          @mouseleave="clearCursorLogo"
+        >IRIT</a>
         lab in Toulouse, in the
-        <a href="https://www.irit.fr/TALENT/site/" target="_blank" rel="noopener noreferrer" class="intro-link pressable text-neutral-900 dark:text-neutral-100">TALENT</a>
+        <a
+          href="https://www.irit.fr/TALENT/site/" target="_blank" rel="noopener noreferrer"
+          class="intro-link pressable text-neutral-900 dark:text-neutral-100"
+          @mouseenter="setCursorLogo(ENTITY_LOGOS.talent)"
+          @mouseleave="clearCursorLogo"
+        >TALENT</a>
         team, in collaboration with
-        <a href="https://www.kosmos-education.com/" target="_blank" rel="noopener noreferrer" class="intro-link pressable text-neutral-900 dark:text-neutral-100">Kosmos Education</a>.
+        <a
+          href="https://www.kosmos-education.com/" target="_blank" rel="noopener noreferrer"
+          class="intro-link pressable text-neutral-900 dark:text-neutral-100"
+          @mouseenter="setCursorLogo(ENTITY_LOGOS.kosmos)"
+          @mouseleave="clearCursorLogo"
+        >Kosmos Education</a>.
         Field work happens in French K-12 schools, currently around
         <span class="text-neutral-900 dark:text-neutral-100">Konsolidation</span>, an
         out-of-class study app.

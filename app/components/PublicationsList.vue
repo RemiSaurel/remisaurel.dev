@@ -39,8 +39,8 @@ function itemMotion(index: number) {
         :href="hasLink(pub) ? pub.url : undefined"
         :target="hasLink(pub) ? '_blank' : undefined"
         :rel="hasLink(pub) ? 'noopener noreferrer' : undefined"
-        class="block pressable px-3 py-4 transition-all duration-300 ease-out"
-        :class="{ 'hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer group': hasLink(pub) }"
+        class="block  px-3 py-4 transition-all duration-300 ease-out"
+        :class="{ 'hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer group pressable': hasLink(pub) }"
       >
         <!-- Mobile: Stacked layout -->
         <div class="flex flex-col gap-2 md:hidden">
