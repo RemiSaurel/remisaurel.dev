@@ -86,8 +86,10 @@ function handlePhotoClick(event: MouseEvent) {
     setTimeout(openTetris, prefersReducedMotion.value ? 0 : 180)
 }
 
-const socialLinks = [
+const socialLinksBeforeCv = [
   { icon: 'academicons:google-scholar', url: 'https://scholar.google.com/citations?hl=fr&user=r8AM0OIAAAAJ', label: 'Google Scholar' },
+]
+const socialLinksAfterCv = [
   { icon: 'uil:github-alt', url: 'https://github.com/remisaurel', label: 'GitHub' },
   { icon: 'uil:linkedin', url: 'https://www.linkedin.com/in/r%C3%A9mi-saurel/', label: 'LinkedIn' },
   { icon: 'i-simple-icons-x', url: 'https://twitter.com/remisaurel', label: 'X' },
@@ -95,6 +97,23 @@ const socialLinks = [
 
 const socialHover = useMotionHover({ scale: 1.08, y: -2 })
 const photoHover = useMotionHover({ scale: 1.02, rotate: -0.75 })
+
+const isHoldingCv = ref(false)
+
+function startCvHold() {
+  isHoldingCv.value = true
+}
+
+function cancelCvHold() {
+  isHoldingCv.value = false
+}
+
+function completeCvHold() {
+  if (!isHoldingCv.value)
+    return
+  isHoldingCv.value = false
+  navigateTo('/failures')
+}
 
 const transition = {
   duration: 0.6,
@@ -109,7 +128,9 @@ function computedTransition(delay: number) {
 }
 
 function computedInitial(y: number) {
-  return props.animate && !prefersReducedMotion.value ? { opacity: 0, y } : { opacity: 1, y: 0 }
+  return props.animate && !prefersReducedMotion.value
+    ? { opacity: 0, y, filter: 'blur(8px)' }
+    : { opacity: 1, y: 0, filter: 'blur(0px)' }
 }
 </script>
 
@@ -118,7 +139,7 @@ function computedInitial(y: number) {
     <!-- Mobile: Horizontal layout with large photo -->
     <motion.div
       :initial="computedInitial(15)"
-      :animate="{ opacity: 1, y: 0 }"
+      :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
       :transition="computedTransition(0.1)"
       class="lg:hidden"
     >
@@ -138,7 +159,7 @@ function computedInitial(y: number) {
           <span
             v-for="p in particles"
             :key="p.id"
-            class="particle absolute left-1/2 top-1/2 rounded-full"
+            class="[animation:photo-particle_650ms_var(--ease-out)_forwards] absolute left-1/2 top-1/2 rounded-full"
             :class="p.accent ? 'bg-amber-500' : 'bg-neutral-700 dark:bg-neutral-200'"
             :style="{ 'width': `${p.size}px`, 'height': `${p.size}px`, '--sx': `${p.sx}px`, '--sy': `${p.sy}px`, '--tx': `${p.tx}px`, '--ty': `${p.ty}px` }"
           />
@@ -164,7 +185,53 @@ function computedInitial(y: number) {
       <!-- Social links below -->
       <div class="mt-4 flex items-center gap-2">
         <motion.a
-          v-for="link in socialLinks"
+          v-for="link in socialLinksBeforeCv"
+          :key="link.url"
+          :href="link.url"
+          target="_blank"
+          rel="noopener noreferrer"
+          :aria-label="link.label"
+          class="size-8 inline-flex pressable items-center justify-center bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
+          :while-hover="socialHover"
+          :transition="{ type: 'spring', stiffness: 400, damping: 17 }"
+        >
+          <Icon :name="link.icon" class="size-4" />
+        </motion.a>
+
+        <div class="relative size-8 shrink-0">
+          <button
+            type="button"
+            title="CV — coming soon"
+            aria-label="CV — coming soon"
+            class="[-webkit-touch-callout:none] relative size-8 inline-flex pressable select-none items-center justify-center overflow-hidden border border-neutral-300 border-dashed text-neutral-400 dark:border-neutral-700 dark:text-neutral-500"
+            @pointerdown="startCvHold"
+            @pointerup="cancelCvHold"
+            @pointerleave="cancelCvHold"
+            @pointercancel="cancelCvHold"
+            @contextmenu.prevent
+          >
+            <Icon name="uil:padlock" class="pointer-events-none absolute inset-0 z-1 m-auto size-4" />
+            <span
+              class="pointer-events-none absolute inset-0 z-2 bg-[rgb(244_114_182)]"
+              :class="isHoldingCv ? '[clip-path:inset(0_0_0_0)] [transition:clip-path_900ms_linear]' : '[clip-path:inset(0_100%_0_0)] [transition:clip-path_200ms_var(--ease-out)]'"
+              @transitionend="completeCvHold"
+            />
+            <Icon
+              name="uil:padlock"
+              class="pointer-events-none absolute inset-0 z-3 m-auto size-4 text-white"
+              :class="isHoldingCv ? '[clip-path:inset(0_0_0_0)] [transition:clip-path_900ms_linear]' : '[clip-path:inset(0_100%_0_0)] [transition:clip-path_200ms_var(--ease-out)]'"
+            />
+          </button>
+          <span class="pointer-events-none absolute flex flex-col rotate-[-9deg] select-none items-center whitespace-nowrap text-[0.62rem] text-[rgb(244_114_182)] font-700 tracking-[0.02em] -right-[0.65rem] -top-[0.85rem]" aria-hidden="true">
+            Soon
+            <svg class="mt-[-3px] h-[8px] w-[28px]" viewBox="0 0 44 12" aria-hidden="true">
+              <path d="M2 6c6-4 10-4 15-1.5s9 3 14-1 8-2 11 1" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
+            </svg>
+          </span>
+        </div>
+
+        <motion.a
+          v-for="link in socialLinksAfterCv"
           :key="link.url"
           :href="link.url"
           target="_blank"
@@ -184,7 +251,7 @@ function computedInitial(y: number) {
       <!-- Photo -->
       <motion.div
         :initial="computedInitial(15)"
-        :animate="{ opacity: 1, y: 0 }"
+        :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
         :transition="computedTransition(0.1)"
       >
         <motion.div
@@ -201,7 +268,7 @@ function computedInitial(y: number) {
           <span
             v-for="p in particles"
             :key="p.id"
-            class="particle absolute left-1/2 top-1/2 rounded-full"
+            class="[animation:photo-particle_650ms_var(--ease-out)_forwards] absolute left-1/2 top-1/2 rounded-full"
             :class="p.accent ? 'bg-amber-500' : 'bg-neutral-700 dark:bg-neutral-200'"
             :style="{ 'width': `${p.size}px`, 'height': `${p.size}px`, '--sx': `${p.sx}px`, '--sy': `${p.sy}px`, '--tx': `${p.tx}px`, '--ty': `${p.ty}px` }"
           />
@@ -211,7 +278,7 @@ function computedInitial(y: number) {
       <!-- Name & Title -->
       <motion.div
         :initial="computedInitial(15)"
-        :animate="{ opacity: 1, y: 0 }"
+        :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
         :transition="computedTransition(0.2)"
         class="flex flex-col gap-0.5"
       >
@@ -226,7 +293,7 @@ function computedInitial(y: number) {
       <!-- Contact -->
       <motion.div
         :initial="computedInitial(15)"
-        :animate="{ opacity: 1, y: 0 }"
+        :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
         :transition="computedTransition(0.25)"
         class="flex flex-col gap-1"
       >
@@ -238,12 +305,58 @@ function computedInitial(y: number) {
       <!-- Social Links -->
       <motion.div
         :initial="computedInitial(15)"
-        :animate="{ opacity: 1, y: 0 }"
+        :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
         :transition="computedTransition(0.3)"
         class="flex gap-2"
       >
         <motion.a
-          v-for="link in socialLinks"
+          v-for="link in socialLinksBeforeCv"
+          :key="link.url"
+          :href="link.url"
+          target="_blank"
+          rel="noopener noreferrer"
+          :aria-label="link.label"
+          class="size-8 inline-flex pressable items-center justify-center bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
+          :while-hover="socialHover"
+          :transition="{ type: 'spring', stiffness: 400, damping: 17 }"
+        >
+          <Icon :name="link.icon" class="size-4" />
+        </motion.a>
+
+        <div class="relative size-8 shrink-0">
+          <button
+            type="button"
+            title="CV — coming soon"
+            aria-label="CV — coming soon"
+            class="[-webkit-touch-callout:none] relative size-8 inline-flex pressable select-none items-center justify-center overflow-hidden border border-neutral-300 border-dashed text-neutral-400 dark:border-neutral-700 dark:text-neutral-500"
+            @pointerdown="startCvHold"
+            @pointerup="cancelCvHold"
+            @pointerleave="cancelCvHold"
+            @pointercancel="cancelCvHold"
+            @contextmenu.prevent
+          >
+            <Icon name="uil:padlock" class="pointer-events-none absolute inset-0 z-1 m-auto size-4" />
+            <span
+              class="pointer-events-none absolute inset-0 z-2 bg-[rgb(244_114_182)]"
+              :class="isHoldingCv ? '[clip-path:inset(0_0_0_0)] [transition:clip-path_900ms_linear]' : '[clip-path:inset(0_100%_0_0)] [transition:clip-path_200ms_var(--ease-out)]'"
+              @transitionend="completeCvHold"
+            />
+            <Icon
+              name="uil:padlock"
+              class="pointer-events-none absolute inset-0 z-3 m-auto size-4 text-white"
+              :class="isHoldingCv ? '[clip-path:inset(0_0_0_0)] [transition:clip-path_900ms_linear]' : '[clip-path:inset(0_100%_0_0)] [transition:clip-path_200ms_var(--ease-out)]'"
+            />
+          </button>
+          <span class="pointer-events-none absolute flex flex-col rotate-[-9deg] select-none items-center whitespace-nowrap text-[0.62rem] text-[rgb(244_114_182)] font-700 tracking-[0.02em] -right-[0.65rem] -top-[0.85rem]" aria-hidden="true">
+            Soon
+            <svg class="mt-[-3px] h-[8px] w-[28px]" viewBox="0 0 44 12" aria-hidden="true">
+              <path d="M2 6c6-4 10-4 15-1.5s9 3 14-1 8-2 11 1" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
+            </svg>
+          </span>
+        </div>
+
+        <motion.a
+          v-for="link in socialLinksAfterCv"
           :key="link.url"
           :href="link.url"
           target="_blank"
@@ -259,23 +372,3 @@ function computedInitial(y: number) {
     </div>
   </aside>
 </template>
-
-<style scoped>
-.particle {
-  animation: photo-particle 650ms var(--ease-out) forwards;
-}
-
-@keyframes photo-particle {
-  0% {
-    transform: translate(-50%, -50%) translate(var(--sx), var(--sy)) scale(0.6);
-    opacity: 1;
-  }
-  70% {
-    opacity: 0.9;
-  }
-  100% {
-    transform: translate(-50%, -50%) translate(var(--tx), var(--ty)) scale(1.4);
-    opacity: 0;
-  }
-}
-</style>

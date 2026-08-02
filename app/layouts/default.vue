@@ -76,9 +76,17 @@ function isActive(path: string) {
     <!-- Footer -->
     <footer class="mt-auto">
       <div class="mx-auto max-w-7xl px-6 py-10">
-        <p class="text-xs text-neutral-400 dark:text-neutral-600">
-          &copy; {{ new Date().getFullYear() }} Rémi Saurel
-        </p>
+        <div class="flex items-center justify-between text-xs text-neutral-400 dark:text-neutral-600">
+          <p class="m-0">
+            &copy; {{ new Date().getFullYear() }} Rémi Saurel
+          </p>
+          <NuxtLink
+            to="/failures"
+            class="pressable transition-colors duration-200 hover:text-neutral-600 dark:hover:text-neutral-400"
+          >
+            failures
+          </NuxtLink>
+        </div>
       </div>
     </footer>
   </div>

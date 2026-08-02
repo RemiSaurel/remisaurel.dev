@@ -39,8 +39,8 @@ const { setCursorLogo, clearCursorLogo } = useCursorLogo()
       <!-- Intro Section -->
       <ContentSection :animate="animate" :delay="0.3">
         <motion.p
-          :initial="(animate.value && !prefersReducedMotion.value) ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }"
-          :animate="{ opacity: 1, y: 0 }"
+          :initial="(animate.value && !prefersReducedMotion.value) ? { opacity: 0, y: 15, filter: 'blur(8px)' } : { opacity: 1, y: 0, filter: 'blur(0px)' }"
+          :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
           :transition="prefersReducedMotion.value ? { duration: 0 } : (animate.value ? { ...transition, delay: 0.4 } : { duration: 0 })"
           class="intro-text"
         >
@@ -62,8 +62,8 @@ const { setCursorLogo, clearCursorLogo } = useCursorLogo()
           >Kosmos Education</a>.
         </motion.p>
         <motion.p
-          :initial="(animate.value && !prefersReducedMotion.value) ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }"
-          :animate="{ opacity: 1, y: 0 }"
+          :initial="(animate.value && !prefersReducedMotion.value) ? { opacity: 0, y: 15, filter: 'blur(8px)' } : { opacity: 1, y: 0, filter: 'blur(0px)' }"
+          :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
           :transition="prefersReducedMotion.value ? { duration: 0 } : (animate.value ? { ...transition, delay: 0.5 } : { duration: 0 })"
           class="mt-4 text-zinc-500 dark:text-zinc-400"
         >

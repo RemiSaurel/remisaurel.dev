@@ -83,6 +83,16 @@ html.dark {
   --tetris-l: 224 168 110;
 }
 
+/* Failure resume accent color — same "muted RGB triple, lightened for dark
+   mode" recipe as the tokens above. */
+.failures-root {
+  --failure-ink: 176 84 96;
+}
+
+.dark .failures-root {
+  --failure-ink: 224 148 158;
+}
+
 /* Respect reduced motion: keep opacity/color, remove transform/position motion */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -298,4 +308,21 @@ article hr {
   margin: 2rem 0;
   border: none;
   border-top-width: 1px;
+}
+
+/* Photo click particle burst (ProfileSidebar) — keyframes can't be expressed
+   as a UnoCSS utility class, so this stays global CSS; the animation is
+   applied via the `[animation:photo-particle_...]` arbitrary-property class. */
+@keyframes photo-particle {
+  0% {
+    transform: translate(-50%, -50%) translate(var(--sx), var(--sy)) scale(0.6);
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, -50%) translate(var(--tx), var(--ty)) scale(1.4);
+    opacity: 0;
+  }
 }

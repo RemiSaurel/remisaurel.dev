@@ -30,8 +30,8 @@ const computedTransition = computed(() => {
 
 <template>
   <motion.section
-    :initial="props.animate && !prefersReducedMotion ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }"
-    :animate="{ opacity: 1, y: 0 }"
+    :initial="props.animate && !prefersReducedMotion ? { opacity: 0, y: 15, filter: 'blur(8px)' } : { opacity: 1, y: 0, filter: 'blur(0px)' }"
+    :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
     :transition="computedTransition"
     class="flex flex-col"
   >
