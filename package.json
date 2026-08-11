@@ -31,7 +31,7 @@
     "@nuxt/fonts": "^0.14.0",
     "@unocss/eslint-plugin": "^66.7.5",
     "@unocss/nuxt": "^66.7.5",
-    "eslint": "^10.8.0",
+    "eslint": "^10.8.1",
     "typescript": "^5.9.3",
     "unocss": "^66.7.5"
   }
