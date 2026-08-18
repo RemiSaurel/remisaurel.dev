@@ -1,8 +1,49 @@
 <script setup lang="ts">
 const colorMode = useColorMode()
 
-function toggleColorMode() {
+function applyPreference() {
   colorMode.preference = colorMode.preference === 'light' ? 'dark' : 'light'
+}
+
+function toggleColorMode(event: MouseEvent) {
+  const supportsViewTransition = typeof document.startViewTransition === 'function'
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  if (!supportsViewTransition || prefersReducedMotion) {
+    applyPreference()
+    return
+  }
+
+  const button = event.currentTarget as HTMLElement
+  const { top, left, width, height } = button.getBoundingClientRect()
+  const x = left + width / 2
+  const y = top + height / 2
+  const endRadius = Math.hypot(
+    Math.max(x, window.innerWidth - x),
+    Math.max(y, window.innerHeight - y),
+  )
+
+  const rootStyles = getComputedStyle(document.documentElement)
+  const duration = Number.parseFloat(rootStyles.getPropertyValue('--duration-theme')) || 500
+  const easing = rootStyles.getPropertyValue('--ease-in-out').trim() || 'ease-in-out'
+
+  const transition = document.startViewTransition(applyPreference)
+
+  transition.ready.then(() => {
+    document.documentElement.animate(
+      {
+        clipPath: [
+          `circle(0px at ${x}px ${y}px)`,
+          `circle(${endRadius}px at ${x}px ${y}px)`,
+        ],
+      },
+      {
+        duration,
+        easing,
+        pseudoElement: '::view-transition-new(root)',
+      },
+    )
+  })
 }
 
 // Use colorMode.value to get the actual current mode (resolves 'system' to actual value)

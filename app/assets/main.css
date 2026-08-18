@@ -12,6 +12,7 @@
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --duration-micro: 160ms;
   --duration-short: 200ms;
+  --duration-theme: 500ms;
 }
 
 html {
@@ -22,6 +23,22 @@ html {
 
 html.dark {
   background-color: #171717; /* neutral-900 */
+}
+
+/* Theme toggle reveal (ColorModeSwitcher) — disable the browser's default
+   cross-fade so only the clip-path circle animated from JS is visible. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2;
 }
 
 * {
