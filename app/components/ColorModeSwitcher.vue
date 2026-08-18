@@ -5,6 +5,14 @@ function applyPreference() {
   colorMode.preference = colorMode.preference === 'light' ? 'dark' : 'light'
 }
 
+// CSS minifiers (Lightning CSS in prod builds) rewrite `500ms` as `.5s` to
+// save bytes, so a duration read from a custom property can't assume `ms`.
+function cssTimeToMs(value: string): number {
+  const trimmed = value.trim()
+  const amount = Number.parseFloat(trimmed)
+  return trimmed.endsWith('ms') ? amount : amount * 1000
+}
+
 function toggleColorMode(event: MouseEvent) {
   const supportsViewTransition = typeof document.startViewTransition === 'function'
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -24,7 +32,7 @@ function toggleColorMode(event: MouseEvent) {
   )
 
   const rootStyles = getComputedStyle(document.documentElement)
-  const duration = Number.parseFloat(rootStyles.getPropertyValue('--duration-theme')) || 500
+  const duration = cssTimeToMs(rootStyles.getPropertyValue('--duration-theme')) || 500
   const easing = rootStyles.getPropertyValue('--ease-in-out').trim() || 'ease-in-out'
 
   const transition = document.startViewTransition(applyPreference)
@@ -43,6 +51,9 @@ function toggleColorMode(event: MouseEvent) {
         pseudoElement: '::view-transition-new(root)',
       },
     )
+  }).catch(() => {
+    // The browser can skip a transition (e.g. tab not visible); the color
+    // mode still applies via applyPreference, just without the reveal.
   })
 }
 
