@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { motion } from 'motion-v'
+import { MINIMAL } from '~/sounds/sounds'
 
 const route = useRoute()
 const { prefersReducedMotion } = usePrefersReducedMotion()
+const { play } = useSound()
 
 const navItems = [
   { route: '/', label: 'About' },
@@ -49,18 +51,20 @@ function isActive(path: string) {
                 :to="item.route"
                 class="pressable whitespace-nowrap rounded-sm text-xs text-neutral-500 transition-colors duration-200 sm:text-sm dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
                 :class="{ 'text-neutral-900! dark:text-neutral-100!': isActive(item.route) }"
+                @click="play(MINIMAL.tap)"
               >
                 {{ item.label }}
               </NuxtLink>
             </motion.div>
 
-            <!-- Theme Toggle -->
+            <!-- Sound + Theme Toggles -->
             <motion.div
-              class="shrink-0"
+              class="flex shrink-0 gap-1"
               :initial="prefersReducedMotion ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }"
               :animate="{ opacity: 1, scale: 1 }"
               :transition="prefersReducedMotion ? { duration: 0 } : { duration: 0.3, delay: 0.3 }"
             >
+              <SoundSwitcher />
               <ColorModeSwitcher />
             </motion.div>
           </div>

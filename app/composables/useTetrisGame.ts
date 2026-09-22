@@ -1,6 +1,8 @@
+import type { PlayOptions, SoundDefinition } from '@web-kits/audio'
 import type { Board, PieceId, PieceState } from '~/tetris/tetris'
 import { useDocumentVisibility, useLocalStorage, useRafFn } from '@vueuse/core'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { RETRO } from '~/sounds/sounds'
 import {
   BUFFER_ROWS,
   clearFullRows,
@@ -26,6 +28,8 @@ export interface DisplayCell {
 }
 
 const CLEAR_ANIMATION_MS = 160
+/** Retro square waves are much louder than the site's sine blips; keep the game in the same ballpark. */
+const GAME_VOLUME = 0.45
 
 export function useTetrisGame() {
   const board = ref<Board>(createEmptyBoard())
@@ -40,6 +44,9 @@ export function useTetrisGame() {
   /** A piece can only be swapped to hold once per drop, resets when the next piece spawns. */
   const canHold = ref(true)
   const bestScore = useLocalStorage('tetris-best-score', 0)
+  const { play: playSound } = useSound()
+  const sfx = (definition: SoundDefinition, opts?: PlayOptions) =>
+    playSound(definition, { volume: GAME_VOLUME, ...opts })
 
   const level = computed(() => Math.floor(lines.value / 10) + 1)
 
@@ -92,6 +99,14 @@ export function useTetrisGame() {
     return bag.value.shift()!
   }
 
+  function endGame() {
+    status.value = 'over'
+    if (score.value > bestScore.value)
+      bestScore.value = score.value
+    pauseLoop()
+    sfx(RETRO.error)
+  }
+
   function spawnNext() {
     const id = next.value ?? drawFromBag()
     next.value = drawFromBag()
@@ -99,10 +114,7 @@ export function useTetrisGame() {
     canHold.value = true
     if (collides(board.value, piece)) {
       current.value = null
-      status.value = 'over'
-      if (score.value > bestScore.value)
-        bestScore.value = score.value
-      pauseLoop()
+      endGame()
       return
     }
     current.value = piece
@@ -112,6 +124,7 @@ export function useTetrisGame() {
     if (status.value !== 'playing' || !current.value || !canHold.value)
       return
     const currentId = current.value.id
+    sfx(RETRO.tabSwitch)
 
     if (held.value === null) {
       held.value = currentId
@@ -123,10 +136,7 @@ export function useTetrisGame() {
       // The held piece can't fit at spawn — extremely unlikely, but end cleanly rather than corrupt state.
       if (collides(board.value, swapped)) {
         current.value = null
-        status.value = 'over'
-        if (score.value > bestScore.value)
-          bestScore.value = score.value
-        pauseLoop()
+        endGame()
         return
       }
       current.value = swapped
@@ -136,7 +146,8 @@ export function useTetrisGame() {
     canHold.value = false
   }
 
-  function lockCurrent() {
+  /** `quiet` skips the landing thud, for hard drops that already made their own sound. */
+  function lockCurrent(quiet = false) {
     if (!current.value)
       return
     board.value = lockPiece(board.value, current.value)
@@ -144,14 +155,21 @@ export function useTetrisGame() {
 
     const { board: cleared, rows } = clearFullRows(board.value)
     if (rows.length === 0) {
+      if (!quiet)
+        sfx(RETRO.click, { volume: GAME_VOLUME * 0.5, detune: -1200 })
       spawnNext()
       return
     }
 
     status.value = 'clearing'
     clearingRows.value = rows
+    const previousLevel = level.value
     score.value += lineScore(rows.length, level.value)
     lines.value += rows.length
+    // The arpeggio climbs a step per extra row, so a Tetris sounds like the jackpot it is.
+    sfx(RETRO.success, { detune: (rows.length - 1) * 200 })
+    if (level.value > previousLevel)
+      setTimeout(sfx, 260, RETRO.notification)
 
     setTimeout(() => {
       board.value = cleared
@@ -186,16 +204,20 @@ export function useTetrisGame() {
     if (status.value !== 'playing' || !current.value)
       return
     const moved = tryMove(board.value, current.value, 0, dir)
-    if (moved)
+    if (moved) {
       current.value = moved
+      sfx(RETRO.tap, { volume: GAME_VOLUME * 0.6 })
+    }
   }
 
   function rotate(dir: 1 | -1) {
     if (status.value !== 'playing' || !current.value)
       return
     const rotated = tryRotate(board.value, current.value, dir)
-    if (rotated)
+    if (rotated) {
       current.value = rotated
+      sfx(RETRO.click, { volume: GAME_VOLUME * 0.7, detune: dir === 1 ? 0 : -300 })
+    }
   }
 
   function hardDrop() {
@@ -204,7 +226,8 @@ export function useTetrisGame() {
     const { piece, distance } = hardDropDistance(board.value, current.value)
     current.value = piece
     score.value += distance * 2
-    lockCurrent()
+    sfx(RETRO.pop)
+    lockCurrent(true)
   }
 
   function start() {
@@ -219,6 +242,7 @@ export function useTetrisGame() {
     clearingRows.value = []
     gravityElapsed = 0
     status.value = 'playing'
+    sfx(RETRO.pageEnter)
     spawnNext()
     resumeLoop()
   }
@@ -237,11 +261,13 @@ export function useTetrisGame() {
     status.value = 'ready'
   }
 
-  function pause() {
+  function pause(quiet = false) {
     if (status.value !== 'playing')
       return
     status.value = 'paused'
     pauseLoop()
+    if (!quiet)
+      sfx(RETRO.toggleOff)
   }
 
   function resume() {
@@ -249,6 +275,7 @@ export function useTetrisGame() {
       return
     status.value = 'playing'
     resumeLoop()
+    sfx(RETRO.toggleOn)
   }
 
   function togglePause() {
@@ -264,7 +291,7 @@ export function useTetrisGame() {
   const visibility = useDocumentVisibility()
   watch(visibility, (value) => {
     if (value === 'hidden')
-      pause()
+      pause(true)
   })
 
   onBeforeUnmount(pauseLoop)
@@ -281,7 +308,7 @@ export function useTetrisGame() {
     held,
     start,
     resetToReady,
-    pause,
+    pause: () => pause(),
     resume,
     stop,
     togglePause,

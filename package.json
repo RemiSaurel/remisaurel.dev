@@ -17,6 +17,7 @@
     "@nuxt/ui": "^4.10.0",
     "@nuxtjs/color-mode": "^4.0.1",
     "@vueuse/core": "^14.4.0",
+    "@web-kits/audio": "^0.2.0",
     "motion-v": "2.2.1",
     "nuxt": "^4.5.1",
     "tailwindcss": "^4.3.3"
