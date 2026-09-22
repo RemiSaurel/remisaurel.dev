@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { motion } from 'motion-v'
+import { LayoutGroup, motion } from 'motion-v'
 import { useFirstVisit } from '~/composables/useFirstVisit'
 
 useSeoMeta({
@@ -27,6 +27,12 @@ const transition = {
 
 const { prefersReducedMotion } = usePrefersReducedMotion()
 const { setCursorLogo, clearCursorLogo } = useCursorLogo()
+
+const { view: publicationsView, isRestoring: isRestoringPublicationsView } = useListView('publications')
+const PUBLICATION_VIEWS = [
+  { value: 'list', label: 'List', icon: 'uil:list-ul' },
+  { value: 'card', label: 'Cards', icon: 'uil:apps' },
+]
 </script>
 
 <template>
@@ -35,53 +41,58 @@ const { setCursorLogo, clearCursorLogo } = useCursorLogo()
     <ProfileSidebar :animate="animate" />
 
     <!-- Right: Main Content -->
-    <main class="flex flex-col gap-8">
-      <!-- Intro Section -->
-      <ContentSection :animate="animate" :delay="0.3">
-        <motion.p
-          :initial="(animate.value && !prefersReducedMotion.value) ? { opacity: 0, y: 15, filter: 'blur(8px)' } : { opacity: 1, y: 0, filter: 'blur(0px)' }"
-          :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
-          :transition="prefersReducedMotion.value ? { duration: 0 } : (animate.value ? { ...transition, delay: 0.4 } : { duration: 0 })"
-          class="intro-text"
-        >
-          French PhD student at the
-          <a
-            href="https://www.irit.fr/" target="_blank" class="intro-link pressable"
-            @mouseenter="setCursorLogo(ENTITY_LOGOS.irit)"
-            @mouseleave="clearCursorLogo"
-          >IRIT</a> lab in Toulouse, working in the
-          <a
-            href="https://www.irit.fr/TALENT/site/" target="_blank" class="intro-link pressable"
-            @mouseenter="setCursorLogo(ENTITY_LOGOS.talent)"
-            @mouseleave="clearCursorLogo"
-          >TALENT</a> team, in collaboration with
-          <a
-            href="https://www.kosmos-education.com/" target="_blank" class="intro-link pressable"
-            @mouseenter="setCursorLogo(ENTITY_LOGOS.kosmos)"
-            @mouseleave="clearCursorLogo"
-          >Kosmos Education</a>.
-        </motion.p>
-        <motion.p
-          :initial="(animate.value && !prefersReducedMotion.value) ? { opacity: 0, y: 15, filter: 'blur(8px)' } : { opacity: 1, y: 0, filter: 'blur(0px)' }"
-          :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
-          :transition="prefersReducedMotion.value ? { duration: 0 } : (animate.value ? { ...transition, delay: 0.5 } : { duration: 0 })"
-          class="mt-4 text-zinc-500 dark:text-zinc-400"
-        >
-          I develop dashboards powered by AI and learning analytics to help teachers
-          support students' out-of-class activities in K-12 education. Interested in
-          Human-AI Interaction and responsible AI integration in education.
-        </motion.p>
-      </ContentSection>
+    <LayoutGroup>
+      <main class="flex flex-col gap-8">
+        <!-- Intro Section -->
+        <ContentSection :animate="animate" :delay="0.3">
+          <motion.p
+            :initial="(animate.value && !prefersReducedMotion.value) ? { opacity: 0, y: 15, filter: 'blur(8px)' } : { opacity: 1, y: 0, filter: 'blur(0px)' }"
+            :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
+            :transition="prefersReducedMotion.value ? { duration: 0 } : (animate.value ? { ...transition, delay: 0.4 } : { duration: 0 })"
+            class="intro-text"
+          >
+            French PhD student at the
+            <a
+              href="https://www.irit.fr/" target="_blank" class="intro-link pressable"
+              @mouseenter="setCursorLogo(ENTITY_LOGOS.irit)"
+              @mouseleave="clearCursorLogo"
+            >IRIT</a> lab in Toulouse, working in the
+            <a
+              href="https://www.irit.fr/TALENT/site/" target="_blank" class="intro-link pressable"
+              @mouseenter="setCursorLogo(ENTITY_LOGOS.talent)"
+              @mouseleave="clearCursorLogo"
+            >TALENT</a> team, in collaboration with
+            <a
+              href="https://www.kosmos-education.com/" target="_blank" class="intro-link pressable"
+              @mouseenter="setCursorLogo(ENTITY_LOGOS.kosmos)"
+              @mouseleave="clearCursorLogo"
+            >Kosmos Education</a>.
+          </motion.p>
+          <motion.p
+            :initial="(animate.value && !prefersReducedMotion.value) ? { opacity: 0, y: 15, filter: 'blur(8px)' } : { opacity: 1, y: 0, filter: 'blur(0px)' }"
+            :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
+            :transition="prefersReducedMotion.value ? { duration: 0 } : (animate.value ? { ...transition, delay: 0.5 } : { duration: 0 })"
+            class="mt-4 text-zinc-500 dark:text-zinc-400"
+          >
+            I develop dashboards powered by AI and learning analytics to help teachers
+            support students' out-of-class activities in K-12 education. Interested in
+            Human-AI Interaction and responsible AI integration in education.
+          </motion.p>
+        </ContentSection>
 
-      <!-- Publications Section -->
-      <ContentSection title="Publications" :animate="animate" :delay="0.5">
-        <PublicationsList />
-      </ContentSection>
+        <!-- Publications Section -->
+        <ContentSection title="Publications" :animate="animate" :delay="0.5">
+          <template #actions>
+            <ViewSwitcher id="publications" v-model="publicationsView" :options="PUBLICATION_VIEWS" />
+          </template>
+          <PublicationsList :view="publicationsView" :instant="isRestoringPublicationsView" />
+        </ContentSection>
 
-      <!-- News Section -->
-      <ContentSection title="News" :animate="animate" :delay="0.7">
-        <NewsList :limit="5" />
-      </ContentSection>
-    </main>
+        <!-- News Section: glides down/up as the publications above change height -->
+        <ContentSection title="News" :animate="animate" :delay="0.7" layout="position">
+          <NewsList :limit="5" />
+        </ContentSection>
+      </main>
+    </LayoutGroup>
   </div>
 </template>

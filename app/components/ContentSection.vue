@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { motion } from 'motion-v'
+import { VIEW_MORPH_TRANSITION } from '~/composables/useListView'
 
 interface Props {
   title?: string
   link?: string
   animate?: boolean
   delay?: number
+  /** Opt into motion layout animations, so the section glides when content above it resizes. */
+  layout?: boolean | 'position'
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -24,7 +27,9 @@ const computedTransition = computed(() => {
   if (prefersReducedMotion.value) {
     return { duration: 0 }
   }
-  return props.animate ? { ...transition, delay: props.delay } : { duration: 0 }
+  const base = props.animate ? { ...transition, delay: props.delay } : { duration: 0 }
+  // Layout moves follow the list/card morph, never the entrance delay.
+  return { ...base, layout: VIEW_MORPH_TRANSITION }
 })
 </script>
 
@@ -33,6 +38,7 @@ const computedTransition = computed(() => {
     :initial="props.animate && !prefersReducedMotion ? { opacity: 0, y: 15, filter: 'blur(8px)' } : { opacity: 1, y: 0, filter: 'blur(0px)' }"
     :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
     :transition="computedTransition"
+    :layout="props.layout"
     class="flex flex-col"
   >
     <!-- Section header (optional) -->
@@ -46,6 +52,7 @@ const computedTransition = computed(() => {
       <div class="text-xl text-neutral-700 font-medium tracking-tight dark:text-neutral-300">
         {{ title }}
       </div>
+      <slot name="actions" />
       <svg
         v-if="link"
         class="h-2.5 w-2.5 group-hover:rotate-45"

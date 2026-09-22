@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { NewsCategory } from '~/news/news'
+import type { FilterDefinition, FilterState } from '~/utils/filters'
 import { motion } from 'motion-v'
 import { useFirstVisit } from '~/composables/useFirstVisit'
 import { news } from '~/news/news'
+import { countBy, emptyFilterState, matchesFilter } from '~/utils/filters'
 
 interface Props {
   limit?: number
@@ -12,37 +14,66 @@ const props = withDefaults(defineProps<Props>(), {
   limit: 5,
 })
 
-// Available categories for filtering
-const categories: NewsCategory[] = ['paper', 'project', 'conference', 'misc']
+const CATEGORIES: { value: NewsCategory, label: string, icon: string }[] = [
+  { value: 'paper', label: 'Paper', icon: 'lucide:file-text' },
+  { value: 'project', label: 'Project', icon: 'lucide:folder' },
+  { value: 'conference', label: 'Conference', icon: 'lucide:presentation' },
+  { value: 'misc', label: 'Misc', icon: 'lucide:sparkles' },
+]
 
-// Count items per category
-const categoryCounts = computed(() => {
-  const counts: Record<NewsCategory, number> = { paper: 0, project: 0, conference: 0, misc: 0 }
-  for (const item of news) {
-    for (const cat of item.categories ?? []) {
-      if (cat in counts) {
-        counts[cat]++
-      }
-    }
-  }
-  return counts
+const sortedNews = [...news].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+
+const filterDefinitions = computed<FilterDefinition[]>(() => {
+  const categoryCounts = countBy(sortedNews, item => item.categories)
+  const yearCounts = countBy(sortedNews, item => item.date.getFullYear())
+  const linkCounts = countBy(sortedNews, item => hasLink(item))
+
+  return [
+    {
+      key: 'categories',
+      label: 'Category',
+      icon: 'lucide:tag',
+      multiple: true,
+      plural: 'categories',
+      options: CATEGORIES
+        .filter(category => categoryCounts.has(category.value))
+        .map(category => ({ ...category, count: categoryCounts.get(category.value) })),
+    },
+    {
+      key: 'years',
+      label: 'Year',
+      icon: 'lucide:calendar',
+      multiple: true,
+      plural: 'years',
+      options: [...yearCounts.keys()].map(year => ({ value: year, label: String(year), count: yearCounts.get(year) })),
+    },
+    {
+      key: 'link',
+      label: 'Link',
+      icon: 'lucide:link',
+      multiple: false,
+      options: [
+        { value: true, label: 'Has a link', count: linkCounts.get(true) ?? 0 },
+        { value: false, label: 'No link', count: linkCounts.get(false) ?? 0 },
+      ],
+    },
+  ]
 })
 
-// Track selected filter
-const selectedCategory = ref<NewsCategory | null>(null)
+const filters = ref<FilterState>(emptyFilterState(filterDefinitions.value))
+
+const hasFilters = computed(() => Object.values(filters.value).some(values => values.length))
 
 // Track how many items to show
 const displayLimit = ref(props.limit)
 
-// Get filtered and limited news items
 const filteredNews = computed(() => {
-  let items = [...news].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-
-  if (selectedCategory.value) {
-    items = items.filter(item => item.categories?.includes(selectedCategory.value!))
-  }
-
-  return items
+  const { categories, years, link } = filters.value
+  return sortedNews.filter(item =>
+    matchesFilter(categories, item.categories)
+    && matchesFilter(years, item.date.getFullYear())
+    && matchesFilter(link, hasLink(item)),
+  )
 })
 
 const displayedNews = computed(() => {
@@ -57,19 +88,17 @@ function loadMore() {
   displayLimit.value += 5
 }
 
-function toggleFilter(category: NewsCategory) {
-  if (selectedCategory.value === category) {
-    selectedCategory.value = null
-  }
-  else {
-    selectedCategory.value = category
-  }
-  // Reset display limit when filter changes
+// Start again from the first page whenever the filters change
+watch(filters, () => {
   displayLimit.value = props.limit
+})
+
+function clearFilters() {
+  filters.value = emptyFilterState(filterDefinitions.value)
 }
 
 function hasLink(item: typeof news[0]) {
-  return item.links && item.links.length > 0
+  return !!item.links?.length
 }
 
 function getFirstLink(item: typeof news[0]) {
@@ -82,26 +111,13 @@ const { isFirstVisit } = useFirstVisit()
 function itemMotion(index: number) {
   if (prefersReducedMotion.value || !isFirstVisit.value)
     return { initial: { opacity: 1, y: 0 }, transition: { duration: 0 } }
-  return { initial: { opacity: 0, y: 10 }, transition: { duration: 0.4, delay: Math.min(index, 7) * 0.04, ease: [0.23, 1, 0.32, 1] } }
+  return { initial: { opacity: 0, y: 10 }, transition: { duration: 0.4, delay: Math.min(index, 7) * 0.04, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] } }
 }
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
-    <!-- Tag filters -->
-    <div class="mt-2 flex flex-wrap gap-2">
-      <UBadge
-        v-for="category in categories"
-        :key="category"
-        as="button"
-        :variant="selectedCategory === category ? 'solid' : 'subtle'"
-        color="neutral"
-        class="capitalize pressable cursor-pointer rounded-none"
-        @click="toggleFilter(category)"
-      >
-        {{ category }} ({{ categoryCounts[category] }})
-      </UBadge>
-    </div>
+    <FilterBar v-model="filters" class="mt-2" :definitions="filterDefinitions" />
 
     <!-- News list -->
     <div class="flex flex-col gap-1">
@@ -183,6 +199,17 @@ function itemMotion(index: number) {
           </component>
         </motion.div>
       </template>
+    </div>
+
+    <div v-if="hasFilters && !filteredNews.length" class="flex flex-col items-center gap-3 py-8 text-sm text-neutral-500 dark:text-neutral-400">
+      No news matches these filters.
+      <button
+        type="button"
+        class="pressable cursor-pointer text-xs text-neutral-900 underline decoration-neutral-300 underline-offset-4 dark:text-neutral-100 dark:decoration-neutral-600 hover:decoration-current"
+        @click="clearFilters()"
+      >
+        Clear filters
+      </button>
     </div>
 
     <!-- Load more button -->

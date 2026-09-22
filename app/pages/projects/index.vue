@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { motion } from 'motion-v'
-
-const { prefersReducedMotion } = usePrefersReducedMotion()
+import type { TechKey } from '~/projects/techs'
 
 export interface Project {
   title: string
@@ -12,6 +10,7 @@ export interface Project {
     demo?: string
   }
   date: number // YYYY
+  stack?: TechKey[]
 }
 
 const PROJECTS: Project[] = [
@@ -25,6 +24,7 @@ const PROJECTS: Project[] = [
       demo: 'https://remisaurel.github.io/lycees-france/',
     },
     date: 2026,
+    stack: ['nuxt', 'typescript', 'tailwind'],
   },
   {
     title: 'colleges-france',
@@ -36,6 +36,7 @@ const PROJECTS: Project[] = [
       demo: 'https://remisaurel.github.io/colleges-france/',
     },
     date: 2026,
+    stack: ['nuxt', 'typescript', 'tailwind'],
   },
   {
     title: 'paper-web',
@@ -47,6 +48,7 @@ const PROJECTS: Project[] = [
       demo: 'https://remisaurel.github.io/paper-web/',
     },
     date: 2026,
+    stack: ['nuxt', 'typescript', 'tailwind'],
   },
   {
     title: 'evalbuddy',
@@ -58,6 +60,7 @@ const PROJECTS: Project[] = [
       demo: 'https://evalbuddy.remisaurel.dev/',
     },
     date: 2025,
+    stack: ['nuxt', 'typescript', 'tailwind'],
   },
   {
     title: 'littleman',
@@ -68,6 +71,7 @@ const PROJECTS: Project[] = [
       github: 'https://github.com/RemiSaurel/littleman',
     },
     date: 2025,
+    stack: ['typescript', 'discord'],
   },
   {
     title: 'memoire',
@@ -77,6 +81,7 @@ const PROJECTS: Project[] = [
       github: 'https://github.com/memoire-app',
     },
     date: 2024,
+    stack: ['nuxt', 'adonisjs', 'docker'],
   },
   {
     title: 'elaasticatalog',
@@ -86,6 +91,7 @@ const PROJECTS: Project[] = [
       github: 'https://github.com/elaastic/elaasticatalog',
     },
     date: 2024,
+    stack: ['nuxt', 'adonisjs', 'docker'],
   },
   {
     title: 'Golden Legends',
@@ -97,6 +103,7 @@ const PROJECTS: Project[] = [
       demo: 'https://golden-legends.github.io/golden-legends/',
     },
     date: 2024,
+    stack: ['vue', 'babylonjs', 'typescript', 'vite'],
   },
   {
     title: 'MIAGE typst template',
@@ -108,6 +115,7 @@ const PROJECTS: Project[] = [
       demo: 'https://www.youtube.com/watch?v=RQGjWUptxXM',
     },
     date: 2024,
+    stack: ['typst'],
   },
   {
     title: 'Datastrike',
@@ -118,6 +126,7 @@ const PROJECTS: Project[] = [
       github: 'https://github.com/datastrike',
     },
     date: 2024,
+    stack: ['react', 'adonisjs', 'python'],
   },
   {
     title: 'Wasabi',
@@ -129,6 +138,7 @@ const PROJECTS: Project[] = [
       demo: 'https://wasabi-project.github.io/wasabi-dataviz/#/dataviz/',
     },
     date: 2023,
+    stack: ['vue', 'd3', 'python'],
   },
   {
     title: 'Blockus',
@@ -139,6 +149,7 @@ const PROJECTS: Project[] = [
       demo: 'https://blockus-prod-d75bc.web.app/',
     },
     date: 2023,
+    stack: ['firebase'],
   },
   {
     title: 'Sorting Visualizer',
@@ -150,6 +161,7 @@ const PROJECTS: Project[] = [
       demo: 'https://remisaurel.github.io/sorting-algorithms/',
     },
     date: 2023,
+    stack: ['react', 'typescript'],
   },
   {
     title: 'Lockio',
@@ -160,6 +172,7 @@ const PROJECTS: Project[] = [
       github: 'https://github.com/Lockiio',
     },
     date: 2023,
+    stack: ['vue', 'spring', 'python'],
   },
   {
     title: 'Spotidrone',
@@ -170,6 +183,7 @@ const PROJECTS: Project[] = [
       github: 'https://github.com/RemiSaurel/SpotiDrone',
     },
     date: 2023,
+    stack: ['python', 'spotify'],
   },
 ]
 
@@ -179,6 +193,14 @@ const projectList = computed(() => {
     return b.date - a.date
   })
 })
+
+const { definitions: filterDefinitions, filters, filtered, hasFilters, clear: clearFilters } = useProjectFilters(projectList)
+
+const { view, isRestoring } = useListView('projects')
+const PROJECT_VIEWS = [
+  { value: 'list', label: 'List', icon: 'uil:list-ul' },
+  { value: 'card', label: 'Cards', icon: 'uil:apps' },
+]
 </script>
 
 <template>
@@ -194,7 +216,7 @@ const projectList = computed(() => {
       <div class="mt-6 flex flex-col gap-1.5">
         <div class="flex flex-wrap items-center gap-2">
           <span class="font-semibold">Mainly programming</span> with
-          <IconLink icon-name="i-logos-nuxt-icon" route="https://nuxtjs.org" external size="sm">
+          <IconLink icon-name="i-logos-nuxt-icon" route="https://nuxt.com" external size="sm">
             Nuxt
           </IconLink>
           <IconLink icon-name="i-logos-vue" route="https://vuejs.org" external size="sm">
@@ -203,7 +225,7 @@ const projectList = computed(() => {
           <IconLink icon-name="i-logos-typescript-icon" route="https://www.typescriptlang.org" external size="sm">
             TypeScript
           </IconLink>
-          <IconLink icon-name="uil-docker" route="https://www.java.com" external size="sm">
+          <IconLink icon-name="i-logos-docker-icon" route="https://www.docker.com" external size="sm">
             Docker
           </IconLink>
           <IconLink icon-name="i-logos-react" route="https://reactjs.org" external size="sm">
@@ -221,17 +243,20 @@ const projectList = computed(() => {
         </div>
       </div>
     </div>
-    <div class="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
-      <motion.div
-        v-for="(project, index) in projectList"
-        :key="project.title"
-        :initial="prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }"
-        :while-in-view="prefersReducedMotion ? undefined : { opacity: 1, y: 0 }"
-        :viewport="{ once: true, margin: '-50px' }"
-        :transition="prefersReducedMotion ? { duration: 0 } : { duration: 0.5, delay: index * 0.05, ease: [0.23, 1, 0.32, 1] }"
+    <div class="mb-3 flex items-start justify-between gap-3">
+      <FilterBar v-model="filters" :definitions="filterDefinitions" />
+      <ViewSwitcher id="projects" v-model="view" :options="PROJECT_VIEWS" class="shrink-0" />
+    </div>
+    <ProjectsList :projects="filtered" :view="view" :instant="isRestoring" />
+    <div v-if="hasFilters && !filtered.length" class="flex flex-col items-center gap-3 py-12 text-sm text-neutral-500 dark:text-neutral-400">
+      No project matches these filters.
+      <button
+        type="button"
+        class="pressable cursor-pointer text-xs text-neutral-900 underline decoration-neutral-300 underline-offset-4 dark:text-neutral-100 dark:decoration-neutral-600 hover:decoration-current"
+        @click="clearFilters()"
       >
-        <ProjectCard :project="project" />
-      </motion.div>
+        Clear filters
+      </button>
     </div>
   </div>
 </template>

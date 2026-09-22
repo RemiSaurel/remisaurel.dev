@@ -51,7 +51,10 @@ function getIconName(key: string) {
         </a>
       </div>
       <div v-else />
-      <span class="tabular-nums text-xs text-neutral-400 dark:text-neutral-500">{{ project.date }}</span>
+      <div class="flex items-center gap-3">
+        <TechStack v-if="project.stack?.length" :stack="project.stack" />
+        <span class="tabular-nums text-xs text-neutral-400 dark:text-neutral-500">{{ project.date }}</span>
+      </div>
     </div>
   </div>
 </template>

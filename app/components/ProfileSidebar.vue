@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { animate, motion } from 'motion-v'
+import { MINIMAL, RETRO } from '~/sounds/sounds'
 
 interface Props {
   animate?: boolean
@@ -11,6 +12,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const { registerClick, open: openTetris } = useTetrisEasterEgg()
 const { prefersReducedMotion } = usePrefersReducedMotion()
+const { play } = useSound()
 
 interface Particle {
   id: number
@@ -68,6 +70,13 @@ function handlePhotoClick(event: MouseEvent) {
   const { progress, triggered } = registerClick()
   const target = event.currentTarget as HTMLElement
 
+  // Each pop climbs in pitch as the streak builds (up to an octave), then the
+  // retro swoosh hints at what's about to open.
+  if (triggered)
+    play(RETRO.swoosh, { volume: 0.6 })
+  else
+    play(MINIMAL.pop, { detune: progress * 1200, jitter: { volume: 0.1 } })
+
   if (!prefersReducedMotion.value) {
     const amplitude = 1.5 + progress * 2.5
     animate(target, {
@@ -112,6 +121,7 @@ function completeCvHold() {
   if (!isHoldingCv.value)
     return
   isHoldingCv.value = false
+  play(MINIMAL.success)
   navigateTo('/failures')
 }
 

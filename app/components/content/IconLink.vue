@@ -1,68 +1,75 @@
 <script setup lang="ts">
-import { motion } from 'motion-v'
-import { useRouter } from 'vue-router'
-
-const props = defineProps({
-  iconName: {
-    type: String,
-    required: false,
-  },
-  image: {
-    type: String,
-    required: false,
-  },
-  route: {
-    type: String,
-    required: true,
-  },
-  external: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
-  size: {
-    type: String as PropType<'sm' | 'md'>,
-    required: false,
-    default: 'md',
-  },
-})
-
-const router = useRouter()
-
-function handleClick() {
-  if (props.external) {
-    window.open(props.route, '_blank')
-  }
-  else {
-    router.push(props.route)
-  }
+interface Props {
+  iconName?: string
+  image?: string
+  route: string
+  external?: boolean
+  size?: 'sm' | 'md'
 }
 
-const hover = useMotionHover({ scale: 1.03, y: -1 })
+const props = withDefaults(defineProps<Props>(), {
+  external: false,
+  size: 'md',
+})
 </script>
 
 <template>
-  <motion.div
-    class="group relative w-fit inline-flex pressable items-center gap-1 rounded bg-gray-400/10 px-2 text-zinc-5 font-light transition duration-500 hover:cursor-pointer hover:bg-gray-400/20 dark:text-zinc-4 hover:text-zinc-700 dark:hover:text-zinc-2"
-    :class="[size === 'sm' ? 'py-0.5 text-sm' : 'py-1']"
-    :while-hover="hover"
-    :transition="{ type: 'spring', stiffness: 400, damping: 17 }"
-    @click="handleClick"
+  <NuxtLink
+    :to="props.route"
+    :external="props.external"
+    :target="props.external ? '_blank' : undefined"
+    :rel="props.external ? 'noopener noreferrer' : undefined"
+    class="icon-link inline-flex items-center gap-1.5 rounded bg-neutral-400/10 text-neutral-600 leading-none no-underline hover:bg-neutral-400/20 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100"
+    :class="props.size === 'sm' ? 'px-1.5 py-1 text-sm' : 'px-2 py-1.5'"
   >
-    <ClientOnly>
-      <Icon
-        v-if="iconName"
-        :name="iconName"
-        class="transition duration-500"
-        :class="[size === 'sm' ? 'w-4' : 'w-5']"
-      />
-    </ClientOnly>
+    <Icon
+      v-if="props.iconName"
+      :name="props.iconName"
+      class="shrink-0"
+      :class="props.size === 'sm' ? 'size-3.5' : 'size-4'"
+      aria-hidden="true"
+    />
     <img
-      v-if="image"
-      :src="image"
-      class="transition duration-500"
-      :class="[size === 'sm' ? 'w-4' : 'w-5']"
+      v-else-if="props.image"
+      :src="props.image"
+      alt=""
+      class="shrink-0"
+      :class="props.size === 'sm' ? 'size-3.5' : 'size-4'"
     >
-    <slot />
-  </motion.div>
+    <span><slot /></span>
+  </NuxtLink>
 </template>
+
+<style scoped>
+.icon-link {
+  /* Sits on the surrounding text's line instead of on the icon's baseline */
+  vertical-align: middle;
+  transition:
+    background-color 150ms var(--ease-out),
+    color 150ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .icon-link:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.icon-link:active {
+  transform: scale(0.97);
+}
+
+.icon-link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon-link,
+  .icon-link:hover,
+  .icon-link:active {
+    transform: none;
+  }
+}
+</style>
