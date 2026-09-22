@@ -50,19 +50,40 @@ html.dark {
    into nested elements of child components). */
 .rl-root {
   font-family: "Geist Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-  --rl-on: #ffffff;
-  --rl-region-fill: 0.05;
-  --rl-region-stroke: 0.26;
+  --rl-text: #262626;
+  --rl-muted: #737373;
   --rl-surface: #ffffff;
-  --rl-edge: rgb(115 115 115 / 0.22);
+  --rl-canvas: #fafafa;
+  --rl-grid: rgb(0 0 0 / 0.07);
+  --rl-hairline: rgb(0 0 0 / 0.09);
+  --rl-hairline-strong: rgb(0 0 0 / 0.2);
+  --rl-hub-bg: #525252;
+  --rl-hub-on: #fafafa;
+  --rl-region-fill: 0.045;
+  --rl-region-stroke: 0.3;
+  --rl-edge: rgb(115 115 115 / 0.25);
+  /* Light comes from above: a tight contact shadow plus a soft ambient one */
+  --rl-shadow: 0 1px 1px rgb(0 0 0 / 0.04), 0 2px 4px -1px rgb(0 0 0 / 0.05);
+  --rl-shadow-lift: 0 2px 4px rgb(0 0 0 / 0.05), 0 10px 24px -6px rgb(0 0 0 / 0.14);
+  --rl-shadow-pop: 0 2px 4px rgb(0 0 0 / 0.04), 0 12px 32px -8px rgb(0 0 0 / 0.16);
 }
 
 .dark .rl-root {
-  --rl-on: #171717;
-  --rl-region-fill: 0.08;
-  --rl-region-stroke: 0.24;
-  --rl-surface: #171717;
-  --rl-edge: rgb(163 163 163 / 0.18);
+  --rl-text: #e5e5e5;
+  --rl-muted: #a3a3a3;
+  --rl-surface: #1f1f1f;
+  --rl-canvas: #171717;
+  --rl-grid: rgb(255 255 255 / 0.06);
+  --rl-hairline: rgb(255 255 255 / 0.09);
+  --rl-hairline-strong: rgb(255 255 255 / 0.22);
+  --rl-hub-bg: #e5e5e5;
+  --rl-hub-on: #171717;
+  --rl-region-fill: 0.06;
+  --rl-region-stroke: 0.28;
+  --rl-edge: rgb(163 163 163 / 0.2);
+  --rl-shadow: 0 1px 2px rgb(0 0 0 / 0.4);
+  --rl-shadow-lift: 0 2px 4px rgb(0 0 0 / 0.4), 0 12px 28px -6px rgb(0 0 0 / 0.6);
+  --rl-shadow-pop: 0 2px 4px rgb(0 0 0 / 0.35), 0 12px 32px -8px rgb(0 0 0 / 0.55);
 }
 
 .rl-la { --c: 59 110 170; }

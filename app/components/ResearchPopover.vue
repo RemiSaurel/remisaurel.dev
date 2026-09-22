@@ -11,6 +11,22 @@ const props = defineProps<{
 
 const GAP = '10px'
 
+/**
+ * Hovering from node to node closes one popover and opens the next a few ms later.
+ * Once a popover has just been shown, the next one opens instantly: the reader has
+ * already said they want the details, fading in each one again only makes them wait.
+ */
+const WARM_MS = 300
+const instant = ref(false)
+let closedAt = 0
+
+watch(() => props.node, (node, previous) => {
+  if (node && !previous)
+    instant.value = performance.now() - closedAt < WARM_MS
+  else if (!node && previous)
+    closedAt = performance.now()
+})
+
 function pct(value: number, total: number) {
   return `${((value / total) * 100).toFixed(3)}%`
 }
@@ -49,24 +65,29 @@ const placement = computed(() => {
 </script>
 
 <template>
-  <Transition name="rl-pop">
+  <Transition
+    name="rl-pop"
+    :enter-active-class="instant ? 'rl-pop-instant' : 'rl-pop-enter-active'"
+    :enter-from-class="instant ? 'rl-pop-instant' : 'rl-pop-enter-from'"
+  >
     <div
       v-if="node && placement"
-      class="rl-popover pointer-events-none absolute z-50 max-w-55 w-max border border-[rgb(var(--c)/0.3)] bg-[var(--rl-surface)] px-3 py-2.4 shadow-lg"
+      class="rl-popover pointer-events-none absolute z-50 max-w-60 w-max px-3.5 py-3"
       :class="[`rl-${node.clusters[0] || 'hub'}`, `rl-pop-${placement.side}`, `rl-pop-${placement.align}`]"
       :style="placement.style"
       role="tooltip"
     >
-      <p v-if="node.venue" class="rl-popover-venue uppercase m-0 text-[0.8rem] font-500 tracking-[0.08em]">
+      <p v-if="node.venue" class="rl-popover-venue m-0 flex items-center gap-1.5 text-[0.62rem] font-500 tracking-[0.08em] uppercase">
+        <span class="rl-popover-dot" />
         {{ node.venue }}
       </p>
-      <p class="m-0 mt-[0.15rem] text-[0.8rem] font-500">
+      <p class="m-0 text-[0.84rem] font-600 leading-[1.35] tracking-[-0.005em]" :class="{ 'mt-1': node.venue }">
         {{ node.label }}
       </p>
-      <p v-if="node.description" class="m-0 mt-[0.3rem] text-[0.8rem] text-neutral-500 leading-[1.5] dark:text-neutral-400">
+      <p v-if="node.description" class="m-0 mt-1 text-[0.78rem] text-neutral-500 leading-[1.5] dark:text-neutral-400">
         {{ node.description }}
       </p>
-      <p v-if="node.url" class="rl-popover-cta m-0 mt-[0.35rem] text-[0.68rem] font-500">
+      <p v-if="node.url" class="rl-popover-cta m-0 mt-2.5 pt-2 text-[0.7rem] font-500">
         Open paper ↗
       </p>
     </div>
@@ -74,16 +95,26 @@ const placement = computed(() => {
 </template>
 
 <style scoped>
-.rl-popover-venue {
-  color: rgb(var(--c));
+.rl-popover {
+  background-color: var(--rl-surface);
+  box-shadow: inset 0 0 0 1px var(--rl-hairline), var(--rl-shadow-pop);
 }
 
-.dark .rl-popover {
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
+.rl-popover-venue {
+  color: var(--rl-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.rl-popover-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: rgb(var(--c));
 }
 
 .rl-popover-cta {
   color: rgb(var(--c));
+  border-top: 1px solid var(--rl-hairline);
 }
 
 .rl-pop-right.rl-pop-middle { transform-origin: left center; }
@@ -93,18 +124,25 @@ const placement = computed(() => {
 .rl-pop-left.rl-pop-top { transform-origin: right top; }
 .rl-pop-left.rl-pop-bottom { transform-origin: right bottom; }
 
-.rl-pop-enter-active,
-.rl-pop-leave-active {
+.rl-pop-enter-active {
   transition: opacity var(--duration-micro) var(--ease-out), scale var(--duration-micro) var(--ease-out);
 }
 
+/* Exit is faster than entry: the system is responding, not presenting */
 .rl-pop-leave-active {
-  transition-duration: 100ms;
+  transition: opacity 100ms var(--ease-out), scale 100ms var(--ease-out);
 }
 
 .rl-pop-enter-from,
 .rl-pop-leave-to {
   opacity: 0;
-  scale: 0.95;
+  scale: 0.96;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rl-pop-enter-from,
+  .rl-pop-leave-to {
+    scale: 1;
+  }
 }
 </style>

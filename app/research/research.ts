@@ -312,7 +312,7 @@ const LAYOUT: Record<string, Vec> = {
 
   // AI & Ethics
   'ethics': { x: 711, y: 357 },
-  'eiah': { x: 789, y: 227 },
+  'eiah': { x: 789, y: 240 },
   'responsible-ai': { x: 894, y: 357 },
   'governance': { x: 841, y: 423 },
 }

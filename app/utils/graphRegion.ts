@@ -17,7 +17,7 @@ const CANVAS_W = 1000
 const CANVAS_H = 460
 
 /** Rounded rectangle wrapping every box, padded evenly on each side, clamped within canvas. */
-export function regionRect(boxes: RegionBox[], padding = 26): Region | null {
+export function regionRect(boxes: RegionBox[], padding = 20): Region | null {
   if (!boxes.length)
     return null
 

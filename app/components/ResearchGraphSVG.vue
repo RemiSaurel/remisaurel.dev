@@ -11,10 +11,6 @@ defineProps<{
 defineEmits<{
   registerRegion: [clusterId: ClusterId, element: SVGRectElement | null]
 }>()
-
-function clusterClass(ids: ClusterId[]) {
-  return ids.length ? `rl-${ids[0]}` : 'rl-hub'
-}
 </script>
 
 <template>
@@ -32,28 +28,23 @@ function clusterClass(ids: ClusterId[]) {
       :y="region.rect.y"
       :width="region.rect.width"
       :height="region.rect.height"
-      class="rl-region touch-none cursor-grab stroke-1 transition-opacity active:cursor-grabbing"
-      :class="clusterClass([region.id])"
-      :style="{ opacity: focusedClusters ? (focusedClusters.has(region.id) ? 1 : 0.3) : 1 }"
+      class="rl-region touch-none cursor-grab active:cursor-grabbing"
+      :class="[`rl-${region.id}`, { 'rl-region-dimmed': focusedClusters && !focusedClusters.has(region.id) }]"
     />
 
     <!-- Links -->
-    <template v-for="edge in edges" :key="edge.id">
-      <path
-        :d="edge.d"
-        class="rl-edge pointer-events-none fill-none stroke-1 stroke-[var(--rl-edge)] transition-[opacity,stroke]"
-        :class="[
-          edge.cluster ? `rl-${edge.cluster}` : '',
-          { 'rl-edge-active stroke-[rgb(var(--c)/0.7)]': edge.highlight, 'rl-edge-dimmed opacity-30': edge.dimmed },
-        ]"
-      />
-      <path
-        v-if="edge.highlight"
-        :d="edge.d"
-        class="rl-edge-flow pointer-events-none fill-none stroke-[rgb(var(--c)/0.8)]"
-        :class="edge.cluster ? `rl-${edge.cluster}` : ''"
-      />
-    </template>
+    <path
+      v-for="(edge, index) in edges"
+      :key="edge.id"
+      :d="edge.d"
+      pathLength="1"
+      class="rl-edge pointer-events-none fill-none"
+      :class="[
+        edge.cluster ? `rl-${edge.cluster}` : 'rl-hub',
+        { 'rl-edge-active': edge.highlight, 'rl-edge-dimmed': edge.dimmed },
+      ]"
+      :style="{ '--i': index }"
+    />
   </svg>
 </template>
 
@@ -61,18 +52,52 @@ function clusterClass(ids: ClusterId[]) {
 .rl-region {
   fill: rgb(var(--c) / var(--rl-region-fill));
   stroke: rgb(var(--c) / var(--rl-region-stroke));
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  transition: opacity 120ms ease;
+  animation: rl-fade-in 500ms var(--ease-out) backwards;
 }
 
-.rl-edge-flow {
-  stroke-width: 1.4;
+.rl-region-dimmed {
+  opacity: 0.35;
+}
+
+.rl-edge {
+  stroke: var(--rl-edge);
+  stroke-width: 1;
   stroke-linecap: round;
-  stroke-dasharray: 4 26;
-  animation: rl-edge-flow 1.1s linear infinite;
+  /* Drawn in once on load, from each link's source. Hover then only changes colour. */
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  transition: opacity 120ms ease, stroke 120ms ease;
+  animation: rl-edge-draw 700ms var(--ease-in-out) backwards;
+  animation-delay: calc(260ms + var(--i) * 10ms);
 }
 
-@keyframes rl-edge-flow {
-  to {
-    stroke-dashoffset: -30;
+.rl-edge-active {
+  stroke: rgb(var(--c) / 0.8);
+  stroke-width: 1.5;
+}
+
+.rl-edge-dimmed {
+  opacity: 0.25;
+}
+
+@keyframes rl-edge-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes rl-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rl-edge {
+    animation: rl-fade-in 200ms ease backwards;
   }
 }
 </style>

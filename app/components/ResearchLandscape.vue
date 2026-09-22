@@ -13,6 +13,15 @@ const nodeEls = reactive<Record<string, HTMLElement | null>>({})
 const regionEls = reactive<Record<string, SVGRectElement | null>>({})
 const boxes = ref<Record<string, { hw: number, hh: number }>>({})
 const activeId = ref<string | null>(null)
+const draggingId = ref<string | null>(null)
+
+/** Entrance cascade reads from the centre outwards: hub, themes, topics, then papers. */
+const KIND_RANK: Record<ResearchNode['kind'], number> = { hub: 0, theme: 1, topic: 2, paper: 3 }
+const entranceOrder = Object.fromEntries(
+  [...researchNodes]
+    .sort((a, b) => KIND_RANK[a.kind] - KIND_RANK[b.kind])
+    .map((node, index) => [node.id, index]),
+)
 
 const positions = reactive<Record<string, { x: number, y: number }>>(
   Object.fromEntries(researchNodes.map(node => [node.id, { x: node.x, y: node.y }])),
@@ -155,8 +164,10 @@ for (const node of researchNodes) {
         return
       const dx = event.clientX - start.clientX
       const dy = event.clientY - start.clientY
-      if (Math.hypot(dx, dy) > 3)
+      if (Math.hypot(dx, dy) > 3) {
         moved = true
+        draggingId.value = node.id
+      }
 
       userMoved = true
       const s = scale()
@@ -166,6 +177,7 @@ for (const node of researchNodes) {
     onEnd: () => {
       if (moved)
         justDragged = node.id
+      draggingId.value = null
       start = null
     },
   })
@@ -185,7 +197,7 @@ for (const cluster of clusters) {
     onStart: (_pos, event) => {
       const snapshot: Record<string, { x: number, y: number }> = {}
       for (const node of researchNodes) {
-        if (node.clusters.includes(cluster.id))
+        if (node.clusters[0] === cluster.id)
           snapshot[node.id] = { ...positions[node.id]! }
       }
       start = { clientX: event.clientX, clientY: event.clientY, positions: snapshot }
@@ -209,11 +221,16 @@ for (const cluster of clusters) {
   })
 }
 
+/**
+ * A region wraps the nodes whose primary cluster it is. Papers that bridge two clusters
+ * sit in their first one and show the second as a dot, so regions never overlap into a
+ * muddy intersection.
+ */
 const regions = computed(() => {
   return clusters
     .map((cluster) => {
       const clusterBoxes = researchNodes
-        .filter(node => node.clusters.includes(cluster.id))
+        .filter(node => node.clusters[0] === cluster.id)
         .flatMap((node) => {
           const box = boxes.value[node.id]
           const pos = positions[node.id]
@@ -297,13 +314,14 @@ const edges = computed(() => {
 function nodeOpacity(node: ResearchNode) {
   if (!focused.value)
     return 1
-  return focused.value.has(node.id) ? 1 : 0.18
+  return focused.value.has(node.id) ? 1 : 0.22
 }
 
+// The section around the graph already slides in; the frame only fades so nodes cascade into a still canvas.
 const enter = computed(() =>
   prefersReducedMotion.value
-    ? { initial: { opacity: 1, y: 0 }, transition: { duration: 0 } }
-    : { initial: { opacity: 0, y: 12 }, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } },
+    ? { initial: { opacity: 1 }, transition: { duration: 0 } }
+    : { initial: { opacity: 0 }, transition: { duration: 0.4, ease: [0.23, 1, 0.32, 1] } },
 )
 </script>
 
@@ -311,9 +329,9 @@ const enter = computed(() =>
   <div class="rl-root">
     <motion.div
       :initial="enter.initial"
-      :animate="{ opacity: 1, y: 0 }"
+      :animate="{ opacity: 1 }"
       :transition="enter.transition"
-      class="hidden border border-neutral-200 p-6 md:block dark:border-neutral-800"
+      class="rl-frame hidden p-7 md:block"
     >
       <div
         ref="container"
@@ -337,6 +355,8 @@ const enter = computed(() =>
           :node="node"
           :position="positions[node.id]!"
           :opacity="nodeOpacity(node)"
+          :order="entranceOrder[node.id]!"
+          :dragging="draggingId === node.id"
           @click="consumeDragClick(node.id, $event)"
           @mouseenter="activeId = node.id"
           @mouseleave="activeId = null"
@@ -356,7 +376,8 @@ const enter = computed(() =>
     <!-- Accessible / small-screen equivalent -->
     <div class="md:sr-only flex flex-col gap-8">
       <section v-for="cluster in clusters" :key="cluster.id" :class="`rl-${cluster.id}`">
-        <h3 class="rl-list-heading uppercase m-0 inline-block px-2.4 py-1.2 text-[0.68rem] font-600 tracking-[0.09em]">
+        <h3 class="rl-list-heading m-0 flex items-center gap-2 text-sm font-600">
+          <span class="rl-list-dot" />
           {{ cluster.label }}
         </h3>
         <p class="mb-0 mt-2 text-sm text-neutral-500 dark:text-neutral-400">
@@ -389,8 +410,23 @@ const enter = computed(() =>
 </template>
 
 <style scoped>
+.rl-frame {
+  background-color: var(--rl-canvas);
+  box-shadow: inset 0 0 0 1px var(--rl-hairline);
+  /* Faint dot grid: gives the free-floating nodes a surface to sit on */
+  background-image: radial-gradient(circle at 1px 1px, var(--rl-grid) 1px, transparent 0);
+  background-size: 18px 18px;
+  background-position: 9px 9px;
+}
+
 .rl-list-heading {
+  color: rgb(var(--c));
+}
+
+.rl-list-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
   background-color: rgb(var(--c));
-  color: var(--rl-on);
 }
 </style>
