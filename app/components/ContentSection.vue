@@ -16,30 +16,18 @@ const props = withDefaults(defineProps<Props>(), {
   delay: 0,
 })
 
-const transition = {
-  duration: 0.6,
-  ease: [0.25, 0.46, 0.45, 0.94],
-}
-
 const { prefersReducedMotion } = usePrefersReducedMotion()
 
-const computedTransition = computed(() => {
-  if (prefersReducedMotion.value) {
-    return { duration: 0 }
-  }
-  const base = props.animate ? { ...transition, delay: props.delay } : { duration: 0 }
-  // Layout moves follow the list/card morph, never the entrance delay.
-  return { ...base, layout: VIEW_MORPH_TRANSITION }
-})
+const layoutTransition = computed(() => prefersReducedMotion.value ? { duration: 0 } : { layout: VIEW_MORPH_TRANSITION })
 </script>
 
 <template>
   <motion.section
-    :initial="props.animate && !prefersReducedMotion ? { opacity: 0, y: 15, filter: 'blur(8px)' } : { opacity: 1, y: 0, filter: 'blur(0px)' }"
-    :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
-    :transition="computedTransition"
+    :transition="layoutTransition"
     :layout="props.layout"
-    class="flex flex-col"
+    class="[--enter-blur:8px] flex flex-col"
+    :class="{ enter: props.animate }"
+    :style="{ '--enter-delay': `${props.delay}s` }"
   >
     <!-- Section header (optional) -->
     <component
@@ -53,18 +41,10 @@ const computedTransition = computed(() => {
         {{ title }}
       </div>
       <slot name="actions" />
-      <svg
+      <LinkArrow
         v-if="link"
         class="h-2.5 w-2.5 group-hover:rotate-45"
-        viewBox="0 0 11 11"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M8.4778 3.06917L1.23404 10.3129L0 9.0789L7.24376 1.83513L0.456622 1.71166L0.440628 0L10.1366 0.176392L10.313 9.87231L8.60128 9.85632L8.4778 3.06917Z"
-          fill="currentColor"
-        />
-      </svg>
+      />
     </component>
 
     <!-- Content slot -->

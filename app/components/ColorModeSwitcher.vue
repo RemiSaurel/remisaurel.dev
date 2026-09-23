@@ -4,8 +4,9 @@ import { MINIMAL } from '~/sounds/sounds'
 const colorMode = useColorMode()
 const { play } = useSound()
 
+// Flip what is on screen: `value` resolves 'system' to the mode actually shown.
 function applyPreference() {
-  colorMode.preference = colorMode.preference === 'light' ? 'dark' : 'light'
+  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
 }
 
 // CSS minifiers (Lightning CSS in prod builds) rewrite `500ms` as `.5s` to
@@ -18,7 +19,7 @@ function cssTimeToMs(value: string): number {
 
 function toggleColorMode(event: MouseEvent) {
   // Rising two-note blip towards light, falling towards dark.
-  play(colorMode.preference === 'light' ? MINIMAL.toggleOff : MINIMAL.toggleOn)
+  play(colorMode.value === 'dark' ? MINIMAL.toggleOn : MINIMAL.toggleOff)
 
   const supportsViewTransition = typeof document.startViewTransition === 'function'
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -64,13 +65,14 @@ function toggleColorMode(event: MouseEvent) {
 }
 
 // Use colorMode.value to get the actual current mode (resolves 'system' to actual value)
-const isDark = computed(() => colorMode.preference === 'dark')
+const isDark = computed(() => colorMode.value === 'dark')
 </script>
 
 <template>
   <button
     class="relative h-8 w-8 flex pressable items-center justify-center bg-neutral-100 transition-colors duration-200 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700"
-    aria-label="Toggle color mode"
+    type="button"
+    :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
     @click="toggleColorMode"
   >
     <ClientOnly>

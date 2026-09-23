@@ -125,34 +125,28 @@ function completeCvHold() {
   navigateTo('/failures')
 }
 
-const transition = {
-  duration: 0.6,
-  ease: [0.25, 0.46, 0.45, 0.94],
-}
-
-function computedTransition(delay: number) {
-  if (prefersReducedMotion.value) {
-    return { duration: 0 }
+// Entrance runs as the CSS `.enter` reveal, so it starts before hydration.
+function enter(delay: number) {
+  return {
+    class: [props.animate && 'enter', '[--enter-blur:8px]'],
+    style: { '--enter-delay': `${delay}s` },
   }
-  return props.animate ? { ...transition, delay } : { duration: 0 }
 }
 
-function computedInitial(y: number) {
-  return props.animate && !prefersReducedMotion.value
-    ? { opacity: 0, y, filter: 'blur(8px)' }
-    : { opacity: 1, y: 0, filter: 'blur(0px)' }
-}
+const PHOTO = {
+  src: '/photo.png',
+  alt: 'Rémi Saurel',
+  width: 192,
+  height: 210,
+  format: 'webp',
+  densities: 'x1 x2',
+} as const
 </script>
 
 <template>
   <aside class="relative lg:sticky lg:top-8">
     <!-- Mobile: Horizontal layout with large photo -->
-    <motion.div
-      :initial="computedInitial(15)"
-      :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
-      :transition="computedTransition(0.1)"
-      class="lg:hidden"
-    >
+    <div v-bind="enter(0.1)" class="lg:hidden">
       <div class="flex items-start gap-4">
         <!-- Photo same size as desktop -->
         <motion.div
@@ -162,9 +156,10 @@ function computedInitial(y: number) {
           @click="handlePhotoClick"
         >
           <NuxtImg
-            src="/photo.png"
-            alt="Rémi Saurel"
-            class="w-32"
+            v-bind="PHOTO"
+            :preload="{ fetchPriority: 'high' }"
+            fetchpriority="high"
+            class="h-auto w-32"
           />
           <span
             v-for="p in particles"
@@ -183,7 +178,7 @@ function computedInitial(y: number) {
           <p class="m-0 text-sm text-neutral-500 dark:text-neutral-400">
             PhD Student
           </p>
-          <p class="m-0 text-sm text-neutral-400 dark:text-neutral-500">
+          <p class="m-0 text-sm text-neutral-500 dark:text-neutral-400">
             IRIT Lab, Toulouse
           </p>
           <span class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
@@ -232,7 +227,7 @@ function computedInitial(y: number) {
               :class="isHoldingCv ? '[clip-path:inset(0_0_0_0)] [transition:clip-path_900ms_linear]' : '[clip-path:inset(0_100%_0_0)] [transition:clip-path_200ms_var(--ease-out)]'"
             />
           </button>
-          <span class="pointer-events-none absolute flex flex-col rotate-[-9deg] select-none items-center whitespace-nowrap font-hand text-[0.95rem] leading-none text-[rgb(244_114_182)] font-700 -right-[0.65rem] -top-[0.85rem]" aria-hidden="true">
+          <span class="font-hand pointer-events-none absolute flex flex-col rotate-[-9deg] select-none items-center whitespace-nowrap text-[0.95rem] text-[rgb(244_114_182)] font-700 leading-none -right-[0.65rem] -top-[0.85rem]" aria-hidden="true">
             Soon
             <svg class="mt-[-1px] h-[8px] w-[28px]" viewBox="0 0 44 12" aria-hidden="true">
               <path d="M2 6c6-4 10-4 15-1.5s9 3 14-1 8-2 11 1" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
@@ -254,16 +249,12 @@ function computedInitial(y: number) {
           <Icon :name="link.icon" class="size-4" />
         </motion.a>
       </div>
-    </motion.div>
+    </div>
 
     <!-- Desktop: Original vertical layout -->
     <div class="hidden flex-col gap-3 lg:flex">
       <!-- Photo -->
-      <motion.div
-        :initial="computedInitial(15)"
-        :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
-        :transition="computedTransition(0.1)"
-      >
+      <div v-bind="enter(0.1)">
         <motion.div
           class="relative cursor-pointer"
           :while-hover="photoHover"
@@ -271,9 +262,9 @@ function computedInitial(y: number) {
           @click="handlePhotoClick"
         >
           <NuxtImg
-            src="/photo.png"
-            alt="Rémi Saurel"
-            class="max-w-48 w-full transition-all duration-300"
+            v-bind="PHOTO"
+            fetchpriority="high"
+            class="h-auto max-w-48 w-full transition-all duration-300"
           />
           <span
             v-for="p in particles"
@@ -283,42 +274,27 @@ function computedInitial(y: number) {
             :style="{ 'width': `${p.size}px`, 'height': `${p.size}px`, '--sx': `${p.sx}px`, '--sy': `${p.sy}px`, '--tx': `${p.tx}px`, '--ty': `${p.ty}px` }"
           />
         </motion.div>
-      </motion.div>
+      </div>
 
       <!-- Name & Title -->
-      <motion.div
-        :initial="computedInitial(15)"
-        :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
-        :transition="computedTransition(0.2)"
-        class="flex flex-col gap-0.5"
-      >
+      <div v-bind="enter(0.2)" class="flex flex-col gap-0.5">
         <h1 class="m-0 text-lg font-medium tracking-tight">
           Rémi Saurel
         </h1>
         <p class="m-0 text-sm text-neutral-500 dark:text-neutral-400">
           PhD Student at IRIT Lab, Toulouse
         </p>
-      </motion.div>
+      </div>
 
       <!-- Contact -->
-      <motion.div
-        :initial="computedInitial(15)"
-        :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
-        :transition="computedTransition(0.25)"
-        class="flex flex-col gap-1"
-      >
+      <div v-bind="enter(0.25)" class="flex flex-col gap-1">
         <span class="text-sm text-neutral-500 dark:text-neutral-400">
           remi.saurel [at] irit.fr
         </span>
-      </motion.div>
+      </div>
 
       <!-- Social Links -->
-      <motion.div
-        :initial="computedInitial(15)"
-        :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
-        :transition="computedTransition(0.3)"
-        class="flex gap-2"
-      >
+      <div v-bind="enter(0.3)" class="flex gap-2">
         <motion.a
           v-for="link in socialLinksBeforeCv"
           :key="link.url"
@@ -357,7 +333,7 @@ function computedInitial(y: number) {
               :class="isHoldingCv ? '[clip-path:inset(0_0_0_0)] [transition:clip-path_900ms_linear]' : '[clip-path:inset(0_100%_0_0)] [transition:clip-path_200ms_var(--ease-out)]'"
             />
           </button>
-          <span class="pointer-events-none absolute flex flex-col rotate-[-9deg] select-none items-center whitespace-nowrap font-hand text-[0.95rem] leading-none text-[rgb(244_114_182)] font-700 -right-[0.65rem] -top-[0.85rem]" aria-hidden="true">
+          <span class="font-hand pointer-events-none absolute flex flex-col rotate-[-9deg] select-none items-center whitespace-nowrap text-[0.95rem] text-[rgb(244_114_182)] font-700 leading-none -right-[0.65rem] -top-[0.85rem]" aria-hidden="true">
             Soon
             <svg class="mt-[-1px] h-[8px] w-[28px]" viewBox="0 0 44 12" aria-hidden="true">
               <path d="M2 6c6-4 10-4 15-1.5s9 3 14-1 8-2 11 1" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
@@ -378,7 +354,7 @@ function computedInitial(y: number) {
         >
           <Icon :name="link.icon" class="size-4" />
         </motion.a>
-      </motion.div>
+      </div>
     </div>
   </aside>
 </template>

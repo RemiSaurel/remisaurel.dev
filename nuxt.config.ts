@@ -59,15 +59,35 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
   ],
   icon: {
-    serverBundle: 'remote',
+    serverBundle: {
+      collections: ['uil', 'lucide', 'logos', 'simple-icons', 'academicons'],
+    },
+    clientBundle: {
+      scan: true,
+    },
+  },
+  image: {
+    quality: 80,
   },
   ui: {
     fonts: false,
+    theme: {
+      colors: ['primary'],
+    },
+    experimental: {
+      componentDetection: true,
+    },
   },
   fonts: {
+    defaults: {
+      styles: ['normal'],
+      subsets: ['latin', 'latin-ext'],
+    },
     families: [
+      { name: 'Instrument Sans', provider: 'google', weights: [400, 500, 600, 700] },
       { name: 'Geist Sans', provider: 'npm', weights: [400, 500, 600, 700] },
       { name: 'Caveat', provider: 'google', weights: [600, 700] },
+      { name: 'Patrick Hand', provider: 'google', weights: [400] },
     ],
   },
 

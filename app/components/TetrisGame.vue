@@ -225,7 +225,7 @@ watch(isOpen, (open) => {
     cancelHoldRestart()
     previouslyFocused?.focus?.()
   }
-})
+}, { immediate: true }) // Lazy-loaded: the first open is what mounts this component.
 </script>
 
 <template>

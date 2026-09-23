@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LayoutGroup, motion } from 'motion-v'
+import { LayoutGroup } from 'motion-v'
 import { useFirstVisit } from '~/composables/useFirstVisit'
 
 useSeoMeta({
@@ -20,12 +20,6 @@ onMounted(() => {
   }, 2000)
 })
 
-const transition = {
-  duration: 0.6,
-  ease: [0.25, 0.46, 0.45, 0.94],
-}
-
-const { prefersReducedMotion } = usePrefersReducedMotion()
 const { setCursorLogo, clearCursorLogo } = useCursorLogo()
 
 const { view: publicationsView, isRestoring: isRestoringPublicationsView } = useListView('publications')
@@ -42,15 +36,10 @@ const PUBLICATION_VIEWS = [
 
     <!-- Right: Main Content -->
     <LayoutGroup>
-      <main class="flex flex-col gap-8">
+      <div class="flex flex-col gap-8">
         <!-- Intro Section -->
         <ContentSection :animate="animate" :delay="0.3">
-          <motion.p
-            :initial="(animate.value && !prefersReducedMotion.value) ? { opacity: 0, y: 15, filter: 'blur(8px)' } : { opacity: 1, y: 0, filter: 'blur(0px)' }"
-            :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
-            :transition="prefersReducedMotion.value ? { duration: 0 } : (animate.value ? { ...transition, delay: 0.4 } : { duration: 0 })"
-            class="intro-text"
-          >
+          <p class="intro-text [--enter-blur:8px] [--enter-delay:0.4s]" :class="{ enter: animate }">
             French PhD student at the
             <a
               href="https://www.irit.fr/" target="_blank" class="intro-link pressable"
@@ -67,17 +56,12 @@ const PUBLICATION_VIEWS = [
               @mouseenter="setCursorLogo(ENTITY_LOGOS.kosmos)"
               @mouseleave="clearCursorLogo"
             >Kosmos Education</a>.
-          </motion.p>
-          <motion.p
-            :initial="(animate.value && !prefersReducedMotion.value) ? { opacity: 0, y: 15, filter: 'blur(8px)' } : { opacity: 1, y: 0, filter: 'blur(0px)' }"
-            :animate="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
-            :transition="prefersReducedMotion.value ? { duration: 0 } : (animate.value ? { ...transition, delay: 0.5 } : { duration: 0 })"
-            class="mt-4 text-zinc-500 dark:text-zinc-400"
-          >
+          </p>
+          <p class="[--enter-blur:8px] [--enter-delay:0.5s] mt-4 text-zinc-500 dark:text-zinc-400" :class="{ enter: animate }">
             I develop dashboards powered by AI and learning analytics to help teachers
             support students' out-of-class activities in K-12 education. Interested in
             Human-AI Interaction and responsible AI integration in education.
-          </motion.p>
+          </p>
         </ContentSection>
 
         <!-- Publications Section -->
@@ -92,7 +76,7 @@ const PUBLICATION_VIEWS = [
         <ContentSection title="News" :animate="animate" :delay="0.7" layout="position">
           <NewsList :limit="5" />
         </ContentSection>
-      </main>
+      </div>
     </LayoutGroup>
   </div>
 </template>

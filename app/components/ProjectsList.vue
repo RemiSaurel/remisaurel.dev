@@ -17,8 +17,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const { prefersReducedMotion } = usePrefersReducedMotion()
 
-const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1]
-
 // Only the first render plays the scroll-in entrance; later view switches crossfade instead.
 const hasSwitched = ref(false)
 watch(() => props.view, () => {
@@ -86,7 +84,7 @@ const REVEALED = { opacity: 1, y: 0, filter: 'blur(0px)' }
       :class="{ 'border-t border-neutral-200/70 dark:border-neutral-800': index > 0 && isFirstOfYear(index) }"
     >
       <span
-        class="tabular-nums [grid-area:date] text-xs text-neutral-400 md:pt-0.5 dark:text-neutral-500"
+        class="tabular-nums [grid-area:date] text-xs text-neutral-500 md:pt-0.5 dark:text-neutral-400"
         :class="{ 'hidden md:block md:invisible': !isFirstOfYear(index) }"
       >
         {{ project.date }}
@@ -110,7 +108,7 @@ const REVEALED = { opacity: 1, y: 0, filter: 'blur(0px)' }
             target="_blank"
             rel="noopener noreferrer"
             :aria-label="`${project.title} ${key}`"
-            class="flex pressable text-neutral-400 transition-colors duration-200 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100"
+            class="flex pressable text-neutral-500 transition-colors duration-200 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
           >
             <Icon :name="LINK_ICONS[key] ?? ''" class="size-4" />
           </a>

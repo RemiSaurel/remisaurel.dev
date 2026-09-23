@@ -18,15 +18,15 @@ const containerClasses = computed(() => [
 ])
 
 const titleClasses = computed(() => [
-  'text-md my-0 inline-flex items-center gap-2 font-semibold transition duration-500',
-  'dark:text-zinc-400 text-zinc-500',
-  !props.disabled && 'group-hover:text-zinc-900 dark:group-hover:text-zinc-200',
+  'text-md my-0 inline-flex items-center gap-2 font-semibold transition-colors duration-200',
+  'dark:text-zinc-300 text-zinc-700',
+  !props.disabled && 'group-hover:text-zinc-900 dark:group-hover:text-zinc-100',
 ].filter(Boolean))
 
 const descriptionClasses = computed(() => [
-  'text-sm my-0 font-medium transition duration-500',
-  'dark:text-zinc-500 text-zinc-400',
-  !props.disabled && 'group-hover:text-zinc-500 dark:group-hover:text-zinc-400',
+  'text-sm my-0 font-medium transition-colors duration-200',
+  'dark:text-zinc-400 text-zinc-500',
+  !props.disabled && 'group-hover:text-zinc-600 dark:group-hover:text-zinc-300',
 ].filter(Boolean))
 
 const displayTitle = computed(() =>
@@ -45,11 +45,11 @@ const displayTitle = computed(() =>
       <Icon
         v-if="!disabled"
         name="uil:arrow-up-right"
-        class="size-4 opacity-0 transition-all duration-300 -translate-x-1 group-hover:translate-x-0 group-hover:opacity-100"
+        class="size-4 opacity-0 transition-[opacity,transform] duration-300 -translate-x-1 group-hover:translate-x-0 group-hover:opacity-100"
       />
     </h3>
-    <h4 :class="descriptionClasses">
+    <p :class="descriptionClasses">
       {{ description }}
-    </h4>
+    </p>
   </component>
 </template>

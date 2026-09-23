@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { motion } from 'motion-v'
 import { MINIMAL } from '~/sounds/sounds'
 
 const route = useRoute()
-const { prefersReducedMotion } = usePrefersReducedMotion()
 const { play } = useSound()
 
 const navItems = [
@@ -22,30 +20,31 @@ function isActive(path: string) {
 
 <template>
   <div class="min-h-screen bg-white text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100">
+    <a
+      href="#content"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-50 focus:bg-white focus:px-3 focus:py-2 focus:text-sm dark:focus:bg-neutral-900"
+    >
+      Skip to content
+    </a>
+
     <!-- Navigation -->
     <nav>
       <div class="mx-auto max-w-7xl px-4 py-3 sm:px-6 sm:py-4">
-        <div class="flex items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
           <!-- Logo/Name -->
-          <motion.div
-            class="shrink-0"
-            :initial="prefersReducedMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }"
-            :animate="{ opacity: 1, x: 0 }"
-            :transition="prefersReducedMotion ? { duration: 0 } : { duration: 0.4 }"
-          >
+          <div class="enter [--enter-duration:0.4s] [--enter-x:-10px] [--enter-y:0] shrink-0">
             <NuxtLink to="/" class="pressable whitespace-nowrap rounded-sm text-xs font-medium tracking-tight sm:text-sm">
               Rémi Saurel
             </NuxtLink>
-          </motion.div>
+          </div>
 
           <!-- Nav Links -->
           <div class="flex items-center gap-2 sm:gap-6">
-            <motion.div
+            <div
               v-for="(item, index) in navItems"
               :key="item.route"
-              :initial="prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: -5 }"
-              :animate="{ opacity: 1, y: 0 }"
-              :transition="prefersReducedMotion ? { duration: 0 } : { duration: 0.3, delay: 0.1 + index * 0.05 }"
+              class="enter [--enter-duration:0.3s] [--enter-y:-5px]"
+              :style="{ '--enter-delay': `${0.1 + index * 0.05}s` }"
             >
               <NuxtLink
                 :to="item.route"
@@ -55,38 +54,33 @@ function isActive(path: string) {
               >
                 {{ item.label }}
               </NuxtLink>
-            </motion.div>
+            </div>
 
             <!-- Sound + Theme Toggles -->
-            <motion.div
-              class="flex shrink-0 gap-1"
-              :initial="prefersReducedMotion ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }"
-              :animate="{ opacity: 1, scale: 1 }"
-              :transition="prefersReducedMotion ? { duration: 0 } : { duration: 0.3, delay: 0.3 }"
-            >
+            <div class="enter [--enter-delay:0.3s] [--enter-duration:0.3s] [--enter-scale:0.9] [--enter-y:0] flex shrink-0 gap-1">
               <SoundSwitcher />
               <ColorModeSwitcher />
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="mx-auto max-w-7xl px-6 py-12">
+    <main id="content" class="mx-auto max-w-7xl px-6 py-12">
       <slot />
     </main>
 
     <!-- Footer -->
     <footer class="mt-auto">
       <div class="mx-auto max-w-7xl px-6 py-10">
-        <div class="flex items-center justify-between text-xs text-neutral-400 dark:text-neutral-600">
+        <div class="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
           <p class="m-0">
             &copy; {{ new Date().getFullYear() }} Rémi Saurel
           </p>
           <NuxtLink
             to="/failures"
-            class="pressable transition-colors duration-200 hover:text-neutral-600 dark:hover:text-neutral-400"
+            class="pressable transition-colors duration-200 hover:text-neutral-900 dark:hover:text-neutral-100"
           >
             failures
           </NuxtLink>

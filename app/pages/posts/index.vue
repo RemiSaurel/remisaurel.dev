@@ -12,8 +12,8 @@ useSeoMeta({
 const { data } = await useAsyncData('posts', () =>
   queryCollection('posts').all())
 
-// Create an array of projects grouped by MM/YY
-const projects = computed(() => {
+// Posts grouped by MM/YY, newest first
+const postGroups = computed(() => {
   if (!data.value)
     return []
 
@@ -21,7 +21,7 @@ const projects = computed(() => {
     return new Date(b.date).getTime() - new Date(a.date).getTime()
   })
 
-  const groupedProjects = sorted.reduce((acc, post) => {
+  const grouped = sorted.reduce((acc, post) => {
     const date = new Date(post.date)
     const monthYear = `${String(date.getMonth() + 1).padStart(2, '0')}/${date
       .getFullYear()
@@ -33,9 +33,9 @@ const projects = computed(() => {
     return acc
   }, {} as Record<string, typeof sorted>)
 
-  return Object.entries(groupedProjects).map(([monthYear, projects]) => ({
+  return Object.entries(grouped).map(([monthYear, posts]) => ({
     monthYear,
-    projects,
+    posts,
   }))
 })
 </script>
@@ -43,9 +43,9 @@ const projects = computed(() => {
 <template>
   <div>
     <div class="mb-16">
-      <h5 class="m-0 text-2xl font-semibold">
+      <h1 class="m-0 text-2xl font-semibold">
         Posts
-      </h5>
+      </h1>
       <p>
         You'll find here some blog posts I've written. <br>
         Posts can be technical-oriented, personal thoughts, or anything else.
@@ -53,21 +53,21 @@ const projects = computed(() => {
     </div>
     <div class="flex flex-col gap-12 pl-4">
       <motion.div
-        v-for="(group, groupIndex) in projects"
+        v-for="(group, groupIndex) in postGroups"
         :key="group.monthYear"
         class="relative"
         :initial="prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }"
         :while-in-view="prefersReducedMotion ? undefined : { opacity: 1, y: 0 }"
         :viewport="{ once: true, margin: '-50px' }"
-        :transition="prefersReducedMotion ? { duration: 0 } : { duration: 0.5, delay: groupIndex * 0.1, ease: [0.23, 1, 0.32, 1] }"
+        :transition="prefersReducedMotion ? { duration: 0 } : { duration: 0.5, delay: groupIndex * 0.1, ease: EASE_OUT }"
       >
         <h2
-          class="absolute z-0 my-1 cursor-default text-lg text-zinc-400/70 tracking-tight -left-4 -top-8 dark:text-zinc-6"
+          class="absolute z-0 my-1 cursor-default text-lg text-zinc-500 tracking-tight -left-4 -top-8 dark:text-zinc-400"
         >
           {{ group.monthYear }}
         </h2>
         <div class="flex flex-col gap-2">
-          <div v-for="p in group.projects" :key="p.path">
+          <div v-for="p in group.posts" :key="p.path">
             <PostLine
               :to="p.path"
               :title="p.title"

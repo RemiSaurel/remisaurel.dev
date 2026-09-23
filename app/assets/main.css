@@ -1,10 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 @import "@nuxt/ui";
 
 :root {
   font-family: "Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 15px;
   line-height: 1.6;
 
   /* Animation tokens */
@@ -44,10 +42,17 @@ html.dark {
 * {
   box-sizing: border-box;
 }
+body {
+  font-size: 15px;
+}
 
 /* Handwritten annotations ("Soon", "& more!") */
 .font-hand {
   font-family: "Caveat", "Bradley Hand", cursive;
+}
+
+.font-note {
+  font-family: "Patrick Hand", "Bradley Hand", cursive;
 }
 
 /* Research landscape cluster color tokens — shared across ResearchLandscape's
@@ -136,6 +141,33 @@ html.dark {
   --failure-ink: 224 148 158;
 }
 
+.failure-strike {
+  background-image: linear-gradient(rgb(var(--failure-ink) / 0.8), rgb(var(--failure-ink) / 0.8));
+  background-repeat: no-repeat;
+  background-position: 0 58%;
+  background-size: 100% 2px;
+}
+
+.failure-stamp {
+  display: inline-block;
+  padding: 0.2rem 0.45rem 0.15rem;
+  border: 2px solid rgb(var(--failure-ink));
+  border-radius: 3px;
+  color: rgb(var(--failure-ink));
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  white-space: nowrap;
+  user-select: none;
+  --stamp-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -12 8.7'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  -webkit-mask-image: var(--stamp-grain);
+  mask-image: var(--stamp-grain);
+  -webkit-mask-size: 90px 90px;
+  mask-size: 90px 90px;
+}
+
 /* Respect reduced motion: keep opacity/color, remove transform/position motion */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -154,10 +186,9 @@ a {
   text-decoration: none;
 }
 
-/* Remove default focus rings on click (keep press/hover micro-interactions clean) */
-*:focus,
-*:focus-visible {
-  outline: none;
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
 }
 
 /* Remove mobile tap highlight */
@@ -184,6 +215,25 @@ a {
 .page-enter-from,
 .page-leave-to {
   opacity: 0;
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    translate: var(--enter-x, 0) var(--enter-y, 15px);
+    scale: var(--enter-scale, 1);
+    filter: blur(var(--enter-blur, 0));
+  }
+}
+
+.enter {
+  animation: enter var(--enter-duration, 0.6s) var(--enter-ease, cubic-bezier(0.25, 0.46, 0.45, 0.94)) var(--enter-delay, 0s) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter {
+    animation: none;
+  }
 }
 
 /* Divider line */

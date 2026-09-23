@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { motion } from 'motion-v'
-
 useSeoMeta({
   title: 'Research',
   ogTitle: 'Research · Rémi Saurel',
@@ -9,7 +7,6 @@ useSeoMeta({
   twitterCard: 'summary_large_image',
 })
 
-const { prefersReducedMotion } = usePrefersReducedMotion()
 const { setCursorLogo, clearCursorLogo } = useCursorLogo()
 
 const approach = [
@@ -27,48 +24,37 @@ const approach = [
   },
 ]
 
-const transition = {
-  duration: 0.6,
-  ease: [0.25, 0.46, 0.45, 0.94],
-}
-
+// Entrance runs as the CSS `.enter` reveal, so it starts before hydration.
 function reveal(delay: number) {
-  if (prefersReducedMotion.value)
-    return { initial: { opacity: 1, y: 0 }, transition: { duration: 0 } }
-  return { initial: { opacity: 0, y: 15 }, transition: { ...transition, delay } }
+  return { class: 'enter', style: { '--enter-delay': `${delay}s` } }
 }
 
 function itemReveal(index: number) {
-  if (prefersReducedMotion.value)
-    return { initial: { opacity: 1, y: 0 }, transition: { duration: 0 } }
-  return { initial: { opacity: 0, y: 10 }, transition: { duration: 0.4, delay: Math.min(index, 7) * 0.04, ease: [0.23, 1, 0.32, 1] } }
+  return {
+    class: 'enter [--enter-duration:0.4s] [--enter-ease:var(--ease-out)] [--enter-y:10px]',
+    style: { '--enter-delay': `${Math.min(index, 7) * 0.04}s` },
+  }
 }
 </script>
 
 <template>
   <div class="flex flex-col gap-16">
     <!-- Intro -->
-    <motion.div
-      :initial="reveal(0).initial"
-      :animate="{ opacity: 1, y: 0 }"
-      :transition="reveal(0).transition"
-    >
-      <h5 class="m-0 text-2xl font-semibold">
+    <div v-bind="reveal(0)">
+      <h1 class="m-0 text-2xl font-semibold">
         Research
-      </h5>
+      </h1>
       <p class="mt-2 max-w-2xl text-neutral-500 dark:text-neutral-400">
         My PhD sits between computer science, AI and education: I build
         AI-powered learning analytics dashboards that help K-12 teachers support
         what their students do outside the classroom. That makes the work
         inherently pluridisciplinary and what makes it so interesting.
       </p>
-    </motion.div>
+    </div>
 
     <!-- Research landscape graph -->
-    <motion.section
-      :initial="reveal(0.1).initial"
-      :animate="{ opacity: 1, y: 0 }"
-      :transition="reveal(0.1).transition"
+    <section
+      v-bind="reveal(0.1)"
       class="flex flex-col"
     >
       <div class="mb-3 mt-2 flex items-center justify-between">
@@ -80,13 +66,11 @@ function itemReveal(index: number) {
         The four themes I work across, and how my papers connect them.
       </p>
       <ResearchLandscape />
-    </motion.section>
+    </section>
 
     <!-- Approach -->
-    <motion.section
-      :initial="reveal(0.3).initial"
-      :animate="{ opacity: 1, y: 0 }"
-      :transition="reveal(0.3).transition"
+    <section
+      v-bind="reveal(0.3)"
       class="flex flex-col"
     >
       <div class="mb-3 mt-2 flex items-center justify-between">
@@ -95,12 +79,10 @@ function itemReveal(index: number) {
         </h2>
       </div>
       <div class="grid mt-4 gap-6 md:grid-cols-3">
-        <motion.div
+        <div
           v-for="(item, index) in approach"
           :key="item.title"
-          :initial="itemReveal(index).initial"
-          :animate="{ opacity: 1, y: 0 }"
-          :transition="itemReveal(index).transition"
+          v-bind="itemReveal(index)"
           class="flex flex-col gap-1.5"
         >
           <h3 class="m-0 text-sm font-medium">
@@ -109,15 +91,13 @@ function itemReveal(index: number) {
           <p class="m-0 text-sm text-neutral-500 leading-relaxed dark:text-neutral-400">
             {{ item.body }}
           </p>
-        </motion.div>
+        </div>
       </div>
-    </motion.section>
+    </section>
 
     <!-- Context -->
-    <motion.section
-      :initial="reveal(0.4).initial"
-      :animate="{ opacity: 1, y: 0 }"
-      :transition="reveal(0.4).transition"
+    <section
+      v-bind="reveal(0.4)"
       class="flex flex-col"
     >
       <div class="mb-3 mt-2 flex items-center justify-between">
@@ -164,6 +144,6 @@ function itemReveal(index: number) {
           Google Scholar ↗
         </a>
       </div>
-    </motion.section>
+    </section>
   </div>
 </template>

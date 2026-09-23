@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue' // Import ref to track hover state
-
 defineProps<{
   tooltip: string
 }>()
