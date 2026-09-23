@@ -321,7 +321,7 @@ function nodeOpacity(node: ResearchNode) {
 const enter = computed(() =>
   prefersReducedMotion.value
     ? { initial: { opacity: 1 }, transition: { duration: 0 } }
-    : { initial: { opacity: 0 }, transition: { duration: 0.4, ease: [0.23, 1, 0.32, 1] } },
+    : { initial: { opacity: 0 }, transition: { duration: 0.4, ease: EASE_OUT } },
 )
 </script>
 
@@ -376,7 +376,7 @@ const enter = computed(() =>
     <!-- Accessible / small-screen equivalent -->
     <div class="md:sr-only flex flex-col gap-8">
       <section v-for="cluster in clusters" :key="cluster.id" :class="`rl-${cluster.id}`">
-        <h3 class="rl-list-heading m-0 flex items-center gap-2 text-sm font-600">
+        <h3 class="m-0 flex items-center gap-2 text-sm font-600">
           <span class="rl-list-dot" />
           {{ cluster.label }}
         </h3>
@@ -400,7 +400,7 @@ const enter = computed(() =>
               {{ node.label }}
               <Icon v-if="node.url" name="uil:arrow-up-right" class="size-3.5 shrink-0" />
             </component>
-            <span v-if="node.venue" class="ml-1.5 text-xs text-neutral-400 dark:text-neutral-500">{{ node.venue }}</span>
+            <span v-if="node.venue" class="ml-1.5 text-xs text-neutral-500 dark:text-neutral-400">{{ node.venue }}</span>
             <span v-if="node.description" class="block text-neutral-500 dark:text-neutral-400">{{ node.description }}</span>
           </li>
         </ul>
@@ -417,10 +417,6 @@ const enter = computed(() =>
   background-image: radial-gradient(circle at 1px 1px, var(--rl-grid) 1px, transparent 0);
   background-size: 18px 18px;
   background-position: 9px 9px;
-}
-
-.rl-list-heading {
-  color: rgb(var(--c));
 }
 
 .rl-list-dot {

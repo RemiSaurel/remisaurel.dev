@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { NewsCategory } from '~/news/news'
 import type { FilterDefinition, FilterState } from '~/utils/filters'
-import { motion } from 'motion-v'
 import { useFirstVisit } from '~/composables/useFirstVisit'
 import { news } from '~/news/news'
 import { countBy, emptyFilterState, hasActiveFilters, matchesFilter } from '~/utils/filters'
@@ -21,7 +20,7 @@ const CATEGORIES: { value: NewsCategory, label: string, icon: string }[] = [
   { value: 'misc', label: 'Misc', icon: 'lucide:sparkles' },
 ]
 
-const sortedNews = [...news].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+const sortedNews = [...news].sort((a, b) => b.date.getTime() - a.date.getTime())
 
 const filterDefinitions = computed<FilterDefinition[]>(() => {
   const categoryCounts = countBy(sortedNews, item => item.categories)
@@ -144,19 +143,21 @@ function getFirstLink(item: typeof news[0]) {
   return item.links?.[0]?.url || '#'
 }
 
-const { prefersReducedMotion } = usePrefersReducedMotion()
 const { isFirstVisit } = useFirstVisit()
 
-function itemMotion(index: number) {
-  if (prefersReducedMotion.value || !isFirstVisit.value)
-    return { initial: { opacity: 1, y: 0 }, transition: { duration: 0 } }
-  return { initial: { opacity: 0, y: 10 }, transition: { duration: 0.4, delay: Math.min(index, 7) * 0.04, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] } }
+// CSS `.enter` stagger, so the rows show up before hydration instead of waiting on motion.
+function itemEnter(index: number) {
+  return {
+    class: isFirstVisit.value && 'enter',
+    style: { '--enter-delay': `${Math.min(index, 7) * 0.04}s` },
+  }
 }
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
-    <FilterBar v-model="filters" class="mt-2" :definitions="filterDefinitions" />
+    <!-- Hydrated on first hover/focus/tap: keeps the popover code off the critical path -->
+    <LazyFilterBar v-model="filters" hydrate-on-interaction class="mt-2" :definitions="filterDefinitions" />
 
     <!-- News list -->
     <div class="flex flex-col gap-1">
@@ -172,31 +173,30 @@ function itemMotion(index: number) {
         >
           <span class="tabular-nums text-xs text-neutral-600 font-medium dark:text-neutral-300">{{ group.year }}</span>
           <span class="h-px flex-1 bg-neutral-200 transition-colors duration-200 dark:bg-neutral-800 group-hover:bg-neutral-300 dark:group-hover:bg-neutral-700" />
-          <span class="tabular-nums text-xs text-neutral-400 transition-colors duration-200 dark:text-neutral-500 group-hover:text-neutral-700 dark:group-hover:text-neutral-300">
+          <span class="tabular-nums text-xs text-neutral-500 transition-colors duration-200 dark:text-neutral-400 group-hover:text-neutral-700 dark:group-hover:text-neutral-300">
             {{ group.items.length }} news
           </span>
           <!-- Not `rotate-180`: another stylesheet also defines it (`rotate: 180deg`), the two add up to 360deg -->
           <Icon
             name="uil:angle-down"
-            class="size-4 text-neutral-400 transition-transform duration-200 dark:text-neutral-500"
+            class="size-4 text-neutral-500 transition-transform duration-200 dark:text-neutral-400"
             :style="{ transform: isOpen(group.year) ? 'rotate(180deg)' : 'none' }"
           />
         </button>
 
         <template v-if="isOpen(group.year)">
-          <motion.div
+          <div
             v-for="(item, index) in group.items"
             :key="item.title + item.date.toString()"
-            :initial="itemMotion(index).initial"
-            :animate="{ opacity: 1, y: 0 }"
-            :transition="itemMotion(index).transition"
+            v-bind="itemEnter(index)"
+            class="[--enter-duration:0.4s] [--enter-ease:var(--ease-out)] [--enter-y:10px]"
           >
             <component
               :is="hasLink(item) ? 'a' : 'div'"
               :href="hasLink(item) ? getFirstLink(item) : undefined"
               :target="hasLink(item) ? '_blank' : undefined"
               :rel="hasLink(item) ? 'noopener noreferrer' : undefined"
-              class="block px-3 py-3 transition-all duration-300 ease-out -mx-3"
+              class="block px-3 py-3 transition-colors duration-300 ease-out -mx-3"
               :class="{ 'pressable hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer group': hasLink(item) }"
             >
               <!-- Mobile: Stacked layout -->
@@ -205,26 +205,22 @@ function itemMotion(index: number) {
                 <div class="flex items-center justify-between">
                   <time :datetime="monthAttr(item.date)" class="month-slot tabular-nums text-xs">
                     <span aria-hidden="true" class="invisible font-medium">{{ item.date.getFullYear() }}</span>
-                    <span class="text-right text-neutral-400 dark:text-neutral-500">{{ monthLabel(item.date) }}</span>
+                    <span class="text-right text-neutral-500 dark:text-neutral-400">{{ monthLabel(item.date) }}</span>
                   </time>
                   <div class="flex items-center gap-1.5">
                     <div class="flex items-center gap-1">
                       <span
                         v-for="cat in item.categories?.slice(0, 2)"
                         :key="cat"
-                        class="whitespace-nowrap bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400"
+                        class="whitespace-nowrap bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
                       >
                         {{ cat }}
                       </span>
                     </div>
-                    <svg
-                      class="h-2.5 w-2.5 transition-all duration-300"
+                    <LinkArrow
+                      class="h-2.5 w-2.5 transition-[opacity,transform] duration-300"
                       :class="hasLink(item) ? 'opacity-30 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5' : 'opacity-0'"
-                      viewBox="0 0 11 11"
-                      fill="none"
-                    >
-                      <path d="M8.4778 3.06917L1.23404 10.3129L0 9.0789L7.24376 1.83513L0.456622 1.71166L0.440628 0L10.1366 0.176392L10.313 9.87231L8.60128 9.85632L8.4778 3.06917Z" fill="currentColor" />
-                    </svg>
+                    />
                   </div>
                 </div>
                 <!-- Title + Content -->
@@ -238,7 +234,7 @@ function itemMotion(index: number) {
               <div class="grid-cols-[auto_1fr_auto] hidden items-baseline gap-4 md:grid">
                 <time :datetime="monthAttr(item.date)" class="month-slot tabular-nums text-xs">
                   <span aria-hidden="true" class="invisible font-medium">{{ item.date.getFullYear() }}</span>
-                  <span class="text-right text-neutral-400 dark:text-neutral-500">{{ monthLabel(item.date) }}</span>
+                  <span class="text-right text-neutral-500 dark:text-neutral-400">{{ monthLabel(item.date) }}</span>
                 </time>
 
                 <div class="flex flex-col gap-1">
@@ -256,18 +252,14 @@ function itemMotion(index: number) {
                       {{ cat }}
                     </span>
                   </div>
-                  <svg
-                    class="h-2.5 w-2.5 transition-all duration-300"
+                  <LinkArrow
+                    class="h-2.5 w-2.5 transition-[opacity,transform] duration-300"
                     :class="hasLink(item) ? 'opacity-30 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5' : 'opacity-0'"
-                    viewBox="0 0 11 11"
-                    fill="none"
-                  >
-                    <path d="M8.4778 3.06917L1.23404 10.3129L0 9.0789L7.24376 1.83513L0.456622 1.71166L0.440628 0L10.1366 0.176392L10.313 9.87231L8.60128 9.85632L8.4778 3.06917Z" fill="currentColor" />
-                  </svg>
+                  />
                 </div>
               </div>
             </component>
-          </motion.div>
+          </div>
         </template>
       </template>
     </div>

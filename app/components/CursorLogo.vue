@@ -1,42 +1,39 @@
 <script setup lang="ts">
+import { useEventListener } from '@vueuse/core'
+
 const { activeLogo, enabled } = useCursorLogo()
 
-const x = ref(0)
-const y = ref(0)
+const follower = useTemplateRef('follower')
 
 let latestX = 0
 let latestY = 0
 let ticking = false
 
+// Written straight to the element, once per frame: going through refs would re-render
+// the component on every mouse move, even while no logo is shown.
 function onMouseMove(event: MouseEvent) {
   latestX = event.clientX
   latestY = event.clientY
 
-  if (!ticking) {
+  if (!ticking && follower.value) {
     ticking = true
     requestAnimationFrame(() => {
-      x.value = latestX
-      y.value = latestY
+      if (follower.value)
+        follower.value.style.transform = `translate3d(${latestX + 12}px, ${latestY - 16}px, 0)`
       ticking = false
     })
   }
 }
 
-onMounted(() => {
-  window.addEventListener('mousemove', onMouseMove)
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener('mousemove', onMouseMove)
-})
+useEventListener(window, 'mousemove', onMouseMove, { passive: true })
 </script>
 
 <template>
   <Teleport to="body">
     <div
       v-if="enabled"
+      ref="follower"
       class="cursor-logo-follower pointer-events-none fixed left-0 top-0 z-100"
-      :style="{ transform: `translate3d(${x + 12}px, ${y - 16}px, 0)` }"
     >
       <Transition name="cursor-logo">
         <div

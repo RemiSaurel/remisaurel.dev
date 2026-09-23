@@ -80,9 +80,9 @@ const isSelected = (option: FilterOption) => props.selected.includes(option.valu
           aria-hidden="true"
         />
         <span class="flex-1 truncate">{{ option.label }}</span>
-        <span v-if="option.count !== undefined" class="tabular-nums text-[10px] text-neutral-400 dark:text-neutral-500">{{ option.count }}</span>
+        <span v-if="option.count !== undefined" class="tabular-nums text-xs text-neutral-500 dark:text-neutral-400">{{ option.count }}</span>
       </button>
-      <span v-if="!visibleOptions.length" class="px-1.5 py-2 text-xs text-neutral-400">
+      <span v-if="!visibleOptions.length" class="px-1.5 py-2 text-xs text-neutral-500 dark:text-neutral-400">
         No match
       </span>
     </div>

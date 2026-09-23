@@ -33,7 +33,7 @@ export const failures: Failure[] = [
     id: 'first-hci-submission',
     type: 'paper',
     date: new Date('2026-01-30'),
-    title: 'Co-designing learning analytics dashboards with teachers',
+    title: 'Paper about co-designing learning analytics dashboards with teachers',
     description: 'A first attempt at describing our co-design method with teachers, with an original method using a chatbot to have a dual approach.',
     lesson: 'Reviewer 2 hit. More seriously, we didn\'t know what it took to get accepted at this conference. Now we know a bit more.',
   },

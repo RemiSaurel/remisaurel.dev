@@ -206,9 +206,9 @@ const PROJECT_VIEWS = [
 <template>
   <div>
     <div class="mb-8 md:mb-12">
-      <h5 class="m-0 text-2xl font-semibold">
+      <h1 class="m-0 text-2xl font-semibold">
         Projects
-      </h5>
+      </h1>
       <p>
         Here are some projects I've been working on. Feel free to check them
         out!
@@ -242,7 +242,7 @@ const PROJECT_VIEWS = [
             <IconLink icon-name="i-logos-python" route="https://www.python.org" external size="sm">
               Python
             </IconLink>
-            <span class="inline-flex -rotate-8 select-none items-center gap-0.5 whitespace-nowrap font-hand text-lg leading-none text-[rgb(244_114_182)] font-700 relative -top-0.5">
+            <span class="font-hand relative inline-flex select-none items-center gap-0.5 whitespace-nowrap text-lg text-[rgb(244_114_182)] font-700 leading-none -top-0.5 -rotate-8">
               <svg class="relative h-3 w-6 -top-1" viewBox="0 0 32 16" aria-hidden="true">
                 <path d="M30 13c-6-8-15-10-25-8M10 9.5 4.5 5l6-3.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
@@ -253,7 +253,8 @@ const PROJECT_VIEWS = [
       </div>
     </div>
     <div class="mb-3 flex items-start justify-between gap-3">
-      <FilterBar v-model="filters" :definitions="filterDefinitions" />
+      <!-- Hydrated on first hover/focus/tap: keeps the popover code off the critical path -->
+      <LazyFilterBar v-model="filters" hydrate-on-interaction :definitions="filterDefinitions" />
       <ViewSwitcher id="projects" v-model="view" :options="PROJECT_VIEWS" class="shrink-0" />
     </div>
     <ProjectsList :projects="filtered" :view="view" :instant="isRestoring" />

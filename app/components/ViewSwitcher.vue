@@ -32,7 +32,7 @@ function select(value: string) {
 
 <template>
   <div
-    role="radiogroup"
+    role="group"
     aria-label="Display mode"
     class="inline-flex items-center gap-0.5 bg-neutral-100 p-0.5 dark:bg-neutral-800"
   >
@@ -40,13 +40,12 @@ function select(value: string) {
       v-for="option in props.options"
       :key="option.value"
       type="button"
-      role="radio"
-      :aria-checked="model === option.value"
+      :aria-pressed="model === option.value"
       :aria-label="option.label"
       class="relative h-7 inline-flex pressable cursor-pointer items-center gap-1.5 px-2 text-xs transition-colors duration-200 ease-out"
       :class="model === option.value
         ? 'text-neutral-900 dark:text-neutral-100'
-        : 'text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200'"
+        : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200'"
       @click="select(option.value)"
     >
       <motion.span

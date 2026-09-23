@@ -18,6 +18,6 @@ const month = computed(() => String(new Date(props.date).getMonth() + 1).padStar
       class="text-neutral-600 font-medium dark:text-neutral-300"
       :class="{ invisible: !props.showYear }"
     >{{ year }}</span>
-    <span class="text-neutral-400 dark:text-neutral-500">{{ month }}</span>
+    <span class="text-neutral-500 dark:text-neutral-400">{{ month }}</span>
   </time>
 </template>

@@ -19,14 +19,14 @@ function getIconName(key: string) {
 
 <template>
   <div
-    class="group h-full flex flex-col justify-between gap-3 bg-neutral-100/60 px-4 pb-2 pt-4 transition-all duration-300 ease-out dark:bg-neutral-800/60 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+    class="group h-full flex flex-col justify-between gap-3 bg-neutral-100/60 px-4 pb-2 pt-4 transition-colors duration-300 ease-out dark:bg-neutral-800/60 hover:bg-neutral-100 dark:hover:bg-neutral-800"
   >
     <div class="flex flex-col gap-2">
       <div class="flex items-start justify-between gap-3">
         <h2 class="m-0 text-base text-neutral-900 font-semibold leading-snug dark:text-neutral-100">
           {{ project.title }}
         </h2>
-        <span v-if="project.icon" class="shrink-0 text-lg leading-none opacity-70">{{ project.icon }}</span>
+        <span v-if="project.icon" class="shrink-0 text-lg leading-none opacity-70" aria-hidden="true">{{ project.icon }}</span>
       </div>
 
       <p class="m-0 text-sm text-neutral-500 leading-relaxed dark:text-neutral-400">
@@ -45,7 +45,8 @@ function getIconName(key: string) {
           :href="link"
           target="_blank"
           rel="noopener noreferrer"
-          class="pressable text-neutral-400 transition-colors duration-200 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100"
+          :aria-label="`${project.title} ${key}`"
+          class="pressable text-neutral-500 transition-colors duration-200 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
         >
           <Icon :name="getIconName(key)" class="size-4" />
         </a>
@@ -53,7 +54,7 @@ function getIconName(key: string) {
       <div v-else />
       <div class="flex items-center gap-3">
         <TechStack v-if="project.stack?.length" :stack="project.stack" />
-        <span class="tabular-nums text-xs text-neutral-400 dark:text-neutral-500">{{ project.date }}</span>
+        <span class="tabular-nums text-xs text-neutral-500 dark:text-neutral-400">{{ project.date }}</span>
       </div>
     </div>
   </div>

@@ -20,27 +20,30 @@ const props = withDefaults(defineProps<Props>(), {
 const hasLink = (pub: Publication) => !!pub.url
 
 function formatAuthors(authors: string[]) {
-  return authors.map((author, _index) => {
-    if (author === 'Rémi Saurel') {
-      return { name: author, isMe: true }
-    }
-    return { name: author, isMe: false }
-  })
+  return authors.map(name => ({ name, isMe: name === 'Rémi Saurel' }))
 }
 
 const { prefersReducedMotion } = usePrefersReducedMotion()
 const { isFirstVisit } = useFirstVisit()
 
-// Only the first mount plays the entrance stagger; later view switches morph instead.
+// Text only blurs in on view switches, never on the first render.
 const hasEntered = ref(false)
 onMounted(() => {
   hasEntered.value = true
 })
 
-function itemMotion(index: number) {
-  if (prefersReducedMotion.value || !isFirstVisit.value || hasEntered.value)
-    return { initial: false as const, transition: { duration: 0 } }
-  return { initial: { opacity: 0, y: 10 }, transition: { duration: 0.4, delay: Math.min(index, 7) * 0.04, ease: [0.23, 1, 0.32, 1] } }
+// CSS `.enter` stagger, so the rows show up before hydration instead of waiting on motion.
+// Switching views re-creates the rows, so the entrance is dropped before that re-render.
+const playEntrance = ref(isFirstVisit.value)
+watch(() => props.view, () => {
+  playEntrance.value = false
+})
+
+function itemEnter(index: number) {
+  return {
+    class: playEntrance.value && 'enter',
+    style: { '--enter-delay': `${Math.min(index, 7) * 0.04}s` },
+  }
 }
 
 const isInstant = computed(() => props.instant || prefersReducedMotion.value)
@@ -65,22 +68,34 @@ function reveal(index: number) {
     return { initial: false as const, transition: { duration: 0 } }
   return {
     initial: { opacity: 0, filter: 'blur(6px)' },
-    transition: { duration: 0.35, delay: 0.1 + Math.min(index, 5) * 0.025, ease: [0.23, 1, 0.32, 1] },
+    transition: { duration: 0.35, delay: 0.1 + Math.min(index, 5) * 0.025, ease: EASE_OUT },
   }
 }
 
 const REVEALED = { opacity: 1, filter: 'blur(0px)' }
+
+/**
+ * One variant per paper, shared by both views: the card view is never prerendered (the
+ * saved view is applied after mount), so it can only reuse URLs the list view generated.
+ * Cropped to the 2:1 frame both views display, wide enough for a card on a 2x screen.
+ */
+const PUB_IMAGE = {
+  width: 640,
+  height: 320,
+  fit: 'cover',
+  format: 'webp',
+  densities: 'x1',
+} as const
 </script>
 
 <template>
   <!-- List view -->
   <div v-if="props.view === 'list'" class="flex flex-col gap-1">
-    <motion.div
+    <div
       v-for="(pub, index) in publications"
       :key="pub.id"
-      :initial="itemMotion(index).initial"
-      :animate="{ opacity: 1, y: 0 }"
-      :transition="itemMotion(index).transition"
+      v-bind="itemEnter(index)"
+      class="[--enter-duration:0.4s] [--enter-ease:var(--ease-out)] [--enter-y:10px]"
     >
       <component
         :is="hasLink(pub) ? 'a' : 'div'"
@@ -106,7 +121,7 @@ const REVEALED = { opacity: 1, filter: 'blur(0px)' }
             :transition="morph(index)"
             class="relative z-1 h-10 w-20 shrink-0 overflow-hidden bg-neutral-100 md:h-14 md:w-28 dark:bg-neutral-800"
           >
-            <NuxtImg :src="pub.image" :alt="pub.title" class="pub-image object-cover size-full" />
+            <NuxtImg :src="pub.image" v-bind="PUB_IMAGE" alt="" class="pub-image object-cover size-full" />
           </motion.div>
           <motion.div
             :initial="reveal(index).initial"
@@ -120,7 +135,7 @@ const REVEALED = { opacity: 1, filter: 'blur(0px)' }
                 <span :class="author.isMe ? 'font-medium text-neutral-700 dark:text-neutral-300' : ''">{{ author.name }}</span><span v-if="authorIndex < pub.authors.length - 1">, </span>
               </template>
             </span>
-            <span v-if="pub.award" class="w-fit text-xs text-amber-600 font-medium dark:text-amber-400">{{ pub.award }}</span>
+            <span v-if="pub.award" class="w-fit text-xs text-amber-700 font-medium dark:text-amber-400">{{ pub.award }}</span>
             <span v-if="pub.subtitle" class="text-sm text-neutral-500 dark:text-neutral-400">{{ pub.subtitle }}</span>
           </motion.div>
         </div>
@@ -132,20 +147,13 @@ const REVEALED = { opacity: 1, filter: 'blur(0px)' }
           class="[grid-area:venue] flex items-center justify-end gap-2"
         >
           <span class="whitespace-nowrap border border-neutral-300 px-1.5 py-0.5 text-xs text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">{{ pub.venue }}</span>
-          <svg
+          <LinkArrow
             class="h-2.5 w-2.5 transition-[opacity,transform] duration-300 ease-out"
             :class="hasLink(pub) ? 'opacity-30 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5' : 'opacity-0'"
-            viewBox="0 0 11 11"
-            fill="none"
-          >
-            <path
-              d="M8.4778 3.06917L1.23404 10.3129L0 9.0789L7.24376 1.83513L0.456622 1.71166L0.440628 0L10.1366 0.176392L10.313 9.87231L8.60128 9.85632L8.4778 3.06917Z"
-              fill="currentColor"
-            />
-          </svg>
+          />
         </motion.div>
       </component>
-    </motion.div>
+    </div>
   </div>
 
   <!-- Card view -->
@@ -166,19 +174,14 @@ const REVEALED = { opacity: 1, filter: 'blur(0px)' }
         :transition="morph(index)"
         class="relative z-1 aspect-[2/1] w-full overflow-hidden bg-neutral-100 dark:bg-neutral-800"
       >
-        <NuxtImg :src="pub.image" :alt="pub.title" class="pub-image object-cover size-full" />
+        <NuxtImg :src="pub.image" v-bind="PUB_IMAGE" alt="" class="pub-image object-cover size-full" />
         <!-- Link affordance sits inside the image, so it never pushes past the card edge -->
         <span
           v-if="hasLink(pub)"
           class="pub-link-badge absolute right-2 top-2 size-6 flex items-center justify-center bg-white/90 text-neutral-900 dark:bg-neutral-900/90 dark:text-neutral-100"
           aria-hidden="true"
         >
-          <svg class="h-2.5 w-2.5" viewBox="0 0 11 11" fill="none">
-            <path
-              d="M8.4778 3.06917L1.23404 10.3129L0 9.0789L7.24376 1.83513L0.456622 1.71166L0.440628 0L10.1366 0.176392L10.313 9.87231L8.60128 9.85632L8.4778 3.06917Z"
-              fill="currentColor"
-            />
-          </svg>
+          <LinkArrow class="h-2.5 w-2.5" />
         </span>
       </motion.div>
 
@@ -189,11 +192,11 @@ const REVEALED = { opacity: 1, filter: 'blur(0px)' }
         class="flex flex-col gap-1.5"
       >
         <div class="flex items-center justify-between gap-2">
-          <span class="tabular-nums text-xs text-neutral-400 dark:text-neutral-500">{{ formatDate(pub.date) }}</span>
+          <span class="tabular-nums text-xs text-neutral-500 dark:text-neutral-400">{{ formatDate(pub.date) }}</span>
           <span class="whitespace-nowrap border border-neutral-300 px-1.5 py-0.5 text-xs text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">{{ pub.venue }}</span>
         </div>
         <span class="line-clamp-3 font-medium leading-snug">{{ pub.title }}</span>
-        <span v-if="pub.award" class="w-fit text-xs text-amber-600 font-medium dark:text-amber-400">{{ pub.award }}</span>
+        <span v-if="pub.award" class="w-fit text-xs text-amber-700 font-medium dark:text-amber-400">{{ pub.award }}</span>
         <span v-if="pub.subtitle" class="line-clamp-3 text-sm text-neutral-500 dark:text-neutral-400">{{ pub.subtitle }}</span>
       </motion.div>
     </component>

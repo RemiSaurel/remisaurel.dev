@@ -21,31 +21,29 @@ useSeoMeta(() => ({
 
 <template>
   <div>
-    <main>
-      <article v-if="page" class="leading-6">
-        <h1 class="mb-4 text-4xl">
-          {{ page.title }}
-        </h1>
-        <ContentRenderer :value="page" />
-      </article>
+    <article v-if="page" class="leading-6">
+      <h1 class="mb-4 text-4xl">
+        {{ page.title }}
+      </h1>
+      <ContentRenderer :value="page" />
+    </article>
 
-      <div v-else-if="status === 'pending'" class="py-12 text-center text-neutral-500 dark:text-neutral-400">
-        Loading post…
-      </div>
+    <div v-else-if="status === 'pending'" class="py-12 text-center text-neutral-500 dark:text-neutral-400">
+      Loading post…
+    </div>
 
-      <div v-else class="py-12 text-center">
-        <p class="text-lg text-neutral-600 dark:text-neutral-400">
-          Post not found.
-        </p>
-        <NuxtLink
-          to="/posts"
-          class="mt-4 inline-flex pressable items-center gap-2 text-sm text-neutral-500 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200"
-        >
-          <Icon name="uil:arrow-left" class="h-4 w-4" />
-          Back to posts
-        </NuxtLink>
-      </div>
-    </main>
+    <div v-else class="py-12 text-center">
+      <p class="text-lg text-neutral-600 dark:text-neutral-400">
+        Post not found.
+      </p>
+      <NuxtLink
+        to="/posts"
+        class="mt-4 inline-flex pressable items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+      >
+        <Icon name="uil:arrow-left" class="h-4 w-4" />
+        Back to posts
+      </NuxtLink>
+    </div>
   </div>
 </template>
 

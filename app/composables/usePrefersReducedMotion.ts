@@ -1,9 +1,11 @@
 import { ref } from 'vue'
 
-export function usePrefersReducedMotion() {
-  const prefersReducedMotion = ref(false)
+const prefersReducedMotion = ref(false)
+let isListening = false
 
-  if (import.meta.client) {
+export function usePrefersReducedMotion() {
+  if (import.meta.client && !isListening) {
+    isListening = true
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
     prefersReducedMotion.value = mediaQuery.matches
 

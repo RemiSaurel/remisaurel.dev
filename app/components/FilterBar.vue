@@ -133,7 +133,7 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
               type="button"
               role="tab"
               :aria-selected="panelDefinition.key === definition.key"
-              class="h-7 flex cursor-pointer items-center gap-2 px-1.5 text-left text-xs outline-none"
+              class="h-7 flex cursor-pointer items-center gap-2 px-1.5 text-left text-xs outline-none focus-visible:bg-neutral-100 dark:focus-visible:bg-neutral-800"
               :class="panelDefinition.key === definition.key
                 ? 'bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100'
                 : 'text-neutral-600 dark:text-neutral-400'"
@@ -143,7 +143,7 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
             >
               <Icon :name="definition.icon" class="size-3.5 shrink-0" aria-hidden="true" />
               <span class="flex-1 truncate">{{ definition.label }}</span>
-              <span v-if="selectedFor(definition.key).length" class="tabular-nums text-[10px] text-neutral-400">{{ selectedFor(definition.key).length }}</span>
+              <span v-if="selectedFor(definition.key).length" class="tabular-nums text-xs text-neutral-500 dark:text-neutral-400">{{ selectedFor(definition.key).length }}</span>
             </button>
           </div>
           <FilterOptionList
@@ -181,7 +181,7 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
         <UPopover v-if="modeOptions(definition).length > 1" :content="POPOVER_CONTENT" :ui="POPOVER_UI">
           <button
             type="button"
-            class="mx-1 inline-flex cursor-pointer items-center gap-1 px-1.5 text-neutral-400 font-semibold transition-colors duration-150 ease-out data-[state=open]:bg-neutral-200/70 hover:bg-neutral-200/70 dark:text-neutral-500 hover:text-neutral-900 data-[state=open]:text-neutral-900 dark:data-[state=open]:bg-neutral-700/70 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-100 dark:data-[state=open]:text-neutral-100"
+            class="mx-1 inline-flex cursor-pointer items-center gap-1 px-1.5 text-neutral-500 font-semibold transition-colors duration-150 ease-out data-[state=open]:bg-neutral-200/70 hover:bg-neutral-200/70 dark:text-neutral-400 data-[state=open]:text-neutral-900 hover:text-neutral-900 dark:data-[state=open]:bg-neutral-700/70 dark:hover:bg-neutral-700/70 dark:data-[state=open]:text-neutral-100 dark:hover:text-neutral-100"
             :aria-label="`Change ${definition.label} operator`"
           >
             <motion.span
@@ -204,7 +204,7 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
             />
           </template>
         </UPopover>
-        <span v-else class="mx-1 inline-flex items-center px-1.5 text-neutral-400 font-semibold dark:text-neutral-500">
+        <span v-else class="mx-1 inline-flex items-center px-1.5 text-neutral-500 font-semibold dark:text-neutral-400">
           {{ operator(definition) }}
         </span>
         <span class="my-1 w-px bg-neutral-300 dark:bg-neutral-700" aria-hidden="true" />
@@ -253,7 +253,7 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
         <span class="my-1 w-px bg-neutral-300 dark:bg-neutral-700" aria-hidden="true" />
         <button
           type="button"
-          class="ml-1 inline-flex cursor-pointer items-center px-1.5 text-neutral-400 transition-colors duration-150 ease-out hover:bg-neutral-200/70 dark:text-neutral-500 hover:text-neutral-900 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-100"
+          class="ml-1 inline-flex cursor-pointer items-center px-1.5 text-neutral-500 transition-colors duration-150 ease-out hover:bg-neutral-200/70 dark:text-neutral-400 hover:text-neutral-900 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-100"
           :aria-label="`Remove ${definition.label} filter`"
           @click="remove(definition)"
         >
@@ -269,7 +269,7 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
         :animate="CHIP_SHOWN"
         :exit="CHIP_HIDDEN"
         :transition="chipTransition"
-        class="h-8 inline-flex pressable shrink-0 cursor-pointer items-center px-2 text-xs text-neutral-500 transition-colors duration-150 ease-out dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+        class="h-8 inline-flex shrink-0 pressable cursor-pointer items-center px-2 text-xs text-neutral-500 transition-colors duration-150 ease-out dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
         @click="clearAll()"
       >
         Clear
