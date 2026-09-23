@@ -3,11 +3,11 @@ import type { Project } from '~/pages/projects/index.vue'
 import type { Tech, TechKey } from '~/projects/techs'
 import type { FilterDefinition, FilterState } from '~/utils/filters'
 import { TECHS } from '~/projects/techs'
-import { countBy, emptyFilterState, matchesFilter } from '~/utils/filters'
+import { countBy, emptyFilterState, hasActiveFilters, matchesFilter } from '~/utils/filters'
 
 /**
- * Filters for the projects page. A project must match every active filter; within a
- * multi-value filter (techs, years) matching any selected value is enough.
+ * Filters for the projects page. A project must match every active filter; within one
+ * filter, its mode (any of, all of, none of) decides how the selected values combine.
  */
 export function useProjectFilters(projects: MaybeRefOrGetter<Project[]>) {
   const definitions = computed<FilterDefinition[]>(() => {
@@ -23,6 +23,7 @@ export function useProjectFilters(projects: MaybeRefOrGetter<Project[]>) {
         label: 'Tech',
         icon: 'lucide:layers',
         multiple: true,
+        multiValued: true,
         plural: 'techs',
         searchPlaceholder: 'Search a tech…',
         options: (Object.keys(TECHS) as TechKey[])
@@ -77,7 +78,7 @@ export function useProjectFilters(projects: MaybeRefOrGetter<Project[]>) {
     )
   })
 
-  const hasFilters = computed(() => Object.values(filters.value).some(values => values.length))
+  const hasFilters = computed(() => hasActiveFilters(filters.value))
 
   function clear() {
     filters.value = emptyFilterState(definitions.value)

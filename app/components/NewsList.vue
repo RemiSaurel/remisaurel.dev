@@ -4,7 +4,7 @@ import type { FilterDefinition, FilterState } from '~/utils/filters'
 import { motion } from 'motion-v'
 import { useFirstVisit } from '~/composables/useFirstVisit'
 import { news } from '~/news/news'
-import { countBy, emptyFilterState, matchesFilter } from '~/utils/filters'
+import { countBy, emptyFilterState, hasActiveFilters, matchesFilter } from '~/utils/filters'
 
 interface Props {
   limit?: number
@@ -34,6 +34,7 @@ const filterDefinitions = computed<FilterDefinition[]>(() => {
       label: 'Category',
       icon: 'lucide:tag',
       multiple: true,
+      multiValued: true,
       plural: 'categories',
       options: CATEGORIES
         .filter(category => categoryCounts.has(category.value))
@@ -62,7 +63,7 @@ const filterDefinitions = computed<FilterDefinition[]>(() => {
 
 const filters = ref<FilterState>(emptyFilterState(filterDefinitions.value))
 
-const hasFilters = computed(() => Object.values(filters.value).some(values => values.length))
+const hasFilters = computed(() => hasActiveFilters(filters.value))
 
 // Track how many items to show
 const displayLimit = ref(props.limit)

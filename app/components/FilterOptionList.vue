@@ -50,18 +50,28 @@ const isSelected = (option: FilterOption) => props.selected.includes(option.valu
         @click="emit('toggle', option.value)"
       >
         <span
+          v-if="props.multiple"
           class="size-3.5 flex shrink-0 items-center justify-center border"
-          :class="[
-            props.multiple ? '' : 'rounded-full',
-            isSelected(option)
-              ? 'border-neutral-900 bg-neutral-900 text-white dark:border-neutral-100 dark:bg-neutral-100 dark:text-neutral-900'
-              : 'border-neutral-300 dark:border-neutral-600',
-          ]"
+          :class="isSelected(option)
+            ? 'border-neutral-900 bg-neutral-900 text-white dark:border-neutral-100 dark:bg-neutral-100 dark:text-neutral-900'
+            : 'border-neutral-300 dark:border-neutral-600'"
           aria-hidden="true"
         >
-          <Icon v-if="isSelected(option) && props.multiple" name="lucide:check" class="size-2.5" />
-          <span v-else-if="isSelected(option)" class="size-1.5 rounded-full bg-current" />
+          <Icon v-if="isSelected(option)" name="lucide:check" class="size-2.5" />
         </span>
+        <!-- Ring and dot in one SVG: a CSS border snaps to device pixels but its content does not,
+             so a dot nested in a bordered box drifts off-center at fractional positions.
+             overflow-visible: the ring touches the viewBox edge, and its anti-aliasing would be clipped. -->
+        <svg
+          v-else
+          viewBox="0 0 14 14"
+          class="size-3.5 shrink-0 overflow-visible"
+          :class="isSelected(option) ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-300 dark:text-neutral-600'"
+          aria-hidden="true"
+        >
+          <circle cx="7" cy="7" r="6.5" :fill="isSelected(option) ? 'currentColor' : 'none'" stroke="currentColor" />
+          <circle v-if="isSelected(option)" cx="7" cy="7" r="3" fill="currentColor" class="text-white dark:text-neutral-900" />
+        </svg>
         <Icon
           v-if="option.icon"
           :name="option.icon"
