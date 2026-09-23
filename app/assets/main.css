@@ -55,6 +55,12 @@ body {
   font-family: "Patrick Hand", "Bradley Hand", cursive;
 }
 
+/* Editorial pull quotes (Quote component) */
+.font-quote {
+  font-family: "Newsreader", Georgia, serif;
+  font-style: italic;
+}
+
 /* Research landscape cluster color tokens — shared across ResearchLandscape's
    child components, so they must be global (Vue's scoped CSS doesn't reach
    into nested elements of child components). */

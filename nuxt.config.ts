@@ -88,7 +88,18 @@ export default defineNuxtConfig({
       { name: 'Geist Sans', provider: 'npm', weights: [400, 500, 600, 700] },
       { name: 'Caveat', provider: 'google', weights: [600, 700] },
       { name: 'Patrick Hand', provider: 'google', weights: [400] },
+      { name: 'Newsreader', provider: 'google', weights: [400, 500], styles: ['italic'] },
     ],
+  },
+
+  hooks: {
+    // In dev, @nuxt/content already fills the local SQLite DB at startup and on HMR.
+    // Its runtime integrity check drops the tables on checksum mismatch after a
+    // hot restart, then fails to re-import the dump ("no such table: _content_posts").
+    'nitro:config': function (nitroConfig) {
+      if (nitroConfig.dev && nitroConfig.runtimeConfig?.content)
+        (nitroConfig.runtimeConfig.content as { integrityCheck?: boolean }).integrityCheck = false
+    },
   },
 
   nitro: {

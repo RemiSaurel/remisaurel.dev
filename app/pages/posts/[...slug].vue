@@ -11,6 +11,9 @@ const { data: page, status } = await useAsyncData(
   () => queryCollection('posts').path(`/posts/${slug.value}`).first(),
 )
 
+const references = computed<Reference[]>(() => page.value?.references ?? [])
+provide(REFERENCES_KEY, references)
+
 useSeoMeta(() => ({
   title: page.value?.title,
   description: page.value?.description,
@@ -26,6 +29,7 @@ useSeoMeta(() => ({
         {{ page.title }}
       </h1>
       <ContentRenderer :value="page" />
+      <PostReferences v-if="references.length" :references="references" />
     </article>
 
     <div v-else-if="status === 'pending'" class="py-12 text-center text-neutral-500 dark:text-neutral-400">
