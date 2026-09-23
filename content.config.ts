@@ -10,6 +10,15 @@ export default defineContentConfig({
         description: z.string(),
         date: z.date(),
         disabled: z.boolean().optional(),
+        references: z.array(z.object({
+          id: z.string(),
+          // "Last, F." format: the part before the comma is used in citations
+          authors: z.array(z.string()),
+          year: z.number(),
+          title: z.string(),
+          venue: z.string().optional(),
+          url: z.string().optional(),
+        })).optional(),
       }),
     }),
   },
