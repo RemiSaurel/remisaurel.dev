@@ -65,9 +65,6 @@ const filters = ref<FilterState>(emptyFilterState(filterDefinitions.value))
 
 const hasFilters = computed(() => hasActiveFilters(filters.value))
 
-// Track how many items to show
-const displayLimit = ref(props.limit)
-
 const filteredNews = computed(() => {
   const { categories, years, link } = filters.value
   return sortedNews.filter(item =>
@@ -77,25 +74,66 @@ const filteredNews = computed(() => {
   )
 })
 
-const displayedNews = computed(() => {
-  return filteredNews.value.slice(0, displayLimit.value)
-})
-
-const hasMoreItems = computed(() => {
-  return displayLimit.value < filteredNews.value.length
-})
-
-function loadMore() {
-  displayLimit.value += 5
+interface NewsYear {
+  year: number
+  items: typeof news
 }
 
-// Start again from the first page whenever the filters change
-watch(filters, () => {
-  displayLimit.value = props.limit
+// Already sorted by date, so years come out newest first
+const newsByYear = computed<NewsYear[]>(() => {
+  const groups: NewsYear[] = []
+  for (const item of filteredNews.value) {
+    const year = item.date.getFullYear()
+    if (groups.at(-1)?.year !== year)
+      groups.push({ year, items: [] })
+    groups.at(-1)!.items.push(item)
+  }
+  return groups
 })
+
+/** Years opened by default: the newest ones, until at least `limit` news are visible. */
+function defaultOpenYears() {
+  const open = new Set<number>()
+  let visible = 0
+  for (const group of newsByYear.value) {
+    if (visible >= props.limit)
+      break
+    open.add(group.year)
+    visible += group.items.length
+  }
+  return open
+}
+
+const openYears = ref(defaultOpenYears())
+
+function isOpen(year: number) {
+  return openYears.value.has(year)
+}
+
+function toggleYear(year: number) {
+  const next = new Set(openYears.value)
+  if (!next.delete(year))
+    next.add(year)
+  openYears.value = next
+}
+
+// A filtered list is already short, so it opens every year; clearing the filters goes back to the default
+watch(filters, () => {
+  openYears.value = hasFilters.value ? new Set(newsByYear.value.map(group => group.year)) : defaultOpenYears()
+}, { deep: true })
 
 function clearFilters() {
   filters.value = emptyFilterState(filterDefinitions.value)
+}
+
+// The year divider above already names the year, so a row only carries its month,
+// right-aligned under the year's last two digits (see .month-slot)
+function monthLabel(date: Date) {
+  return String(date.getMonth() + 1).padStart(2, '0')
+}
+
+function monthAttr(date: Date) {
+  return `${date.getFullYear()}-${monthLabel(date)}`
 }
 
 function hasLink(item: typeof news[0]) {
@@ -122,31 +160,98 @@ function itemMotion(index: number) {
 
     <!-- News list -->
     <div class="flex flex-col gap-1">
-      <template v-for="(item, index) in displayedNews" :key="item.title + item.date.toString()">
-        <motion.div
-          :initial="itemMotion(index).initial"
-          :animate="{ opacity: 1, y: 0 }"
-          :transition="itemMotion(index).transition"
+      <template v-for="group in newsByYear" :key="group.year">
+        <!-- Year divider: always there, it folds and unfolds the year -->
+        <button
+          type="button"
+          class="group flex cursor-pointer items-center gap-3 py-2 text-left"
+          :class="{ 'mt-3': group.year !== newsByYear[0]?.year }"
+          :aria-expanded="isOpen(group.year)"
+          :aria-label="`${isOpen(group.year) ? 'Hide' : 'Show'} the ${group.items.length} news from ${group.year}`"
+          @click="toggleYear(group.year)"
         >
-          <component
-            :is="hasLink(item) ? 'a' : 'div'"
-            :href="hasLink(item) ? getFirstLink(item) : undefined"
-            :target="hasLink(item) ? '_blank' : undefined"
-            :rel="hasLink(item) ? 'noopener noreferrer' : undefined"
-            class="block px-3 py-3 transition-all duration-300 ease-out"
-            :class="{ 'pressable hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer group': hasLink(item) }"
+          <span class="tabular-nums text-xs text-neutral-600 font-medium dark:text-neutral-300">{{ group.year }}</span>
+          <span class="h-px flex-1 bg-neutral-200 transition-colors duration-200 dark:bg-neutral-800 group-hover:bg-neutral-300 dark:group-hover:bg-neutral-700" />
+          <span class="tabular-nums text-xs text-neutral-400 transition-colors duration-200 dark:text-neutral-500 group-hover:text-neutral-700 dark:group-hover:text-neutral-300">
+            {{ group.items.length }} news
+          </span>
+          <!-- Not `rotate-180`: another stylesheet also defines it (`rotate: 180deg`), the two add up to 360deg -->
+          <Icon
+            name="uil:angle-down"
+            class="size-4 text-neutral-400 transition-transform duration-200 dark:text-neutral-500"
+            :style="{ transform: isOpen(group.year) ? 'rotate(180deg)' : 'none' }"
+          />
+        </button>
+
+        <template v-if="isOpen(group.year)">
+          <motion.div
+            v-for="(item, index) in group.items"
+            :key="item.title + item.date.toString()"
+            :initial="itemMotion(index).initial"
+            :animate="{ opacity: 1, y: 0 }"
+            :transition="itemMotion(index).transition"
           >
-            <!-- Mobile: Stacked layout -->
-            <div class="flex flex-col gap-2 md:hidden">
-              <!-- Date + Categories row -->
-              <div class="flex items-center justify-between">
-                <span class="tabular-nums text-xs text-neutral-400 dark:text-neutral-500">{{ formatDate(item.date) }}</span>
-                <div class="flex items-center gap-1.5">
+            <component
+              :is="hasLink(item) ? 'a' : 'div'"
+              :href="hasLink(item) ? getFirstLink(item) : undefined"
+              :target="hasLink(item) ? '_blank' : undefined"
+              :rel="hasLink(item) ? 'noopener noreferrer' : undefined"
+              class="block px-3 py-3 transition-all duration-300 ease-out -mx-3"
+              :class="{ 'pressable hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer group': hasLink(item) }"
+            >
+              <!-- Mobile: Stacked layout -->
+              <div class="flex flex-col gap-2 md:hidden">
+                <!-- Date + Categories row -->
+                <div class="flex items-center justify-between">
+                  <time :datetime="monthAttr(item.date)" class="month-slot tabular-nums text-xs">
+                    <span aria-hidden="true" class="invisible font-medium">{{ item.date.getFullYear() }}</span>
+                    <span class="text-right text-neutral-400 dark:text-neutral-500">{{ monthLabel(item.date) }}</span>
+                  </time>
+                  <div class="flex items-center gap-1.5">
+                    <div class="flex items-center gap-1">
+                      <span
+                        v-for="cat in item.categories?.slice(0, 2)"
+                        :key="cat"
+                        class="whitespace-nowrap bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400"
+                      >
+                        {{ cat }}
+                      </span>
+                    </div>
+                    <svg
+                      class="h-2.5 w-2.5 transition-all duration-300"
+                      :class="hasLink(item) ? 'opacity-30 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5' : 'opacity-0'"
+                      viewBox="0 0 11 11"
+                      fill="none"
+                    >
+                      <path d="M8.4778 3.06917L1.23404 10.3129L0 9.0789L7.24376 1.83513L0.456622 1.71166L0.440628 0L10.1366 0.176392L10.313 9.87231L8.60128 9.85632L8.4778 3.06917Z" fill="currentColor" />
+                    </svg>
+                  </div>
+                </div>
+                <!-- Title + Content -->
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium leading-snug">{{ item.title }}</span>
+                  <span v-if="item.content" class="text-xs text-neutral-500 dark:text-neutral-400">{{ item.content }}</span>
+                </div>
+              </div>
+
+              <!-- Desktop: Grid layout -->
+              <div class="grid-cols-[auto_1fr_auto] hidden items-baseline gap-4 md:grid">
+                <time :datetime="monthAttr(item.date)" class="month-slot tabular-nums text-xs">
+                  <span aria-hidden="true" class="invisible font-medium">{{ item.date.getFullYear() }}</span>
+                  <span class="text-right text-neutral-400 dark:text-neutral-500">{{ monthLabel(item.date) }}</span>
+                </time>
+
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium leading-snug">{{ item.title }}</span>
+                  <span v-if="item.content" class="text-xs text-neutral-500 dark:text-neutral-400">{{ item.content }}</span>
+                </div>
+
+                <div class="flex flex-nowrap items-center justify-end gap-1.5">
                   <div class="flex items-center gap-1">
                     <span
                       v-for="cat in item.categories?.slice(0, 2)"
                       :key="cat"
-                      class="whitespace-nowrap bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400"
+                      class="whitespace-nowrap border border-neutral-300 px-1.5 py-0.5 text-xs text-neutral-500 dark:border-neutral-700 dark:text-neutral-400"
                     >
                       {{ cat }}
                     </span>
@@ -161,44 +266,9 @@ function itemMotion(index: number) {
                   </svg>
                 </div>
               </div>
-              <!-- Title + Content -->
-              <div class="flex flex-col gap-1">
-                <span class="text-sm font-medium leading-snug">{{ item.title }}</span>
-                <span v-if="item.content" class="text-xs text-neutral-500 dark:text-neutral-400">{{ item.content }}</span>
-              </div>
-            </div>
-
-            <!-- Desktop: Grid layout -->
-            <div class="grid-cols-[70px_1fr_auto] hidden items-start gap-4 md:grid">
-              <span class="tabular-nums text-xs text-neutral-400 dark:text-neutral-500">{{ formatDate(item.date) }}</span>
-
-              <div class="flex flex-col gap-1">
-                <span class="text-sm font-medium leading-snug">{{ item.title }}</span>
-                <span v-if="item.content" class="text-xs text-neutral-500 dark:text-neutral-400">{{ item.content }}</span>
-              </div>
-
-              <div class="flex flex-nowrap items-center justify-end gap-1.5">
-                <div class="flex items-center gap-1">
-                  <span
-                    v-for="cat in item.categories?.slice(0, 2)"
-                    :key="cat"
-                    class="whitespace-nowrap border border-neutral-300 px-1.5 py-0.5 text-xs text-neutral-500 dark:border-neutral-700 dark:text-neutral-400"
-                  >
-                    {{ cat }}
-                  </span>
-                </div>
-                <svg
-                  class="h-2.5 w-2.5 transition-all duration-300"
-                  :class="hasLink(item) ? 'opacity-30 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5' : 'opacity-0'"
-                  viewBox="0 0 11 11"
-                  fill="none"
-                >
-                  <path d="M8.4778 3.06917L1.23404 10.3129L0 9.0789L7.24376 1.83513L0.456622 1.71166L0.440628 0L10.1366 0.176392L10.313 9.87231L8.60128 9.85632L8.4778 3.06917Z" fill="currentColor" />
-                </svg>
-              </div>
-            </div>
-          </component>
-        </motion.div>
+            </component>
+          </motion.div>
+        </template>
       </template>
     </div>
 
@@ -212,15 +282,16 @@ function itemMotion(index: number) {
         Clear filters
       </button>
     </div>
-
-    <!-- Load more button -->
-    <button
-      v-if="hasMoreItems"
-      class="group mt-2 inline-flex pressable cursor-pointer items-center self-center gap-1 rounded-none bg-neutral-100 px-3 py-2 text-xs text-neutral-600 transition-colors duration-200 dark:bg-neutral-800 hover:bg-neutral-200 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200"
-      @click="loadMore"
-    >
-      <span>Show more</span>
-      <Icon name="uil:angle-down" class="size-5" />
-    </button>
   </div>
 </template>
+
+<style scoped>
+/* Stacks an invisible year behind the month: the slot takes the year's width and the month sits flush right in it */
+.month-slot {
+  display: inline-grid;
+}
+
+.month-slot > * {
+  grid-area: 1 / 1;
+}
+</style>

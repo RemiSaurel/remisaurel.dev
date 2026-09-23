@@ -232,9 +232,9 @@ function computedInitial(y: number) {
               :class="isHoldingCv ? '[clip-path:inset(0_0_0_0)] [transition:clip-path_900ms_linear]' : '[clip-path:inset(0_100%_0_0)] [transition:clip-path_200ms_var(--ease-out)]'"
             />
           </button>
-          <span class="pointer-events-none absolute flex flex-col rotate-[-9deg] select-none items-center whitespace-nowrap text-[0.62rem] text-[rgb(244_114_182)] font-700 tracking-[0.02em] -right-[0.65rem] -top-[0.85rem]" aria-hidden="true">
+          <span class="pointer-events-none absolute flex flex-col rotate-[-9deg] select-none items-center whitespace-nowrap font-hand text-[0.95rem] leading-none text-[rgb(244_114_182)] font-700 -right-[0.65rem] -top-[0.85rem]" aria-hidden="true">
             Soon
-            <svg class="mt-[-3px] h-[8px] w-[28px]" viewBox="0 0 44 12" aria-hidden="true">
+            <svg class="mt-[-1px] h-[8px] w-[28px]" viewBox="0 0 44 12" aria-hidden="true">
               <path d="M2 6c6-4 10-4 15-1.5s9 3 14-1 8-2 11 1" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
             </svg>
           </span>
@@ -357,9 +357,9 @@ function computedInitial(y: number) {
               :class="isHoldingCv ? '[clip-path:inset(0_0_0_0)] [transition:clip-path_900ms_linear]' : '[clip-path:inset(0_100%_0_0)] [transition:clip-path_200ms_var(--ease-out)]'"
             />
           </button>
-          <span class="pointer-events-none absolute flex flex-col rotate-[-9deg] select-none items-center whitespace-nowrap text-[0.62rem] text-[rgb(244_114_182)] font-700 tracking-[0.02em] -right-[0.65rem] -top-[0.85rem]" aria-hidden="true">
+          <span class="pointer-events-none absolute flex flex-col rotate-[-9deg] select-none items-center whitespace-nowrap font-hand text-[0.95rem] leading-none text-[rgb(244_114_182)] font-700 -right-[0.65rem] -top-[0.85rem]" aria-hidden="true">
             Soon
-            <svg class="mt-[-3px] h-[8px] w-[28px]" viewBox="0 0 44 12" aria-hidden="true">
+            <svg class="mt-[-1px] h-[8px] w-[28px]" viewBox="0 0 44 12" aria-hidden="true">
               <path d="M2 6c6-4 10-4 15-1.5s9 3 14-1 8-2 11 1" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
             </svg>
           </span>

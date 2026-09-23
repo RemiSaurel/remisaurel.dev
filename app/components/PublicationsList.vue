@@ -94,9 +94,9 @@ const REVEALED = { opacity: 1, filter: 'blur(0px)' }
           :initial="reveal(index).initial"
           :animate="REVEALED"
           :transition="reveal(index).transition"
-          class="tabular-nums [grid-area:date] w-fit text-xs text-neutral-400 md:pt-1 dark:text-neutral-500"
+          class="[grid-area:date] w-fit md:pt-1"
         >
-          {{ formatDate(pub.date) }}
+          <ListDate :date="pub.date" :show-year="isFirstOfYear(publications, index, item => item.date)" />
         </motion.span>
 
         <div class="[grid-area:body] flex gap-3 md:gap-4">
@@ -213,7 +213,7 @@ const REVEALED = { opacity: 1, filter: 'blur(0px)' }
 
 @media (min-width: 768px) {
   .pub-row {
-    grid-template-columns: 60px 1fr auto;
+    grid-template-columns: 56px 1fr auto;
     grid-template-areas: 'date body venue';
     align-items: start;
   }

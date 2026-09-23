@@ -205,7 +205,7 @@ const PROJECT_VIEWS = [
 
 <template>
   <div>
-    <div class="mb-12">
+    <div class="mb-8 md:mb-12">
       <h5 class="m-0 text-2xl font-semibold">
         Projects
       </h5>
@@ -237,9 +237,18 @@ const PROJECT_VIEWS = [
           <IconLink icon-name="i-logos-adonisjs-icon" route="https://www.adonisjs.com" external size="sm">
             AdonisJS
           </IconLink>
-          <IconLink icon-name="i-logos-python" route="https://www.python.org" external size="sm">
-            Python
-          </IconLink>
+          <!-- Kept together so "& more!" never wraps alone and its arrow keeps pointing at the last tech -->
+          <span class="inline-flex items-center gap-1 whitespace-nowrap">
+            <IconLink icon-name="i-logos-python" route="https://www.python.org" external size="sm">
+              Python
+            </IconLink>
+            <span class="inline-flex -rotate-8 select-none items-center gap-0.5 whitespace-nowrap font-hand text-lg leading-none text-[rgb(244_114_182)] font-700 relative -top-0.5">
+              <svg class="relative h-3 w-6 -top-1" viewBox="0 0 32 16" aria-hidden="true">
+                <path d="M30 13c-6-8-15-10-25-8M10 9.5 4.5 5l6-3.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <span class="relative top-1.5">& more!</span>
+            </span>
+          </span>
         </div>
       </div>
     </div>

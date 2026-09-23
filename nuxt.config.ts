@@ -67,6 +67,7 @@ export default defineNuxtConfig({
   fonts: {
     families: [
       { name: 'Geist Sans', provider: 'npm', weights: [400, 500, 600, 700] },
+      { name: 'Caveat', provider: 'google', weights: [600, 700] },
     ],
   },
 

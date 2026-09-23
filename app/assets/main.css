@@ -45,6 +45,11 @@ html.dark {
   box-sizing: border-box;
 }
 
+/* Handwritten annotations ("Soon", "& more!") */
+.font-hand {
+  font-family: "Caveat", "Bradley Hand", cursive;
+}
+
 /* Research landscape cluster color tokens — shared across ResearchLandscape's
    child components, so they must be global (Vue's scoped CSS doesn't reach
    into nested elements of child components). */
