@@ -14,7 +14,8 @@ useSeoMeta({
   twitterCard: 'summary_large_image',
 })
 
-useHead({ htmlAttrs: { class: 'lab-page' } })
+onMounted(() => document.documentElement.classList.add('lab-page'))
+onBeforeUnmount(() => document.documentElement.classList.remove('lab-page'))
 
 const editor = useLabEditor()
 provide(LAB_EDITOR_KEY, editor)
