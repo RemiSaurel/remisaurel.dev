@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ArtNode } from '~/art/art'
-import { isGroup, LAYER_TYPES } from '~/art/art'
+import { artColorValue, isGroup, LAYER_TYPES } from '~/art/art'
 
 interface Row {
   node: ArtNode
@@ -35,6 +35,11 @@ const rows = computed(() => {
 
 function iconFor(node: ArtNode) {
   return isGroup(node) ? 'lucide:square-dashed' : LAYER_TYPES[node.type].icon
+}
+
+/** Own colors only: the icon tells which node to select to change it. */
+function tintFor(node: ArtNode) {
+  return node.color && node.color !== 'ink' ? { color: artColorValue(node.color, 'auto') } : undefined
 }
 
 function onRowClick(event: MouseEvent, id: string) {
@@ -167,7 +172,8 @@ const INDENT = 14
 
         <Icon
           :name="iconFor(row.node)"
-          class="size-3.5 shrink-0"
+          class="pub-art-auto size-3.5 shrink-0"
+          :style="tintFor(row.node)"
           :class="selectedIds.includes(row.node.id) ? 'text-neutral-700 dark:text-neutral-300' : 'text-neutral-400 dark:text-neutral-500'"
           aria-hidden="true"
         />

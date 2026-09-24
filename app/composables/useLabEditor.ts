@@ -1,7 +1,7 @@
 import type { InjectionKey } from 'vue'
-import type { ArtComposition, ArtGroup, ArtNode, ArtPreset, ArtTheme, LayerType, ParamValue } from '~/art/art'
+import type { ArtComposition, ArtGroup, ArtNode, ArtNodeColor, ArtPreset, ArtTheme, LayerType, ParamValue } from '~/art/art'
 import type { Matrix } from '~/art/geometry'
-import { ART_PRESETS, cloneNode, createGroup, createLayer, isGroup, LAYER_TYPES, newId, normalizeNode } from '~/art/art'
+import { ART_PRESETS, ART_STROKE, cloneNode, createGroup, createLayer, isGroup, LAYER_TYPES, newId, normalizeNode } from '~/art/art'
 import { apply, decompose, IDENTITY, invert, multiply, nodeMatrix } from '~/art/geometry'
 
 const DRAFT_KEY = 'lab-draft'
@@ -42,7 +42,8 @@ export function parseComposition(text: string): ArtComposition | null {
     if (!value || !Array.isArray(value.layers))
       return null
     const layers = value.layers.map(normalizeNode).filter((node: ArtNode | null): node is ArtNode => !!node)
-    return { grid: value.grid !== false, layers }
+    const grain = typeof value.grain === 'number' && value.grain > 0 ? Math.min(1, value.grain) : undefined
+    return { grid: value.grid !== false, ...(grain ? { grain } : {}), layers }
   }
   catch {
     return null
@@ -355,6 +356,32 @@ export function useLabEditor() {
       node.params = createLayer({ type: node.type }).params
   }
 
+  /** `null` goes back to inheriting, which keeps the JSON free of redundant colors. */
+  function colorSelected(color: ArtNodeColor | null) {
+    for (const node of selectedNodes.value) {
+      if (color)
+        // A copy per node: custom colors are objects, and nodes must never share one
+        node.color = typeof color === 'string' ? color : { ...color }
+      else
+        delete node.color
+    }
+  }
+
+  /** The stroke a node gets from its groups, or the default at the root. */
+  function inheritedStroke(id: string) {
+    return entry(id)?.ancestors.findLast(ancestor => ancestor.stroke !== undefined)?.stroke ?? ART_STROKE.default
+  }
+
+  /** A width matching what the node would inherit is dropped, like colors. */
+  function strokeSelected(width: number) {
+    for (const node of selectedNodes.value) {
+      if (width === inheritedStroke(node.id))
+        delete node.stroke
+      else
+        node.stroke = width
+    }
+  }
+
   function isInside(id: string, groupId: string | null) {
     return !!groupId && (groupId === id || !!entry(groupId)?.ancestors.some(ancestor => ancestor.id === id))
   }
@@ -469,7 +496,13 @@ export function useLabEditor() {
         ...transformPatch(multiply(matrix, nodeMatrix(child)), child),
         opacity: child.opacity * group.opacity,
         visible: child.visible && group.visible,
+        // Baked in too, so children keep the width they were drawn with
+        stroke: child.stroke ?? group.stroke,
       }) as ArtNode)
+      for (const child of children) {
+        if (child.stroke === undefined)
+          delete child.stroke
+      }
       item.siblings.splice(item.index, 1, ...children)
       released.unshift(...children.map(child => child.id))
     }
@@ -557,6 +590,12 @@ export function useLabEditor() {
     updateNode,
     updateParam,
     resetParams: step(resetParams),
+    colorSelected: step(colorSelected),
+    /** For continuous picking (dragging in the color field): settles into one undo step. */
+    previewColor: colorSelected,
+    inheritedStroke,
+    /** Not a step: dragging the slider settles into one undo step on its own. */
+    strokeSelected,
     moveNode: step(moveNode),
     shiftSelected: step(shiftSelected),
     groupSelected: step(groupSelected),

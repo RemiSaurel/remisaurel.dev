@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ParamDefinition } from '~/art/art'
-import { ART_HEIGHT, ART_WIDTH, defaultParams, isGroup, LAYER_TYPES } from '~/art/art'
+import { ART_HEIGHT, ART_STROKE, ART_WIDTH, defaultParams, isGroup, LAYER_TYPES } from '~/art/art'
 
 const {
   composition,
@@ -16,6 +16,8 @@ const {
   groupSelected,
   ungroupSelected,
   flipSelected,
+  inheritedStroke,
+  strokeSelected,
 } = injectLabEditor()
 
 const FLIPS = [
@@ -59,6 +61,26 @@ const rotation = field('rotation')
 const scale = field('scale')
 const opacity = field('opacity')
 
+/** Shows the first selected node's width, own or inherited; setting it applies to all of them. */
+const stroke = computed({
+  get: () => {
+    const node = selectedNodes.value[0]
+    return node ? node.stroke ?? inheritedStroke(node.id) : ART_STROKE.default
+  },
+  set: strokeSelected,
+})
+
+/** Zero drops the key, so compositions without grain keep their JSON unchanged. */
+const grain = computed({
+  get: () => composition.value.grain ?? 0,
+  set: (value: number) => {
+    if (value > 0)
+      composition.value.grain = value
+    else
+      delete composition.value.grain
+  },
+})
+
 const seed = computed({
   get: () => layer.value?.seed ?? 0,
   set: (value: number) => layer.value && updateNode(layer.value.id, { seed: value }),
@@ -81,9 +103,10 @@ const yRange = computed(() => inGroup.value ? [-ART_HEIGHT / 2, ART_HEIGHT / 2] 
         Composition
       </h2>
       <LabSwitch v-model="composition.grid" label="Background grid" />
+      <LabSlider v-model="grain" label="Film grain" :min="0" :max="1" :step="0.01" />
       <div class="flex flex-col gap-1.5 border-t border-neutral-200 pt-4 text-xs text-neutral-500 leading-relaxed dark:border-neutral-800 dark:text-neutral-400">
         <p class="m-0">
-          Frame, grid, stroke and palette are locked so every illustration belongs to the same set.
+          Frame and grid are locked, strokes stay thin, and colors come from one palette, so every illustration belongs to the same set.
         </p>
         <p class="m-0">
           Select a layer on the canvas or in the list to edit it. Drag on empty canvas to select several.
@@ -121,6 +144,8 @@ const yRange = computed(() => inGroup.value ? [-ART_HEIGHT / 2, ART_HEIGHT / 2] 
           <kbd class="lab-action-kbd">{{ flip.kbd }}</kbd>
         </button>
       </div>
+      <LabColors />
+      <LabSlider v-model="stroke" label="Stroke" :min="ART_STROKE.min" :max="ART_STROKE.max" :step="ART_STROKE.step" unit="px" />
     </template>
 
     <!-- One node -->
@@ -234,7 +259,9 @@ const yRange = computed(() => inGroup.value ? [-ART_HEIGHT / 2, ART_HEIGHT / 2] 
         <h3 class="lab-heading">
           Appearance
         </h3>
+        <LabColors class="pb-1" />
         <LabSlider v-model="opacity" label="Opacity" :min="0" :max="1" :step="0.01" />
+        <LabSlider v-model="stroke" label="Stroke" :min="ART_STROKE.min" :max="ART_STROKE.max" :step="ART_STROKE.step" unit="px" />
         <div v-if="definition?.random" class="flex gap-1">
           <LabSlider v-model="seed" label="Seed" :min="0" :max="999" :step="1" class="flex-1" />
           <button type="button" class="lab-tool bg-neutral-100 h-7! w-7! dark:bg-neutral-800/70" aria-label="Shuffle seed" title="Shuffle seed (R)" @click="shuffleSeed">

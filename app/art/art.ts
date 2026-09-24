@@ -1,9 +1,13 @@
 /**
  * Generative illustrations: a composition is a stack of layers drawn on a shared 2:1 frame.
- * The frame, grid, stroke and palette are fixed (that is what keeps every image coherent);
+ * The frame and grid are fixed, strokes stay within a small range of screen widths, and colors
+ * come from a curated palette (that is what keeps every image coherent);
  * everything a layer draws is a pure function of its params, so a composition copied from
  * /lab always renders the same picture, including under `nuxt generate`.
  */
+
+import { isHex, normalizeHex } from './color'
+import { GLOW_LAYER } from './glow'
 
 export const ART_WIDTH = 400
 export const ART_HEIGHT = 200
@@ -15,6 +19,72 @@ export const ART_PALETTES = {
 } as const
 
 export type ArtTheme = keyof typeof ART_PALETTES
+
+/** Stroke widths in screen pixels, identical at every rendered size. */
+export const ART_STROKE = { default: 1, min: 0.25, max: 4, step: 0.25 } as const
+
+export function isArtStroke(value: unknown): value is number {
+  return typeof value === 'number' && value >= ART_STROKE.min && value <= ART_STROKE.max
+}
+
+/**
+ * Stroke colors a node can pick. Each one has a variant per theme, tuned to sit at the same
+ * visual weight on its background, so a colored illustration still ships on both site themes.
+ */
+export const ART_COLORS = {
+  ink: { label: 'Ink', light: ART_PALETTES.light.ink, dark: ART_PALETTES.dark.ink },
+  graphite: { label: 'Graphite', light: '#737373', dark: '#a3a3a3' },
+  red: { label: 'Red', light: '#dc2626', dark: '#f87171' },
+  orange: { label: 'Orange', light: '#ea580c', dark: '#fb923c' },
+  amber: { label: 'Amber', light: '#ca8a04', dark: '#facc15' },
+  green: { label: 'Green', light: '#16a34a', dark: '#4ade80' },
+  cyan: { label: 'Cyan', light: '#0891b2', dark: '#22d3ee' },
+  blue: { label: 'Blue', light: '#2563eb', dark: '#60a5fa' },
+  violet: { label: 'Violet', light: '#7c3aed', dark: '#a78bfa' },
+  pink: { label: 'Pink', light: '#db2777', dark: '#f472b6' },
+} as const
+
+export type ArtColor = keyof typeof ART_COLORS
+
+export const ART_COLOR_ORDER = Object.keys(ART_COLORS) as ArtColor[]
+
+export function isArtColor(value: unknown): value is ArtColor {
+  return typeof value === 'string' && value in ART_COLORS
+}
+
+/** A color picked by hand: one hex per theme, like the palette's own pairs. */
+export interface ArtCustomColor {
+  light: string
+  dark: string
+}
+
+export type ArtNodeColor = ArtColor | ArtCustomColor
+
+export function isCustomColor(value: unknown): value is ArtCustomColor {
+  return !!value && typeof value === 'object' && isHex((value as ArtCustomColor).light) && isHex((value as ArtCustomColor).dark)
+}
+
+export function sameColor(a: ArtNodeColor | undefined, b: ArtNodeColor | undefined) {
+  if (typeof a === 'string' || typeof b === 'string' || !a || !b)
+    return a === b
+  return a.light === b.light && a.dark === b.dark
+}
+
+/** Either kind of color, as its two hex values. */
+export function colorPair(color: ArtNodeColor): ArtCustomColor {
+  return typeof color === 'string' ? ART_COLORS[color] : color
+}
+
+/**
+ * A node color as a paint value. `auto` follows the site color mode through the
+ * `--art-dark` switch set by `.pub-art-auto`, so it needs that class on an ancestor.
+ */
+export function artColorValue(color: ArtNodeColor, theme: 'auto' | ArtTheme) {
+  const { light, dark } = colorPair(color)
+  if (theme === 'auto')
+    return `color-mix(in srgb, ${dark} calc(var(--art-dark, 0) * 100%), ${light})`
+  return theme === 'light' ? light : dark
+}
 
 // Shapes: the only two primitives the renderer knows about
 
@@ -70,7 +140,7 @@ export type ParamDefinition = RangeParam | ChoiceParam | ToggleParam
 export type ParamValue = number | string | boolean
 export type LayerParams = Record<string, ParamValue>
 
-export type LayerType = 'lines' | 'retention' | 'orbits' | 'dots' | 'rings' | 'rays' | 'wave' | 'shape'
+export type LayerType = 'lines' | 'retention' | 'orbits' | 'dots' | 'rings' | 'rays' | 'wave' | 'shape' | 'glow'
 
 interface ArtNodeBase {
   id: string
@@ -85,6 +155,10 @@ interface ArtNodeBase {
   flipX?: boolean
   flipY?: boolean
   opacity: number
+  /** Left out means inherited: from the enclosing group, or ink at the root. */
+  color?: ArtNodeColor
+  /** Stroke width in screen pixels. Left out means inherited, like `color`. */
+  stroke?: number
 }
 
 export interface ArtGroup extends ArtNodeBase {
@@ -103,6 +177,8 @@ export type ArtNode = ArtLayer | ArtGroup
 
 export interface ArtComposition {
   grid: boolean
+  /** Film grain over the whole frame, 0..1: left out means none. */
+  grain?: number
   /** Drawn in order: the last node is on top. */
   layers: ArtNode[]
 }
@@ -553,6 +629,8 @@ export const LAYER_TYPES: Record<LayerType, LayerDefinition> = {
       }
     },
   },
+
+  glow: GLOW_LAYER,
 }
 
 export const LAYER_TYPE_ORDER = Object.keys(LAYER_TYPES) as LayerType[]
@@ -622,7 +700,15 @@ export function createGroup(input: GroupInput): ArtGroup {
 export function normalizeNode(value: unknown): ArtNode | null {
   if (!value || typeof value !== 'object')
     return null
-  const node = value as Record<string, unknown>
+  const { color, stroke, ...node } = value as Record<string, unknown>
+  // Custom colors are rewritten as fresh, lowercase hex pairs; an unknown color (typo,
+  // removed swatch) is dropped, so the node inherits rather than breaking
+  if (isArtColor(color))
+    node.color = color
+  else if (isCustomColor(color))
+    node.color = { light: normalizeHex(color.light), dark: normalizeHex(color.dark) }
+  if (isArtStroke(stroke))
+    node.stroke = stroke
   if (node.type === 'group' && Array.isArray(node.children)) {
     const children = node.children.map(normalizeNode).filter((child): child is ArtNode => !!child)
     return createGroup({ ...(node as Partial<ArtGroup>), children })
@@ -649,6 +735,9 @@ export interface ArtPreset {
   label: string
   build: () => ArtComposition
 }
+
+/** The deep red of the glow presets: the palette's red is tuned for thin strokes, not light. */
+const EMBER: ArtCustomColor = { light: '#dc2626', dark: '#f0341f' }
 
 export const ART_PRESETS: ArtPreset[] = [
   {
@@ -677,6 +766,27 @@ export const ART_PRESETS: ArtPreset[] = [
       layers: [
         createLayer({ type: 'wave', params: { echoes: 12, echoGap: 5, amplitude: 24, frequency: 1.5, phaseShift: 0.04 } }),
         createLayer({ type: 'dots', name: 'Field', opacity: 0.5, params: { cols: 36, rows: 16, gap: 11, size: 0.8, falloff: 'none' } }),
+      ],
+    }),
+  },
+  {
+    label: 'Ember',
+    build: () => ({
+      grid: false,
+      grain: 0.5,
+      layers: [
+        createLayer({ type: 'glow', name: 'Wash', color: EMBER, x: 330, y: 200, rotation: -18, params: { size: 360, ratio: 2.2, softness: 58, intensity: 1.3, core: 0.8 } }),
+        createLayer({ type: 'glow', name: 'Streaks', color: EMBER, x: 120, y: 70, rotation: -55, opacity: 0.8, seed: 4, params: { form: 'streaks', size: 220, count: 3, gap: 16, thickness: 14, softness: 5, motion: 0.4, core: 0.3 } }),
+      ],
+    }),
+  },
+  {
+    label: 'Flame',
+    build: () => ({
+      grid: false,
+      grain: 0.5,
+      layers: [
+        createLayer({ type: 'glow', name: 'Flame', color: EMBER, x: 230, y: 105, seed: 12, params: { form: 'flame', size: 150, ratio: 2.6, count: 4, softness: 7, motion: 0.7, warp: 50, turbulence: 0.018, intensity: 1.8, core: 0.85, coreHue: 38 } }),
       ],
     }),
   },
