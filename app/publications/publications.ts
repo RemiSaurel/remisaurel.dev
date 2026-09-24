@@ -9,6 +9,13 @@ export interface Publication {
   venue: string
   url?: string
   image?: string
+  /** Illustration exported from /lab, one file per site theme. Takes precedence over `image`. */
+  art?: PublicationArt
+}
+
+export interface PublicationArt {
+  light: string
+  dark: string
 }
 
 const defaultAuthors = ['Rémi Saurel', 'Franck Silvestre', 'Jean-Baptiste Raclet', 'Emmanuel Lescure']
@@ -22,6 +29,7 @@ export const publications: Publication[] = [
     subtitle: 'A quantitative analysis during the experimentation of Denis\' PhD.',
     venue: 'ECTEL 2026',
     image: '/publications/ectel2026.avif',
+    art: { light: '/publications/art/ectel-2026-light.svg', dark: '/publications/art/ectel-2026-dark.svg' },
   },
   {
     id: 'rjceiah-2026',
@@ -33,6 +41,7 @@ export const publications: Publication[] = [
     venue: 'RJC EIAH 2026',
     url: 'https://hal.science/hal-05641999',
     image: '/publications/rjceiah2026.avif',
+    art: { light: '/publications/art/rjceiah-2026-light.svg', dark: '/publications/art/rjceiah-2026-dark.svg' },
   },
   {
     id: 'lak-2026',
@@ -43,6 +52,7 @@ export const publications: Publication[] = [
     venue: 'LAK 2026',
     url: 'https://hal.science/hal-05481914',
     image: '/publications/lak2026.jpg',
+    art: { light: '/publications/art/lak-2026-light.svg', dark: '/publications/art/lak-2026-dark.svg' },
   },
   {
     id: 'ectel-2025',
@@ -54,6 +64,7 @@ export const publications: Publication[] = [
     venue: 'ECTEL 2025',
     url: 'https://hal.science/hal-05141354',
     image: '/publications/ectel2025.jpg',
+    art: { light: '/publications/art/ectel-2025-light.svg', dark: '/publications/art/ectel-2025-dark.svg' },
   },
   {
     id: 'eiah-2025',
@@ -64,5 +75,6 @@ export const publications: Publication[] = [
     venue: 'EIAH 2025',
     url: 'https://hal.science/hal-05070808',
     image: '/publications/eiah2025.jpg',
+    art: { light: '/publications/art/eiah-2025-light.svg', dark: '/publications/art/eiah-2025-dark.svg' },
   },
 ]

@@ -18,6 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const hasLink = (pub: Publication) => !!pub.url
+const hasVisual = (pub: Publication) => !!pub.art || !!pub.image
 
 function formatAuthors(authors: string[]) {
   return authors.map(name => ({ name, isMe: name === 'Rémi Saurel' }))
@@ -116,12 +117,17 @@ const PUB_IMAGE = {
 
         <div class="[grid-area:body] flex gap-3 md:gap-4">
           <motion.div
-            v-if="pub.image"
+            v-if="hasVisual(pub)"
             :layout-id="`pub-image-${pub.id}`"
             :transition="morph(index)"
             class="relative z-1 h-10 w-20 shrink-0 overflow-hidden bg-neutral-100 md:h-14 md:w-28 dark:bg-neutral-800"
           >
-            <NuxtImg :src="pub.image" v-bind="PUB_IMAGE" alt="" class="pub-image object-cover size-full" />
+            <!-- One file per site theme, swapped by the color mode; the photo is only a fallback -->
+            <template v-if="pub.art">
+              <img :src="pub.art.light" alt="" class="pub-image size-full object-cover dark:hidden">
+              <img :src="pub.art.dark" alt="" class="pub-image hidden size-full object-cover dark:block">
+            </template>
+            <NuxtImg v-else :src="pub.image" v-bind="PUB_IMAGE" alt="" class="pub-image object-cover size-full" />
           </motion.div>
           <motion.div
             :initial="reveal(index).initial"
@@ -169,12 +175,17 @@ const PUB_IMAGE = {
       :class="{ 'cursor-pointer group pressable': hasLink(pub) }"
     >
       <motion.div
-        v-if="pub.image"
+        v-if="hasVisual(pub)"
         :layout-id="`pub-image-${pub.id}`"
         :transition="morph(index)"
         class="relative z-1 aspect-[2/1] w-full overflow-hidden bg-neutral-100 dark:bg-neutral-800"
       >
-        <NuxtImg :src="pub.image" v-bind="PUB_IMAGE" alt="" class="pub-image object-cover size-full" />
+        <!-- One file per site theme, swapped by the color mode; the photo is only a fallback -->
+        <template v-if="pub.art">
+          <img :src="pub.art.light" alt="" class="pub-image size-full object-cover dark:hidden">
+          <img :src="pub.art.dark" alt="" class="pub-image hidden size-full object-cover dark:block">
+        </template>
+        <NuxtImg v-else :src="pub.image" v-bind="PUB_IMAGE" alt="" class="pub-image object-cover size-full" />
         <!-- Link affordance sits inside the image, so it never pushes past the card edge -->
         <span
           v-if="hasLink(pub)"

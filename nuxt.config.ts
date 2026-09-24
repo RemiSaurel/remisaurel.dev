@@ -4,13 +4,19 @@ export default defineNuxtConfig({
     pageTransition: { name: 'page', mode: 'out-in' },
     head: {
       link: [{ rel: 'icon', href: '/favicon.png' }],
-      script: [
-        {
-          'src': 'https://app.rybbit.io/api/script.js',
-          'defer': true,
-          'data-site-id': '5a7335eeadc5',
-        },
-      ],
+    },
+  },
+  $production: {
+    app: {
+      head: {
+        script: [
+          {
+            'src': 'https://app.rybbit.io/api/script.js',
+            'defer': true,
+            'data-site-id': '5a7335eeadc5',
+          },
+        ],
+      },
     },
   },
   colorMode: {

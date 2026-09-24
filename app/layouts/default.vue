@@ -9,6 +9,7 @@ const navItems = [
   { route: '/research', label: 'Research' },
   { route: '/posts', label: 'Posts' },
   { route: '/projects', label: 'Projects' },
+  { route: '/lab', label: 'Lab' },
 ]
 
 function isActive(path: string) {
