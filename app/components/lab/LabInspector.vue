@@ -15,7 +15,13 @@ const {
   removeSelected,
   groupSelected,
   ungroupSelected,
+  flipSelected,
 } = injectLabEditor()
+
+const FLIPS = [
+  { axis: 'x', key: 'flipX', label: 'Flip horizontal', icon: 'lucide:flip-horizontal-2', kbd: '⇧H' },
+  { axis: 'y', key: 'flipY', label: 'Flip vertical', icon: 'lucide:flip-vertical-2', kbd: '⇧V' },
+] as const
 
 const layer = computed(() => selectedNode.value && !isGroup(selectedNode.value) ? selectedNode.value : null)
 const group = computed(() => selectedNode.value && isGroup(selectedNode.value) ? selectedNode.value : null)
@@ -108,6 +114,13 @@ const yRange = computed(() => inGroup.value ? [-ART_HEIGHT / 2, ART_HEIGHT / 2] 
       <p v-if="!canGroup" class="m-0 text-[11px] text-neutral-500 -mt-3 dark:text-neutral-400">
         Layers from different groups can’t be grouped together.
       </p>
+      <div class="grid grid-cols-2 gap-1">
+        <button v-for="flip in FLIPS" :key="flip.axis" type="button" class="lab-action" @click="flipSelected(flip.axis)">
+          <Icon :name="flip.icon" class="size-3.5" aria-hidden="true" />
+          {{ flip.axis === 'x' ? 'Horizontal' : 'Vertical' }}
+          <kbd class="lab-action-kbd">{{ flip.kbd }}</kbd>
+        </button>
+      </div>
     </template>
 
     <!-- One node -->
@@ -136,9 +149,33 @@ const yRange = computed(() => inGroup.value ? [-ART_HEIGHT / 2, ART_HEIGHT / 2] 
       </button>
 
       <div class="flex flex-col gap-1.5">
-        <h3 class="lab-heading">
-          Transform
-        </h3>
+        <div class="flex items-center justify-between">
+          <h3 class="lab-heading">
+            Transform
+          </h3>
+          <div class="flex items-center -my-1.5 -mr-1">
+            <button
+              v-for="flip in FLIPS"
+              :key="flip.axis"
+              type="button"
+              class="lab-tool lab-flip"
+              :class="{ 'is-on': selectedNode[flip.key] }"
+              :aria-pressed="!!selectedNode[flip.key]"
+              :aria-label="flip.label"
+              :title="`${flip.label} (${flip.kbd})`"
+              @click="flipSelected(flip.axis)"
+            >
+              <!-- Turns over like a card with each flip: the icon is symmetric, the motion says what happened -->
+              <Icon
+                :name="flip.icon"
+                class="lab-flip-icon size-3.5"
+                :class="`is-${flip.axis}`"
+                :style="{ '--turn': selectedNode[flip.key] ? '180deg' : '0deg' }"
+                aria-hidden="true"
+              />
+            </button>
+          </div>
+        </div>
         <div class="grid grid-cols-2 gap-1">
           <LabSlider v-model="x" label="X" :min="xRange[0]!" :max="xRange[1]!" :step="0.1" />
           <LabSlider v-model="y" label="Y" :min="yRange[0]!" :max="yRange[1]!" :step="0.1" />
@@ -231,6 +268,34 @@ const yRange = computed(() => inGroup.value ? [-ART_HEIGHT / 2, ART_HEIGHT / 2] 
 
 .lab-tool:active {
   transform: scale(0.94);
+}
+
+.lab-tool.is-on {
+  color: #171717;
+  background: #f5f5f5;
+}
+
+.dark .lab-tool.is-on {
+  color: #f5f5f5;
+  background: rgb(38 38 38 / 0.7);
+}
+
+.lab-flip-icon {
+  transition: transform 300ms var(--ease-in-out);
+}
+
+.lab-flip-icon.is-x {
+  transform: perspective(40px) rotateY(var(--turn));
+}
+
+.lab-flip-icon.is-y {
+  transform: perspective(40px) rotateX(var(--turn));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-flip-icon {
+    transition: none;
+  }
 }
 
 .lab-tool:focus-visible,

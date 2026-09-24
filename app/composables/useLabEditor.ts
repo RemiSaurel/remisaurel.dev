@@ -1,13 +1,22 @@
 import type { InjectionKey } from 'vue'
 import type { ArtComposition, ArtGroup, ArtNode, ArtPreset, ArtTheme, LayerType, ParamValue } from '~/art/art'
 import type { Matrix } from '~/art/geometry'
-import { ART_PRESETS, cloneNode, createGroup, createLayer, isGroup, LAYER_TYPES, normalizeNode } from '~/art/art'
-import { apply, IDENTITY, invert, multiply, nodeMatrix } from '~/art/geometry'
+import { ART_PRESETS, cloneNode, createGroup, createLayer, isGroup, LAYER_TYPES, newId, normalizeNode } from '~/art/art'
+import { apply, decompose, IDENTITY, invert, multiply, nodeMatrix } from '~/art/geometry'
 
 const DRAFT_KEY = 'lab-draft'
+const GUIDES_KEY = 'lab-guides'
+const RULERS_KEY = 'lab-rulers'
 const HISTORY_LIMIT = 100
 /** Continuous edits (drags, slider scrubs) settle into a single undo step after this pause. */
 const HISTORY_SETTLE = 250
+
+/** A ruler guide, in frame units: `x` guides are vertical lines, `y` guides horizontal. */
+export interface Guide {
+  id: string
+  axis: 'x' | 'y'
+  value: number
+}
 
 export interface NodeEntry {
   node: ArtNode
@@ -46,6 +55,9 @@ export function useLabEditor() {
   const hoveredId = ref<string | null>(null)
   const collapsedIds = ref<string[]>([])
   const canvasTheme = ref<ArtTheme>('dark')
+  // Editor aids, not part of the picture: they never reach the JSON or the undo history
+  const rulersVisible = ref(true)
+  const guides = ref<Guide[]>([])
 
   // Index: every node with where it lives, rebuilt whenever the tree changes
 
@@ -165,6 +177,13 @@ export function useLabEditor() {
 
   function restoreDraft() {
     try {
+      rulersVisible.value = localStorage.getItem(RULERS_KEY) !== '0'
+      const saved = JSON.parse(localStorage.getItem(GUIDES_KEY) ?? '[]')
+      if (Array.isArray(saved))
+        guides.value = saved.filter((guide: Guide) => (guide.axis === 'x' || guide.axis === 'y') && Number.isFinite(guide.value))
+    }
+    catch {}
+    try {
       const draft = localStorage.getItem(DRAFT_KEY)
       const parsed = draft ? parseComposition(draft) : null
       if (parsed) {
@@ -174,6 +193,42 @@ export function useLabEditor() {
       }
     }
     catch {}
+  }
+
+  watch(rulersVisible, (visible) => {
+    try {
+      localStorage.setItem(RULERS_KEY, visible ? '1' : '0')
+    }
+    catch {}
+  })
+
+  watch(guides, (list) => {
+    try {
+      localStorage.setItem(GUIDES_KEY, JSON.stringify(list))
+    }
+    catch {}
+  }, { deep: true })
+
+  // Guides
+
+  function addGuide(axis: Guide['axis'], value: number) {
+    const guide: Guide = { id: newId(), axis, value }
+    guides.value.push(guide)
+    return guide.id
+  }
+
+  function moveGuide(id: string, value: number) {
+    const guide = guides.value.find(item => item.id === id)
+    if (guide)
+      guide.value = value
+  }
+
+  function removeGuide(id: string) {
+    guides.value = guides.value.filter(item => item.id !== id)
+  }
+
+  function clearGuides() {
+    guides.value = []
   }
 
   // Selection
@@ -323,6 +378,18 @@ export function useLabEditor() {
     return Math.round(value * 10000) / 10000
   }
 
+  /** A matrix as node fields, keeping the `prefer`red flips where they still fit. */
+  function transformPatch(matrix: Matrix, prefer: Pick<ArtNode, 'flipX' | 'flipY'>, node = prefer): Partial<ArtNode> {
+    const { x, y, rotation, scale, flipX, flipY } = decompose(matrix, prefer)
+    const patch: Partial<ArtNode> = { x: tidy(x), y: tidy(y), rotation: tidy(rotation), scale: tidy(scale) }
+    // Flags are only written when set or changed, so unflipped nodes keep a lean JSON
+    if (flipX || node.flipX)
+      patch.flipX = flipX
+    if (flipY || node.flipY)
+      patch.flipY = flipY
+    return patch
+  }
+
   /**
    * The transform and opacity a node needs under `to` to look exactly as it does under
    * `from`: moving it between groups changes where it lives, never what you see.
@@ -331,13 +398,8 @@ export function useLabEditor() {
     const fromMatrix = chainMatrix(from)
     const toMatrix = chainMatrix(to)
     const patch: Partial<ArtNode> = {}
-    if (fromMatrix.some((value, i) => Math.abs(value - toMatrix[i]!) > 1e-9)) {
-      const [a, b, , , e, f] = multiply(invert(toMatrix), multiply(fromMatrix, nodeMatrix(node)))
-      patch.x = tidy(e)
-      patch.y = tidy(f)
-      patch.rotation = tidy(Math.atan2(b, a) * 180 / Math.PI)
-      patch.scale = tidy(Math.hypot(a, b))
-    }
+    if (fromMatrix.some((value, i) => Math.abs(value - toMatrix[i]!) > 1e-9))
+      Object.assign(patch, transformPatch(multiply(invert(toMatrix), multiply(fromMatrix, nodeMatrix(node))), node))
     const fromOpacity = chainOpacity(from)
     const toOpacity = chainOpacity(to)
     // A parent more transparent than the result needs can't be compensated: keep the closest
@@ -401,23 +463,40 @@ export function useLabEditor() {
       if (!isGroup(group))
         continue
       const matrix = nodeMatrix(group)
-      const children = group.children.map((child) => {
-        const [x, y] = apply(matrix, [child.x, child.y])
-        return {
-          ...child,
-          x,
-          y,
-          rotation: ((child.rotation + group.rotation + 540) % 360) - 180,
-          scale: child.scale * group.scale,
-          opacity: child.opacity * group.opacity,
-          visible: child.visible && group.visible,
-        }
-      })
+      const children = group.children.map(child => ({
+        ...child,
+        // Through the matrices, so a flipped group hands its mirror down to each child
+        ...transformPatch(multiply(matrix, nodeMatrix(child)), child),
+        opacity: child.opacity * group.opacity,
+        visible: child.visible && group.visible,
+      }) as ArtNode)
       item.siblings.splice(item.index, 1, ...children)
       released.unshift(...children.map(child => child.id))
     }
     if (released.length)
       selectedIds.value = released
+  }
+
+  /**
+   * Mirrors the selection across a screen axis through its middle, like design tools: one
+   * node flips in place, several also swap places. Rotations follow, so a tilted layer flips
+   * along the screen and not along its own tilt.
+   */
+  function flipSelected(axis: 'x' | 'y') {
+    const items = topSelection.value
+    if (!items.length)
+      return
+    const parents = items.map(item => chainMatrix(item.ancestors))
+    const origins = items.map((item, i) => apply(parents[i]!, [item.node.x, item.node.y]))
+    const cx = origins.reduce((sum, [ox]) => sum + ox, 0) / origins.length
+    const cy = origins.reduce((sum, [, oy]) => sum + oy, 0) / origins.length
+    const mirror: Matrix = axis === 'x' ? [-1, 0, 0, 1, 2 * cx, 0] : [1, 0, 0, -1, 0, 2 * cy]
+    items.forEach(({ node }, i) => {
+      const parent = parents[i]!
+      const local = multiply(invert(parent), multiply(mirror, multiply(parent, nodeMatrix(node))))
+      const prefer = axis === 'x' ? { flipX: !node.flipX, flipY: node.flipY } : { flipX: node.flipX, flipY: !node.flipY }
+      Object.assign(node, transformPatch(local, prefer, node))
+    })
   }
 
   // Clipboard: layers travel as a composition JSON, so the lab, a file and a gist all speak it
@@ -453,6 +532,12 @@ export function useLabEditor() {
     hoveredId,
     collapsedIds,
     canvasTheme,
+    rulersVisible,
+    guides,
+    addGuide,
+    moveGuide,
+    removeGuide,
+    clearGuides,
     canUndo,
     canRedo,
     canGroup,
@@ -476,6 +561,7 @@ export function useLabEditor() {
     shiftSelected: step(shiftSelected),
     groupSelected: step(groupSelected),
     ungroupSelected: step(ungroupSelected),
+    flipSelected: step(flipSelected),
     copySelection,
     paste: step(paste),
   }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ArtTheme } from '~/art/art'
-import { useClipboard, useEventListener } from '@vueuse/core'
+import { useClipboard, useEventListener, useMediaQuery } from '@vueuse/core'
 import { isGroup } from '~/art/art'
 
 // A tool, not a page: it takes the whole window instead of the site layout
@@ -27,6 +27,7 @@ const {
   topSelection,
   entry,
   canvasTheme,
+  rulersVisible,
   canUndo,
   canRedo,
   undo,
@@ -40,6 +41,7 @@ const {
   shiftSelected,
   groupSelected,
   ungroupSelected,
+  flipSelected,
   copySelection,
   paste,
   loadComposition,
@@ -49,24 +51,46 @@ const {
 // The server renders the default preset; hold the editor back until the draft is in,
 // so the canvas never flashes a composition that is about to be replaced
 const ready = ref(false)
-const previewOpen = ref(true)
-const PREVIEW_KEY = 'lab-preview-open'
+
+/** An open/closed flag remembered across visits, restored once the page is mounted. */
+function usePersistedOpen(key: string) {
+  const open = ref(true)
+  onMounted(() => {
+    try {
+      open.value = localStorage.getItem(key) !== '0'
+    }
+    catch {}
+  })
+  watch(open, (value) => {
+    try {
+      localStorage.setItem(key, value ? '1' : '0')
+    }
+    catch {}
+  })
+  return open
+}
+
+const previewOpen = usePersistedOpen('lab-preview-open')
+const layersOpen = usePersistedOpen('lab-layers-open')
+const inspectorOpen = usePersistedOpen('lab-inspector-open')
+
+// Side panels only fold where they sit beside the canvas; stacked on phones they stay put
+const isDesktop = useMediaQuery('(min-width: 1024px)')
+
+// Restored panel states apply instantly; only a toggle afterwards slides
+const panelsAnimated = ref(false)
 
 onMounted(() => {
   restoreDraft()
-  try {
-    previewOpen.value = localStorage.getItem(PREVIEW_KEY) !== '0'
-  }
-  catch {}
   ready.value = true
+  requestAnimationFrame(() => (panelsAnimated.value = true))
 })
 
-watch(previewOpen, (open) => {
-  try {
-    localStorage.setItem(PREVIEW_KEY, open ? '1' : '0')
-  }
-  catch {}
-})
+function togglePanels() {
+  const open = !layersOpen.value && !inspectorOpen.value
+  layersOpen.value = open
+  inspectorOpen.value = open
+}
 
 const THEME_OPTIONS = [
   { value: 'dark', label: 'Dark', icon: 'lucide:moon' },
@@ -242,26 +266,29 @@ const SHORTCUTS: Shortcut[] = [
         updateNode(item.node.id, { x: item.node.x + dx * step, y: item.node.y + dy * step })
     },
   },
+  { keys: ['⇧', 'H'], label: 'Flip horizontal', combos: [{ key: 'h', mod: false, shift: true }], needsSelection: true, run: () => flipSelected('x') },
+  { keys: ['⇧', 'V'], label: 'Flip vertical', combos: [{ key: 'v', mod: false, shift: true }], needsSelection: true, run: () => flipSelected('y') },
   {
     keys: ['R'],
     label: 'Shuffle seed',
-    combos: [{ key: 'r', mod: false }],
+    combos: [{ key: 'r', mod: false, shift: false }],
     needsSelection: true,
     when: () => !!selectedNode.value && !isGroup(selectedNode.value),
     keepDefault: true,
     run: () => updateNode(selectedNode.value!.id, { seed: Math.floor(Math.random() * 1000) }),
   },
   {
-    keys: ['⇧', 'H'],
+    keys: ['⇧', '⌘', 'H'],
     label: 'Hide or show',
-    combos: [{ key: 'h', mod: false, shift: true }],
+    combos: [{ key: 'h', mod: true, shift: true }],
     needsSelection: true,
-    keepDefault: true,
     run: () => {
       for (const item of topSelection.value)
         updateNode(item.node.id, { visible: !item.node.visible })
     },
   },
+  { keys: ['⌘', '\\'], label: 'Show or hide panels', combos: [{ key: '\\', mod: true }], when: () => isDesktop.value, run: togglePanels },
+  { keys: ['⇧', 'R'], label: 'Rulers and guides', combos: [{ key: 'r', mod: false, shift: true }], keepDefault: true, run: () => (rulersVisible.value = !rulersVisible.value) },
   {
     keys: ['↵'],
     label: 'Select group’s children',
@@ -312,7 +339,8 @@ const GESTURES = [
   { keys: ['⇧'], label: 'Click to add to the selection; drag on one axis' },
   { keys: ['⌘'], label: 'Click to reach a layer inside a group' },
   { keys: ['Double'], label: 'Click to enter a group' },
-  { keys: ['⌥'], label: 'Drag without smart guides' },
+  { keys: ['⌥'], label: 'Hold to measure distances; drag without snapping' },
+  { keys: ['Ruler'], label: 'Drag out a guide, drop it back to remove (⇧ for tens)' },
 ]
 </script>
 
@@ -341,6 +369,41 @@ const GESTURES = [
         <button type="button" class="lab-toolbar-button" :disabled="!canRedo" aria-label="Redo" title="Redo (⇧⌘Z)" @click="redo">
           <Icon name="lucide:redo-2" class="size-3.5" aria-hidden="true" />
         </button>
+
+        <button
+          type="button"
+          class="lab-toolbar-button"
+          :class="{ 'bg-neutral-100 dark:bg-neutral-800': rulersVisible }"
+          :aria-pressed="rulersVisible"
+          aria-label="Rulers and guides"
+          title="Rulers and guides (⇧R)"
+          @click="rulersVisible = !rulersVisible"
+        >
+          <Icon name="lucide:ruler" class="size-3.5" aria-hidden="true" />
+        </button>
+
+        <span class="hidden items-center lg:flex">
+          <button
+            type="button"
+            class="lab-toolbar-button"
+            :aria-pressed="layersOpen"
+            aria-label="Layers panel"
+            :title="`${layersOpen ? 'Hide' : 'Show'} layers (⌘\\ for both panels)`"
+            @click="layersOpen = !layersOpen"
+          >
+            <Icon :name="layersOpen ? 'lucide:panel-left-close' : 'lucide:panel-left-open'" class="size-3.5" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            class="lab-toolbar-button"
+            :aria-pressed="inspectorOpen"
+            aria-label="Inspector panel"
+            :title="`${inspectorOpen ? 'Hide' : 'Show'} inspector (⌘\\ for both panels)`"
+            @click="inspectorOpen = !inspectorOpen"
+          >
+            <Icon :name="inspectorOpen ? 'lucide:panel-right-close' : 'lucide:panel-right-open'" class="size-3.5" aria-hidden="true" />
+          </button>
+        </span>
 
         <UPopover :content="{ ...POPOVER_CONTENT, align: 'start' }" :ui="POPOVER_UI">
           <button type="button" class="lab-toolbar-button data-[state=open]:bg-neutral-100 dark:data-[state=open]:bg-neutral-800" aria-label="Keyboard shortcuts" title="Shortcuts">
@@ -436,9 +499,14 @@ const GESTURES = [
       </div>
     </header>
 
-    <div class="lab-body" :class="{ 'is-ready': ready }">
-      <aside class="lab-panel [grid-area:layers] lg:border-r">
-        <LabLayers />
+    <div
+      class="lab-body"
+      :class="{ 'is-ready': ready, 'is-animated': panelsAnimated, 'layers-closed': !layersOpen, 'inspector-closed': !inspectorOpen }"
+    >
+      <aside class="lab-panel lab-panel-layers [grid-area:layers]" :class="{ 'is-closed': !layersOpen }" :inert="isDesktop && !layersOpen">
+        <div class="lab-panel-inner">
+          <LabLayers />
+        </div>
       </aside>
 
       <main class="[grid-area:canvas] min-h-0 flex flex-col bg-neutral-50 dark:bg-neutral-950/40">
@@ -465,8 +533,10 @@ const GESTURES = [
         </section>
       </main>
 
-      <aside class="lab-panel [grid-area:inspector] lg:border-l">
-        <LabInspector />
+      <aside class="lab-panel lab-panel-inspector [grid-area:inspector]" :class="{ 'is-closed': !inspectorOpen }" :inert="isDesktop && !inspectorOpen">
+        <div class="lab-panel-inner">
+          <LabInspector />
+        </div>
       </aside>
     </div>
   </div>
@@ -499,31 +569,82 @@ const GESTURES = [
 
 @media (min-width: 1024px) {
   .lab-body {
-    grid-template-columns: 13rem minmax(0, 1fr) 16rem;
+    --layers-width: 13rem;
+    --inspector-width: 16rem;
+    --layers-track: var(--layers-width);
+    --inspector-track: var(--inspector-width);
+    grid-template-columns: var(--layers-track) minmax(0, 1fr) var(--inspector-track);
     grid-template-rows: minmax(0, 1fr);
     grid-template-areas: 'layers canvas inspector';
+  }
+
+  /* Tracks interpolate, so the canvas widens with the panel and refits as it goes */
+  .lab-body.is-animated {
+    transition:
+      opacity 300ms var(--ease-out),
+      grid-template-columns 220ms var(--ease-out);
+  }
+
+  .lab-body.layers-closed {
+    --layers-track: 0px;
+  }
+
+  .lab-body.inspector-closed {
+    --inspector-track: 0px;
   }
 }
 
 @media (min-width: 1440px) {
   .lab-body {
-    grid-template-columns: 15rem minmax(0, 1fr) 18rem;
+    --layers-width: 15rem;
+    --inspector-width: 18rem;
   }
 }
 
-.lab-panel {
+.lab-panel-inner {
   padding: 0.75rem;
-  border-color: #e5e5e5;
-}
-
-.dark .lab-panel {
-  border-color: #262626;
 }
 
 @media (min-width: 1024px) {
   .lab-panel {
+    display: flex;
     min-height: 0;
+    overflow-x: hidden;
     overflow-y: auto;
+    /* An inset line, not a border: it shrinks away with the track instead of leaving a 1px sliver */
+    --panel-line: #e5e5e5;
+  }
+
+  .dark .lab-panel {
+    --panel-line: #262626;
+  }
+
+  /* The content keeps its width while the track shrinks, so it slides out instead of reflowing */
+  .lab-panel-inner {
+    flex-shrink: 0;
+  }
+
+  .lab-panel-layers {
+    justify-content: flex-end;
+    box-shadow: inset -1px 0 0 var(--panel-line);
+  }
+
+  .lab-panel-layers .lab-panel-inner {
+    width: var(--layers-width);
+  }
+
+  .lab-panel-inspector {
+    box-shadow: inset 1px 0 0 var(--panel-line);
+  }
+
+  .lab-panel-inspector .lab-panel-inner {
+    width: var(--inspector-width);
+  }
+
+  /* Hidden once folded, after the slide, so nothing lingers for the pointer or the scrollbar */
+  .lab-panel.is-closed {
+    visibility: hidden;
+    transition: visibility 0s 220ms;
   }
 }
 
@@ -668,6 +789,10 @@ const GESTURES = [
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .lab-body.is-animated {
+    transition: opacity 300ms var(--ease-out);
+  }
+
   .lab-chevron,
   .lab-collapse {
     transition: none;

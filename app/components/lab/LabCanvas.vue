@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { ArtNode } from '~/art/art'
 import type { Matrix, Point } from '~/art/geometry'
-import type { NodeEntry } from '~/composables/useLabEditor'
-import { useElementSize } from '@vueuse/core'
+import type { Bounds, Measure, SnapLine, SnapTarget } from '~/art/snap'
+import type { Guide, NodeEntry } from '~/composables/useLabEditor'
+import { useElementBounding, useElementSize, useEventListener } from '@vueuse/core'
 import { ART_HEIGHT, ART_WIDTH, isGroup } from '~/art/art'
-import { apply, applyVector, IDENTITY, invert, matrixRotation, multiply, nodeMatrix } from '~/art/geometry'
+import { apply, applyVector, IDENTITY, invert, isMirrored, matrixRotation, multiply, nodeMatrix } from '~/art/geometry'
+import { alignments, boundsOf, boxTargets, measure as measureBetween, offsetBounds, snapOffset, unionBounds } from '~/art/snap'
 
 interface Box {
   x: number
@@ -22,30 +24,71 @@ interface MoveTarget {
 }
 
 type Drag
-  = | { mode: 'move', start: Point, targets: MoveTarget[], moved: boolean }
-    | { mode: 'rotate', id: string, center: Point, startAngle: number, startRotation: number }
+  = | { mode: 'move', start: Point, targets: MoveTarget[], moved: boolean, bounds: Bounds | null, snaps: { x: SnapTarget[], y: SnapTarget[] } }
+    | { mode: 'rotate', id: string, center: Point, startAngle: number, startRotation: number, direction: 1 | -1 }
     | { mode: 'scale', id: string, center: Point, startDistance: number, startScale: number }
     | { mode: 'marquee', start: Point, current: Point, additive: boolean, initial: string[] }
 
-const { composition, entries, entry, selectedIds, selectedNode, primaryId, topSelection, hoveredId, canvasTheme, select, selectMany, updateNode, commit } = injectLabEditor()
+const {
+  composition,
+  entries,
+  entry,
+  selectedIds,
+  selectedNode,
+  primaryId,
+  topSelection,
+  hoveredId,
+  canvasTheme,
+  rulersVisible,
+  guides,
+  addGuide,
+  moveGuide,
+  removeGuide,
+  clearGuides,
+  select,
+  selectMany,
+  updateNode,
+  commit,
+} = injectLabEditor()
 
 const SELECTION = '#4f7cff'
 const GUIDE = '#f43f5e'
+/** Must match LabRuler's size and the stage padding below. */
+const RULER_PX = 20
+/** Alignment crosses, half their size, in screen pixels. */
+const MARK_PX = 2.5
 /** Screen-pixel sizes, converted to frame units so the chrome never scales with the canvas. */
 const HANDLE_PX = 7
 const ROTATE_OFFSET_PX = 20
 const SNAP_PX = 5
 const HIT_PADDING_PX = 6
 
+const root = useTemplateRef<HTMLElement>('root')
 const stage = useTemplateRef<HTMLElement>('stage')
 const { width: stageWidth } = useElementSize(stage)
 const unit = computed(() => ART_WIDTH / Math.max(stageWidth.value, 1))
 
+// Where the frame sits in the stage, for the rulers and guides drawn around it
+const rootBox = useElementBounding(root)
+const frameBox = useElementBounding(stage)
+// The frame can move without resizing (the preview panel opening below it): follow the stage
+watch([rootBox.width, rootBox.height, rulersVisible], () => nextTick(frameBox.update))
+
+const frameOffset = computed(() => ({ left: frameBox.left.value - rootBox.left.value, top: frameBox.top.value - rootBox.top.value }))
+/** Screen pixels per frame unit. */
+const ppu = computed(() => 1 / unit.value)
+/** Before the first measure, every position would collapse onto the frame origin. */
+const measured = computed(() => stageWidth.value > 0 && frameBox.width.value > 0)
+
 // Interaction state, read by the chrome below
 const drag = shallowRef<Drag | null>(null)
-const guides = shallowRef<{ x: number | null, y: number | null }>({ x: null, y: null })
 const hud = shallowRef<{ left: number, top: number, text: string } | null>(null)
 const hoverCursor = ref('default')
+const snapLines = shallowRef<SnapLine[]>([])
+const litGuides = shallowRef<Set<string>>(new Set())
+/** The pointer in frame units, anywhere over the stage: the rulers mark it. */
+const pointer = shallowRef<Point | null>(null)
+const altHeld = ref(false)
 
 // Local bounding boxes, measured from the rendered groups (strokes excluded)
 const boxes = shallowRef<Record<string, Box>>({})
@@ -148,6 +191,47 @@ const selectionOutlines = computed(() => selectedIds.value
   .map(id => ({ id, points: outline(id) }))
   .filter((item): item is { id: string, points: Point[] } => !!item.points))
 
+function frameBounds(id: string): Bounds | null {
+  const points = outline(id)
+  return points ? boundsOf(points) : null
+}
+
+const FRAME_BOUNDS: Bounds = { minX: 0, minY: 0, maxX: ART_WIDTH, maxY: ART_HEIGHT }
+
+/** The whole selection as one box, in frame units: what the rulers and ⌥ measure. */
+const selectionBounds = computed(() => unionBounds(selectionOutlines.value.map(item => boundsOf(item.points))))
+
+/**
+ * What a moving selection can align with: the frame (edges, middle, thirds), every other
+ * visible node's edges and middle, and the ruler guides. Collected once per drag.
+ */
+function snapTargets(moving: Set<string>) {
+  const x: SnapTarget[] = [ART_WIDTH / 3, ART_WIDTH * 2 / 3].map(value => ({ value, from: 0, to: ART_HEIGHT }))
+  const y: SnapTarget[] = [ART_HEIGHT / 3, ART_HEIGHT * 2 / 3].map(value => ({ value, from: 0, to: ART_WIDTH }))
+  x.push(...boxTargets(FRAME_BOUNDS, 'x'))
+  y.push(...boxTargets(FRAME_BOUNDS, 'y'))
+  for (const item of entries.value.values()) {
+    // Not what moves, not what contains it (its box moves along), not what it contains
+    const related = moving.has(item.node.id)
+      || item.ancestors.some(ancestor => moving.has(ancestor.id))
+      || [...moving].some(id => entry(id)?.ancestors.some(ancestor => ancestor.id === item.node.id))
+    if (related || !isShown(item))
+      continue
+    const bounds = frameBounds(item.node.id)
+    if (!bounds)
+      continue
+    x.push(...boxTargets(bounds, 'x'))
+    y.push(...boxTargets(bounds, 'y'))
+  }
+  if (rulersVisible.value) {
+    for (const guide of guides.value) {
+      const target = { value: guide.value, from: -Infinity, to: Infinity, guideId: guide.id }
+      ;(guide.axis === 'x' ? x : y).push(target)
+    }
+  }
+  return { x, y }
+}
+
 const hoverOutline = computed(() => {
   const id = hoveredId.value
   if (!id || selectedIds.value.includes(id) || drag.value)
@@ -166,9 +250,11 @@ const handles = computed(() => {
   const corners = outline(node.id)!
   const topCenter = apply(world, [box.x + box.width / 2, box.y])
   const rotation = matrixRotation(world)
-  const angle = rotation * Math.PI / 180
+  // Along the node's own "up", which a vertical flip turns into down: the handle follows its top edge
+  const [ux, uy] = applyVector(world, [0, -1])
+  const length = Math.hypot(ux, uy) || 1
   const offset = ROTATE_OFFSET_PX * unit.value
-  const rotateHandle: Point = [topCenter[0] + Math.sin(angle) * offset, topCenter[1] - Math.cos(angle) * offset]
+  const rotateHandle: Point = [topCenter[0] + ux / length * offset, topCenter[1] + uy / length * offset]
   return { corners, topCenter, rotateHandle, rotation }
 })
 
@@ -183,6 +269,154 @@ const marquee = computed(() => {
     height: Math.abs(current.current[1] - current.start[1]),
   }
 })
+
+// ⌥ with a selection: distances to the layer under the pointer, or to the frame edges
+
+useEventListener('keydown', (event: KeyboardEvent) => (altHeld.value = event.altKey))
+useEventListener('keyup', (event: KeyboardEvent) => (altHeld.value = event.altKey))
+// Released outside the window (⌥-tab), the keyup never comes
+useEventListener('blur', () => (altHeld.value = false))
+
+const measureTarget = computed(() => {
+  const id = hoveredId.value
+  if (id && !selectedIds.value.includes(id))
+    return { id, bounds: frameBounds(id) }
+  return { id: null, bounds: FRAME_BOUNDS }
+})
+
+const measurement = computed(() => {
+  const bounds = selectionBounds.value
+  const target = measureTarget.value.bounds
+  if (!altHeld.value || drag.value || !bounds || !target)
+    return null
+  const segments = measureBetween(bounds, target).map(item => ({ ...item, label: formatDistance(item.to - item.from) }))
+  return { segments, outline: measureTarget.value.id ? outline(measureTarget.value.id) : null }
+})
+
+function formatDistance(value: number) {
+  return String(Math.round(value * 10) / 10)
+}
+
+/** Segment endpoints, for the SVG line. */
+function segmentPoints(item: Measure) {
+  return item.axis === 'x'
+    ? { x1: item.from, x2: item.to, y1: item.at, y2: item.at }
+    : { x1: item.at, x2: item.at, y1: item.from, y2: item.to }
+}
+
+/** Where a segment's label sits, in screen pixels inside the frame. */
+function labelPosition(item: Measure) {
+  const middle = (item.from + item.to) / 2
+  const [fx, fy] = item.axis === 'x' ? [middle, item.at] : [item.at, middle]
+  return { left: `${fx * ppu.value}px`, top: `${fy * ppu.value}px` }
+}
+
+/** Crosses on every point an alignment passes through. */
+function snapMarks(line: SnapLine) {
+  const size = MARK_PX * unit.value
+  let d = ''
+  for (const mark of new Set(line.marks.map(value => Math.round(value * 100) / 100))) {
+    const [x, y] = line.axis === 'x' ? [line.value, mark] : [mark, line.value]
+    d += `M${x - size} ${y - size}L${x + size} ${y + size}M${x - size} ${y + size}L${x + size} ${y - size}`
+  }
+  return d
+}
+
+// Rulers and guides
+
+/** Ruler lengths and where frame 0 falls on each, measured from the ruler's own start. */
+const rulerLayout = computed(() => ({
+  width: Math.max(0, rootBox.width.value - RULER_PX),
+  height: Math.max(0, rootBox.height.value - RULER_PX),
+  left: frameOffset.value.left - RULER_PX,
+  top: frameOffset.value.top - RULER_PX,
+}))
+
+const rulerSelection = computed(() => {
+  const bounds = selectionBounds.value
+  return bounds ? { x: [bounds.minX, bounds.maxX] as [number, number], y: [bounds.minY, bounds.maxY] as [number, number] } : null
+})
+
+interface GuideDrag { id: string, axis: Guide['axis'] }
+const guideDrag = shallowRef<GuideDrag | null>(null)
+/** While a dragged guide is over its ruler, letting go removes it. */
+const guideRemoving = ref(false)
+
+/**
+ * Screen position of a guide inside the stage. Not rounded: the SVG strokes it lines up with
+ * sit on fractional pixels too, and a guide snapped to the pixel grid would visibly miss them.
+ * The 1px line is centered on the value, like an SVG stroke, hence the half pixel.
+ */
+function guideStyle(guide: Guide) {
+  return guide.axis === 'x'
+    ? { transform: `translateX(${frameOffset.value.left + guide.value * ppu.value - 0.5}px)` }
+    : { transform: `translateY(${frameOffset.value.top + guide.value * ppu.value - 0.5}px)` }
+}
+
+function guideValue(event: PointerEvent, axis: Guide['axis']) {
+  const raw = axis === 'x'
+    ? (event.clientX - frameBox.left.value) / ppu.value
+    : (event.clientY - frameBox.top.value) / ppu.value
+  // Whole units, or tens with ⇧: guides are for round numbers
+  const step = event.shiftKey ? 10 : 1
+  return Math.round(raw / step) * step
+}
+
+function overOwnRuler(event: PointerEvent, axis: Guide['axis']) {
+  // Vertical guides come from the left ruler, horizontal ones from the top ruler
+  return axis === 'x'
+    ? event.clientX - rootBox.left.value < RULER_PX
+    : event.clientY - rootBox.top.value < RULER_PX
+}
+
+/** Dragging out of a ruler pulls a new guide; its orientation follows the ruler's. */
+function onRulerPointerDown(event: PointerEvent, axis: Guide['axis']) {
+  if (event.button !== 0)
+    return
+  const id = addGuide(axis, guideValue(event, axis))
+  startGuideDrag(event, { id, axis })
+}
+
+function onGuidePointerDown(event: PointerEvent, guide: Guide) {
+  if (event.button !== 0)
+    return
+  startGuideDrag(event, { id: guide.id, axis: guide.axis })
+}
+
+function startGuideDrag(event: PointerEvent, next: GuideDrag) {
+  guideDrag.value = next
+  guideRemoving.value = overOwnRuler(event, next.axis)
+  ;(event.currentTarget as Element).setPointerCapture(event.pointerId)
+  event.preventDefault()
+  event.stopPropagation()
+}
+
+function onGuidePointerMove(event: PointerEvent) {
+  const current = guideDrag.value
+  if (!current)
+    return
+  const value = guideValue(event, current.axis)
+  moveGuide(current.id, value)
+  guideRemoving.value = overOwnRuler(event, current.axis)
+  showHud(event, guideRemoving.value ? 'Remove guide' : `${current.axis.toUpperCase()} ${value}`)
+}
+
+function onGuidePointerUp(event: PointerEvent) {
+  const current = guideDrag.value
+  if (!current)
+    return
+  if (overOwnRuler(event, current.axis))
+    removeGuide(current.id)
+  guideDrag.value = null
+  guideRemoving.value = false
+  hud.value = null
+}
+
+function onStagePointerMove(event: PointerEvent) {
+  if (!frameBox.width.value)
+    return
+  pointer.value = [(event.clientX - frameBox.left.value) / ppu.value, (event.clientY - frameBox.top.value) / ppu.value]
+}
 
 // Pointer handling: one set of handlers on the frame, dispatching on what was pressed
 
@@ -218,8 +452,10 @@ function onPointerDown(event: PointerEvent) {
 
   if (handle && node) {
     const center = originInFrame(node.id)
+    // Under a mirrored group, the node's angle runs the other way from the pointer's
+    const direction = isMirrored(worlds.value.get(node.id)!.parent) ? -1 : 1
     drag.value = handle === 'rotate'
-      ? { mode: 'rotate', id: node.id, center, startAngle: Math.atan2(point[1] - center[1], point[0] - center[0]), startRotation: node.rotation }
+      ? { mode: 'rotate', id: node.id, center, startAngle: Math.atan2(point[1] - center[1], point[0] - center[0]), startRotation: node.rotation, direction }
       : { mode: 'scale', id: node.id, center, startDistance: Math.max(Math.hypot(point[0] - center[0], point[1] - center[1]), 0.001), startScale: node.scale }
   }
   else {
@@ -234,7 +470,10 @@ function onPointerDown(event: PointerEvent) {
       // Pressing a node that is part of a multi-selection drags the whole selection
       else if (!selectedIds.value.includes(id))
         select(id)
-      drag.value = { mode: 'move', start: point, targets: moveTargets(), moved: false }
+      const targets = moveTargets()
+      const moving = new Set(targets.map(target => target.id))
+      const bounds = unionBounds(targets.map(target => frameBounds(target.id)).filter((item): item is Bounds => !!item))
+      drag.value = { mode: 'move', start: point, targets, moved: false, bounds, snaps: snapTargets(moving) }
     }
   }
 
@@ -243,13 +482,13 @@ function onPointerDown(event: PointerEvent) {
   event.preventDefault()
 }
 
-function snap(value: number, candidates: number[], threshold: number) {
-  let best: number | null = null
-  for (const candidate of candidates) {
-    if (Math.abs(candidate - value) <= threshold && (best === null || Math.abs(candidate - value) < Math.abs(best - value)))
-      best = candidate
-  }
-  return best
+function tenth(value: number) {
+  return Math.round(value * 10) / 10
+}
+
+// Four decimals: exact on screen, without float noise (271.99999…) in the JSON
+function tidy(value: number) {
+  return Math.round(value * 10000) / 10000
 }
 
 function onPointerMove(event: PointerEvent) {
@@ -288,45 +527,56 @@ function onPointerMove(event: PointerEvent) {
     if (!current.moved && Math.hypot(dx, dy) < 3 * unit.value)
       return
     current.moved = true
-    if (event.shiftKey) {
-      if (Math.abs(dx) > Math.abs(dy))
-        dy = 0
-      else dx = 0
-    }
+    // ⇧ locks the drag to one axis, which then neither moves nor snaps
+    const lock = event.shiftKey ? (Math.abs(dx) > Math.abs(dy) ? 'y' : 'x') : null
+    if (lock === 'y')
+      dy = 0
+    if (lock === 'x')
+      dx = 0
 
-    let guideX: number | null = null
-    let guideY: number | null = null
-    const lead = current.targets[0]
-    if (lead && !event.altKey) {
-      // Smart guides on the lead node: frame center and thirds, and other root nodes' centers
-      const [ox, oy] = apply(lead.toFrame, [lead.startX, lead.startY])
-      const moving = new Set(current.targets.map(target => target.id))
-      const others = composition.value.layers.filter(node => !moving.has(node.id) && node.visible)
+    const lines: SnapLine[] = []
+    const lit = new Set<string>()
+    let snappedX = false
+    let snappedY = false
+    if (current.bounds && !event.altKey) {
+      // Magnetic edges: the selection's sides and middle pull onto anything within a few pixels
       const threshold = SNAP_PX * unit.value
-      guideX = snap(ox + dx, [ART_WIDTH / 2, ART_WIDTH / 3, ART_WIDTH * 2 / 3, ...others.map(node => node.x)], threshold)
-      guideY = snap(oy + dy, [ART_HEIGHT / 2, ART_HEIGHT / 3, ART_HEIGHT * 2 / 3, ...others.map(node => node.y)], threshold)
-      if (guideX !== null)
-        dx = guideX - ox
-      if (guideY !== null)
-        dy = guideY - oy
+      const moved = offsetBounds(current.bounds, dx, dy)
+      const offsetX = lock === 'x' ? null : snapOffset(moved, 'x', current.snaps.x, threshold)
+      const offsetY = lock === 'y' ? null : snapOffset(moved, 'y', current.snaps.y, threshold)
+      dx += offsetX ?? 0
+      dy += offsetY ?? 0
+      snappedX = offsetX !== null
+      snappedY = offsetY !== null
+      const placed = offsetBounds(current.bounds, dx, dy)
+      for (const [axis, offset] of [['x', offsetX], ['y', offsetY]] as const) {
+        if (offset === null)
+          continue
+        const found = alignments(placed, axis, current.snaps[axis])
+        lines.push(...found.lines)
+        found.guideIds.forEach(id => lit.add(id))
+      }
     }
-    guides.value = { x: guideX, y: guideY }
+    snapLines.value = lines
+    litGuides.value = lit
 
+    // Tenths while free, so values stay tidy; exact once snapped, or the snap would miss by a hair
+    const roundX = snappedX ? tidy : tenth
+    const roundY = snappedY ? tidy : tenth
     for (const target of current.targets) {
       // The frame delta, expressed in the node's own parent space
       const [lx, ly] = applyVector(target.toLocal, [dx, dy])
-      updateNode(target.id, { x: Math.round((target.startX + lx) * 10) / 10, y: Math.round((target.startY + ly) * 10) / 10 })
+      updateNode(target.id, { x: roundX(target.startX + lx), y: roundY(target.startY + ly) })
     }
-    if (lead) {
-      const [fx, fy] = apply(lead.toFrame, [lead.startX, lead.startY])
-      showHud(event, `${Math.round(fx + dx)}, ${Math.round(fy + dy)}`)
-    }
+    // The selection's top-left corner, like the rulers: the position you'd type in a design tool
+    if (current.bounds)
+      showHud(event, `${Math.round(current.bounds.minX + dx)}, ${Math.round(current.bounds.minY + dy)}`)
     return
   }
 
   if (current.mode === 'rotate') {
     const angle = Math.atan2(point[1] - current.center[1], point[0] - current.center[0])
-    let rotation = current.startRotation + (angle - current.startAngle) * 180 / Math.PI
+    let rotation = current.startRotation + current.direction * (angle - current.startAngle) * 180 / Math.PI
     rotation = ((rotation + 540) % 360) - 180
     if (event.shiftKey) {
       rotation = Math.round(rotation / 15) * 15
@@ -358,7 +608,8 @@ function onPointerUp() {
   if (current && current.mode !== 'marquee' && (current.mode !== 'move' || current.moved))
     commit()
   drag.value = null
-  guides.value = { x: null, y: null }
+  snapLines.value = []
+  litGuides.value = new Set()
   hud.value = null
 }
 
@@ -379,6 +630,11 @@ function onPointerLeave() {
     hoveredId.value = null
 }
 
+function onStagePointerLeave() {
+  if (!drag.value && !guideDrag.value)
+    pointer.value = null
+}
+
 const cursor = computed(() => {
   const mode = drag.value?.mode
   if (mode === 'rotate')
@@ -392,11 +648,27 @@ const cursor = computed(() => {
   return hoverCursor.value
 })
 
+const rootCursor = computed(() => {
+  const current = guideDrag.value
+  if (!current)
+    return undefined
+  if (guideRemoving.value)
+    return 'default'
+  return current.axis === 'x' ? 'ew-resize' : 'ns-resize'
+})
+
 const CORNER_HANDLES = ['nw', 'ne', 'se', 'sw'] as const
 </script>
 
 <template>
-  <div class="lab-stage relative flex items-center justify-center overflow-hidden">
+  <div
+    ref="root"
+    class="lab-stage relative flex items-center justify-center overflow-hidden"
+    :class="{ 'has-rulers': rulersVisible }"
+    :style="{ cursor: rootCursor }"
+    @pointermove="onStagePointerMove"
+    @pointerleave="onStagePointerLeave"
+  >
     <div
       ref="stage"
       class="lab-frame relative"
@@ -411,8 +683,11 @@ const CORNER_HANDLES = ['nw', 'ne', 'se', 'sw'] as const
       <PubArt :composition="composition" :theme="canvasTheme" class="aspect-[2/1] w-full overflow-visible">
         <!-- Editor chrome: drawn in frame units, sized in screen pixels -->
         <g class="pointer-events-none" fill="none">
-          <line v-if="guides.x !== null" :x1="guides.x" :x2="guides.x" y1="0" :y2="ART_HEIGHT" :stroke="GUIDE" stroke-width="1" vector-effect="non-scaling-stroke" />
-          <line v-if="guides.y !== null" :y1="guides.y" :y2="guides.y" x1="0" :x2="ART_WIDTH" :stroke="GUIDE" stroke-width="1" vector-effect="non-scaling-stroke" />
+          <!-- Smart guides: one line per alignment, a cross on everything it lines up -->
+          <g v-for="line in snapLines" :key="`${line.axis}-${line.value}`" :stroke="GUIDE" stroke-width="1">
+            <line v-bind="line.axis === 'x' ? { x1: line.value, x2: line.value, y1: line.from, y2: line.to } : { y1: line.value, y2: line.value, x1: line.from, x2: line.to }" vector-effect="non-scaling-stroke" />
+            <path :d="snapMarks(line)" vector-effect="non-scaling-stroke" />
+          </g>
           <polygon v-if="hoverOutline" :points="polygon(hoverOutline)" :stroke="SELECTION" stroke-width="1" vector-effect="non-scaling-stroke" />
           <polygon
             v-for="item in selectionOutlines"
@@ -431,6 +706,21 @@ const CORNER_HANDLES = ['nw', 'ne', 'se', 'sw'] as const
             stroke-width="1"
             vector-effect="non-scaling-stroke"
           />
+          <!-- ⌥ measuring: the target, and the distances to it -->
+          <g v-if="measurement" :stroke="GUIDE" stroke-width="1">
+            <polygon v-if="measurement.outline" :points="polygon(measurement.outline)" vector-effect="non-scaling-stroke" />
+            <template v-for="(item, index) in measurement.segments" :key="index">
+              <line v-bind="segmentPoints(item)" vector-effect="non-scaling-stroke" />
+              <line
+                v-if="item.extension"
+                v-bind="item.axis === 'x'
+                  ? { x1: item.extension.value, x2: item.extension.value, y1: item.extension.from, y2: item.extension.to }
+                  : { y1: item.extension.value, y2: item.extension.value, x1: item.extension.from, x2: item.extension.to }"
+                stroke-dasharray="2 2"
+                vector-effect="non-scaling-stroke"
+              />
+            </template>
+          </g>
         </g>
         <g v-if="handles && drag?.mode !== 'move'">
           <line
@@ -492,14 +782,95 @@ const CORNER_HANDLES = ['nw', 'ne', 'se', 'sw'] as const
         <span class="text-xs">Add a layer or start from a preset.</span>
       </div>
 
+      <template v-if="measurement">
+        <span
+          v-for="(item, index) in measurement.segments"
+          :key="index"
+          class="lab-measure-label"
+          :style="labelPosition(item)"
+        >
+          {{ item.label }}
+        </span>
+      </template>
+
       <div
         v-if="hud"
-        class="tabular-nums pointer-events-none absolute z-10 whitespace-nowrap bg-neutral-900 px-1.5 py-0.5 text-[11px] text-white dark:bg-white dark:text-neutral-900"
+        class="tabular-nums pointer-events-none absolute z-30 whitespace-nowrap bg-neutral-900 px-1.5 py-0.5 text-[11px] text-white dark:bg-white dark:text-neutral-900"
         :style="{ left: `${hud.left}px`, top: `${hud.top}px` }"
       >
         {{ hud.text }}
       </div>
     </div>
+
+    <template v-if="rulersVisible && measured">
+      <!-- Guides span the whole stage, like the rulers they come from -->
+      <div class="pointer-events-none absolute inset-0 z-10" aria-hidden="true">
+        <div
+          v-for="guide in guides"
+          :key="guide.id"
+          class="lab-guide"
+          :class="[`is-${guide.axis}`, {
+            'is-lit': litGuides.has(guide.id) || guideDrag?.id === guide.id,
+            'is-removing': guideRemoving && guideDrag?.id === guide.id,
+          }]"
+          :style="guideStyle(guide)"
+          @pointerdown="onGuidePointerDown($event, guide)"
+          @pointermove="onGuidePointerMove"
+          @pointerup="onGuidePointerUp"
+          @pointercancel="onGuidePointerUp"
+        />
+      </div>
+
+      <!-- Dragging out of the top ruler pulls a horizontal guide, out of the left one a vertical guide -->
+      <div
+        class="lab-ruler-track is-x"
+        @pointerdown="onRulerPointerDown($event, 'y')"
+        @pointermove="onGuidePointerMove"
+        @pointerup="onGuidePointerUp"
+        @pointercancel="onGuidePointerUp"
+      >
+        <LabRuler
+          axis="x"
+          :length="rulerLayout.width"
+          :origin="rulerLayout.left"
+          :ppu="ppu"
+          :extent="ART_WIDTH"
+          :selection="rulerSelection?.x"
+          :cursor="pointer?.[0] ?? null"
+        />
+      </div>
+      <div
+        class="lab-ruler-track is-y"
+        @pointerdown="onRulerPointerDown($event, 'x')"
+        @pointermove="onGuidePointerMove"
+        @pointerup="onGuidePointerUp"
+        @pointercancel="onGuidePointerUp"
+      >
+        <LabRuler
+          axis="y"
+          :length="rulerLayout.height"
+          :origin="rulerLayout.top"
+          :ppu="ppu"
+          :extent="ART_HEIGHT"
+          :selection="rulerSelection?.y"
+          :cursor="pointer?.[1] ?? null"
+        />
+      </div>
+      <div class="lab-ruler-corner">
+        <Transition name="lab-corner">
+          <button
+            v-if="guides.length"
+            type="button"
+            class="lab-ruler-clear"
+            aria-label="Clear guides"
+            title="Clear guides"
+            @click="clearGuides"
+          >
+            <Icon name="lucide:x" class="size-3" aria-hidden="true" />
+          </button>
+        </Transition>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -507,7 +878,13 @@ const CORNER_HANDLES = ['nw', 'ne', 'se', 'sw'] as const
 /* Room around the frame for handles that overflow it */
 .lab-stage {
   --stage-padding: 2.5rem;
+  --ruler: 20px;
   padding: var(--stage-padding) 1.25rem;
+}
+
+/* The rulers take their strip off the top and left, the frame refits in what is left */
+.lab-stage.has-rulers {
+  padding: calc(var(--stage-padding) + var(--ruler)) 1.25rem var(--stage-padding) calc(1.25rem + var(--ruler));
 }
 
 .lab-frame {
@@ -522,6 +899,10 @@ const CORNER_HANDLES = ['nw', 'ne', 'se', 'sw'] as const
     height: 100%;
     container-type: size;
     padding: 0;
+  }
+
+  .lab-stage.has-rulers {
+    padding: var(--ruler) 0 0 var(--ruler);
   }
 
   .lab-frame {
@@ -542,5 +923,183 @@ const CORNER_HANDLES = ['nw', 'ne', 'se', 'sw'] as const
 
 .dark .lab-frame::after {
   outline-color: rgb(255 255 255 / 0.1);
+}
+
+/* Rulers: pinned to the stage edges, counting in frame units */
+.lab-ruler-track,
+.lab-ruler-corner {
+  position: absolute;
+  z-index: 20;
+}
+
+.lab-ruler-track.is-x {
+  top: 0;
+  left: var(--ruler);
+  right: 0;
+  height: var(--ruler);
+  cursor: row-resize;
+}
+
+.lab-ruler-track.is-y {
+  top: var(--ruler);
+  left: 0;
+  bottom: 0;
+  width: var(--ruler);
+  cursor: col-resize;
+}
+
+.lab-ruler-corner {
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ruler);
+  height: var(--ruler);
+  background: #fff;
+}
+
+.dark .lab-ruler-corner {
+  background: #171717;
+}
+
+/* Hairlines between rulers and stage, drawn over the ruler so they never double up */
+.lab-ruler-track::after,
+.lab-ruler-corner::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  inset: 0;
+  box-shadow: inset -1px -1px 0 #e5e5e5;
+}
+
+.lab-ruler-track.is-x::after {
+  box-shadow: inset 0 -1px 0 #e5e5e5;
+}
+
+.lab-ruler-track.is-y::after {
+  box-shadow: inset -1px 0 0 #e5e5e5;
+}
+
+.dark .lab-ruler-track.is-x::after {
+  box-shadow: inset 0 -1px 0 #262626;
+}
+
+.dark .lab-ruler-track.is-y::after {
+  box-shadow: inset -1px 0 0 #262626;
+}
+
+.dark .lab-ruler-corner::after {
+  box-shadow: inset -1px -1px 0 #262626;
+}
+
+.lab-ruler-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #a3a3a3;
+  cursor: pointer;
+  transition:
+    transform 160ms var(--ease-out),
+    opacity 150ms var(--ease-out);
+}
+
+.lab-ruler-clear:hover {
+  color: #f43f5e;
+}
+
+.lab-ruler-clear:active {
+  transform: scale(0.9);
+}
+
+.lab-ruler-clear:focus-visible {
+  outline: 1px solid #4f7cff;
+  outline-offset: -2px;
+}
+
+.lab-corner-enter-from,
+.lab-corner-leave-to {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.lab-corner-leave-active {
+  transition-duration: 100ms;
+}
+
+/* Guides: a 1px line inside a wider grab strip */
+.lab-guide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: auto;
+}
+
+.lab-guide.is-x {
+  bottom: 0;
+  width: 9px;
+  margin-left: -4px;
+  cursor: ew-resize;
+}
+
+.lab-guide.is-y {
+  right: 0;
+  height: 9px;
+  margin-top: -4px;
+  cursor: ns-resize;
+}
+
+.lab-guide::before {
+  content: '';
+  position: absolute;
+  background: #f43f5e;
+  opacity: 0.5;
+}
+
+.lab-guide.is-x::before {
+  top: 0;
+  bottom: 0;
+  left: 4px;
+  width: 1px;
+}
+
+.lab-guide.is-y::before {
+  left: 0;
+  right: 0;
+  top: 4px;
+  height: 1px;
+}
+
+/* Instant: it answers the pointer, and snapping lights it on every frame of a drag */
+.lab-guide:hover::before,
+.lab-guide.is-lit::before {
+  opacity: 1;
+}
+
+.lab-guide.is-removing::before {
+  opacity: 0.2;
+}
+
+.lab-measure-label {
+  position: absolute;
+  z-index: 20;
+  padding: 0 3px;
+  font-size: 10px;
+  line-height: 14px;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  background: #f43f5e;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-corner-enter-from,
+  .lab-corner-leave-to {
+    transform: none;
+  }
 }
 </style>

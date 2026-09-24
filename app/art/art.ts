@@ -81,6 +81,9 @@ interface ArtNodeBase {
   y: number
   rotation: number
   scale: number
+  /** Mirrors the node around its own center, before rotation: left out means not flipped. */
+  flipX?: boolean
+  flipY?: boolean
   opacity: number
 }
 
@@ -565,8 +568,11 @@ export function drawLayer(layer: ArtLayer): ArtShape[] {
   return definition.draw({ params, rand: createRandom(layer.seed) })
 }
 
-export function nodeTransform(node: Pick<ArtNode, 'x' | 'y' | 'rotation' | 'scale'>) {
-  return `translate(${round(node.x)} ${round(node.y)}) rotate(${round(node.rotation)}) scale(${round(node.scale)})`
+export function nodeTransform(node: Pick<ArtNode, 'x' | 'y' | 'rotation' | 'scale' | 'flipX' | 'flipY'>) {
+  const scale = node.flipX || node.flipY
+    ? `${round(node.flipX ? -node.scale : node.scale)} ${round(node.flipY ? -node.scale : node.scale)}`
+    : round(node.scale)
+  return `translate(${round(node.x)} ${round(node.y)}) rotate(${round(node.rotation)}) scale(${scale})`
 }
 
 // Presets: starting points, and a record of the compositions used on the site

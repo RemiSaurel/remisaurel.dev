@@ -34,12 +34,40 @@ export function applyVector([a, b, c, d]: Matrix, [x, y]: Point): Point {
   return [a * x + c * y, b * x + d * y]
 }
 
-/** translate(x y) rotate(r) scale(s), the transform every node carries. */
-export function nodeMatrix({ x, y, rotation, scale }: { x: number, y: number, rotation: number, scale: number }): Matrix {
+export interface NodeTransform {
+  x: number
+  y: number
+  rotation: number
+  scale: number
+  flipX?: boolean
+  flipY?: boolean
+}
+
+/** translate(x y) rotate(r) scale(±s ±s), the transform every node carries. */
+export function nodeMatrix({ x, y, rotation, scale, flipX, flipY }: NodeTransform): Matrix {
   const angle = rotation * Math.PI / 180
-  const cos = Math.cos(angle) * scale
-  const sin = Math.sin(angle) * scale
-  return [cos, sin, -sin, cos, x, y]
+  const sx = flipX ? -scale : scale
+  const sy = flipY ? -scale : scale
+  return [Math.cos(angle) * sx, Math.sin(angle) * sx, -Math.sin(angle) * sy, Math.cos(angle) * sy, x, y]
+}
+
+/**
+ * Reads a matrix back as a node transform. A mirror can be written with either flip (plus a
+ * half turn), so the flips of `prefer` are kept whenever they still explain the matrix, and
+ * only the horizontal one is toggled when they don't: moving a flipped node keeps its flags.
+ */
+export function decompose([a, b, c, d, e, f]: Matrix, prefer: Pick<NodeTransform, 'flipX' | 'flipY'> = {}): NodeTransform {
+  const mirrored = a * d - b * c < 0
+  const flipY = !!prefer.flipY
+  const flipX = !!prefer.flipX !== (mirrored !== (!!prefer.flipX !== flipY))
+  // The first column is rotate(r)·(±s, 0): undo the horizontal sign to read r
+  const sign = flipX ? -1 : 1
+  return { x: e, y: f, rotation: Math.atan2(b * sign, a * sign) * 180 / Math.PI, scale: Math.hypot(a, b), flipX, flipY }
+}
+
+/** Whether a matrix mirrors what it draws, so angles measured on screen run backwards. */
+export function isMirrored([a, b, c, d]: Matrix) {
+  return a * d - b * c < 0
 }
 
 /** Rotation of a matrix in degrees, for handles that follow nested rotations. */
