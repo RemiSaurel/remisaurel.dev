@@ -15,6 +15,18 @@ export interface Project {
 
 const PROJECTS: Project[] = [
   {
+    title: 'lab',
+    description:
+      'A workbench for composing the generative illustrations used across this site: layers, shaders and colors, all tweakable live.',
+    icon: '🧪',
+    links: {
+      github: 'https://github.com/RemiSaurel/blog',
+      demo: '/lab',
+    },
+    date: 2026,
+    stack: ['nuxt', 'typescript'],
+  },
+  {
     title: 'lycees-france',
     description:
       'A dataset of all the high schools in France, with their location and some other information. The data is collected from the official website of the Ministry of Education.',
