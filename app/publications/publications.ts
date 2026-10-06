@@ -28,6 +28,7 @@ export const publications: Publication[] = [
     authors: ['Denis Ollivier', 'Rémi Saurel', 'Jean-Baptiste Raclet', 'Emmanuel Lescure', 'Julien Broisin', 'Franck Silvestre'],
     subtitle: 'A quantitative analysis during the experimentation of Denis\' PhD.',
     venue: 'ECTEL 2026',
+    url: 'https://link.springer.com/chapter/10.1007/978-3-032-37979-5_32',
     image: '/publications/ectel2026.avif',
     art: { light: '/publications/art/ectel-2026-light.svg', dark: '/publications/art/ectel-2026-dark.svg' },
   },
