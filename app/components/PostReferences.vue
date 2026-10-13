@@ -26,7 +26,7 @@ const sorted = computed(() => [...props.references].sort((a, b) =>
           v-if="ref.url"
           :href="ref.url"
           target="_blank"
-          class="break-all underline decoration-zinc-400 underline-offset-2 transition-colors duration-300 hover:text-blue-600 dark:decoration-zinc-500 dark:hover:text-blue-300"
+          class="break-words underline decoration-zinc-400 underline-offset-2 transition-colors duration-300 hover:text-blue-600 dark:decoration-zinc-500 dark:hover:text-blue-300"
         >{{ ref.url }}</a>
       </li>
     </ol>
