@@ -52,18 +52,23 @@ useEventListener(window, 'mousemove', onMouseMove, { passive: true })
 
 <style scoped>
 .cursor-logo-follower {
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  /* A short trail only: at 0.5s the logo sat visibly behind the pointer */
+  transition: transform 0.18s var(--ease-out);
   will-change: transform;
 }
 
-.cursor-logo-enter-active,
+.cursor-logo-enter-active {
+  transition: transform 180ms var(--ease-out), opacity 150ms var(--ease-out);
+}
+
+/* The logo leaves faster than it arrives: the pointer has already moved on */
 .cursor-logo-leave-active {
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+  transition: transform 120ms var(--ease-out), opacity 100ms var(--ease-out);
 }
 
 .cursor-logo-enter-from,
 .cursor-logo-leave-to {
-  transform: scale(0.3) rotate(-10deg);
+  transform: scale(0.9);
   opacity: 0;
 }
 </style>

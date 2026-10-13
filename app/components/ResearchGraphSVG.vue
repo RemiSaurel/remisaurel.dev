@@ -43,7 +43,7 @@ defineEmits<{
         edge.cluster ? `rl-${edge.cluster}` : 'rl-hub',
         { 'rl-edge-active': edge.highlight, 'rl-edge-dimmed': edge.dimmed },
       ]"
-      :style="{ '--i': index }"
+      :style="{ '--i': Math.min(index, 12) }"
     />
   </svg>
 </template>
@@ -70,7 +70,7 @@ defineEmits<{
   stroke-dasharray: 1;
   stroke-dashoffset: 0;
   transition: opacity 120ms ease, stroke 120ms ease;
-  animation: rl-edge-draw 700ms var(--ease-in-out) backwards;
+  animation: rl-edge-draw 450ms var(--ease-in-out) backwards;
   animation-delay: calc(260ms + var(--i) * 10ms);
 }
 
