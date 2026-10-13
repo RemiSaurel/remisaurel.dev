@@ -46,8 +46,8 @@ const postGroups = computed(() => {
       <h1 class="m-0 text-2xl font-semibold">
         Posts
       </h1>
-      <p>
-        You'll find here some blog posts I've written. <br>
+      <p class="max-w-2xl">
+        You’ll find here some blog posts I’ve written. <br>
         Posts can be technical-oriented, personal thoughts, or anything else.
       </p>
     </div>
@@ -59,7 +59,7 @@ const postGroups = computed(() => {
         :initial="prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }"
         :while-in-view="prefersReducedMotion ? undefined : { opacity: 1, y: 0 }"
         :viewport="{ once: true, margin: '-50px' }"
-        :transition="prefersReducedMotion ? { duration: 0 } : { duration: 0.5, delay: groupIndex * 0.1, ease: EASE_OUT }"
+        :transition="prefersReducedMotion ? { duration: 0 } : { duration: 0.5, delay: Math.min(groupIndex, 2) * 0.1, ease: EASE_OUT }"
       >
         <h2
           class="absolute z-0 my-1 cursor-default text-lg text-zinc-500 tracking-tight -left-4 -top-8 dark:text-zinc-400"

@@ -65,7 +65,7 @@ const PROJECTS: Project[] = [
   {
     title: 'evalbuddy',
     description:
-      'A tool to easily evaluate answers',
+      'A tool to easily evaluate answers.',
     icon: '🧑‍🏫',
     links: {
       github: 'https://github.com/RemiSaurel/evalbuddy',
@@ -77,7 +77,7 @@ const PROJECTS: Project[] = [
   {
     title: 'littleman',
     description:
-      'A simple Discord bot to fetch papers from arXiv. .',
+      'A simple Discord bot to fetch papers from arXiv.',
     icon: '🤖',
     links: {
       github: 'https://github.com/RemiSaurel/littleman',
@@ -87,7 +87,7 @@ const PROJECTS: Project[] = [
   },
   {
     title: 'memoire',
-    description: 'Flashcards app. based on research recommendations.',
+    description: 'A flashcards app based on research recommendations.',
     icon: '🧠',
     links: {
       github: 'https://github.com/memoire-app',
@@ -132,7 +132,7 @@ const PROJECTS: Project[] = [
   {
     title: 'Datastrike',
     description:
-      'Esport and data. Feel free to check it out to discover the different analysis features',
+      'Esport and data. Feel free to check it out to discover the different analysis features.',
     icon: '🎮',
     links: {
       github: 'https://github.com/datastrike',
@@ -178,7 +178,7 @@ const PROJECTS: Project[] = [
   {
     title: 'Lockio',
     description:
-      'M1 project. This PoC was designed to demonstrate our idea about an innovative solution to store your stuff...',
+      'M1 project. This PoC was designed to demonstrate our idea about an innovative solution to store your stuff…',
     icon: '📦',
     links: {
       github: 'https://github.com/Lockiio',
@@ -208,8 +208,6 @@ const projectList = computed(() => {
 
 const { definitions: filterDefinitions, filters, filtered, hasFilters, clear: clearFilters } = useProjectFilters(projectList)
 
-const { view, isRestoring } = useListView('projects')
-const PROJECT_VIEWS = [
 // Read out by a live region, so a filter change isn't silent for screen reader users
 const resultsMessage = computed(() => {
   if (!hasFilters.value)

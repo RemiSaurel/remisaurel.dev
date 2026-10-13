@@ -19,6 +19,9 @@ defineEmits<{
   blur: []
 }>()
 
+/** The cascade stops growing after this many steps, so the last nodes don't land seconds late. */
+const ENTRANCE_STEPS = 8
+
 function pct(value: number, total: number) {
   return `${(value / total) * 100}%`
 }
@@ -43,7 +46,7 @@ function pct(value: number, total: number) {
         `rl-${node.clusters[0] || 'hub'}`,
         { 'is-dragging': dragging },
       ]"
-      :style="{ 'opacity': opacity, 'maxWidth': node.maxW ? `${node.maxW}px` : undefined, '--i': order }"
+      :style="{ 'opacity': opacity, 'maxWidth': node.maxW ? `${node.maxW}px` : undefined, '--i': Math.min(order, ENTRANCE_STEPS) }"
       @click="$emit('click', $event)"
       @mouseenter="$emit('mouseenter')"
       @mouseleave="$emit('mouseleave')"
@@ -113,7 +116,7 @@ function pct(value: number, total: number) {
   padding: 0.36rem 0.7rem 0.36rem 0.6rem;
   font-weight: 600;
   letter-spacing: -0.005em;
-  color: rgb(var(--c));
+  color: rgb(var(--c-ink));
   background-color: color-mix(in srgb, rgb(var(--c)) 11%, var(--rl-surface));
   box-shadow: inset 0 0 0 1px rgb(var(--c) / 0.28);
 }
@@ -151,7 +154,7 @@ function pct(value: number, total: number) {
   }
 
   .rl-node-paper:hover .rl-paper-arrow {
-    color: rgb(var(--c));
+    color: rgb(var(--c-ink));
     translate: 1px -1px;
   }
 }
@@ -171,9 +174,9 @@ function pct(value: number, total: number) {
 }
 
 .rl-venue {
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   font-variant-numeric: tabular-nums;
   color: var(--rl-muted);

@@ -103,7 +103,7 @@ const PUB_IMAGE = {
         :href="hasLink(pub) ? pub.url : undefined"
         :target="hasLink(pub) ? '_blank' : undefined"
         :rel="hasLink(pub) ? 'noopener noreferrer' : undefined"
-        class="pub-row px-3 py-4 transition-colors duration-300 ease-out"
+        class="pub-row px-3 py-4 transition-colors duration-150 ease-out"
         :class="{ 'hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer group': hasLink(pub) }"
       >
         <motion.span
@@ -120,14 +120,14 @@ const PUB_IMAGE = {
             v-if="hasVisual(pub)"
             :layout-id="`pub-image-${pub.id}`"
             :transition="morph(index)"
-            class="relative z-1 h-10 w-20 shrink-0 overflow-hidden bg-neutral-100 md:h-14 md:w-28 dark:bg-neutral-800"
+            class="pub-image-frame relative z-1 h-10 w-20 shrink-0 overflow-hidden bg-neutral-100 md:h-14 md:w-28 dark:bg-neutral-800"
           >
             <!-- One file per site theme, swapped by the color mode; the photo is only a fallback -->
             <template v-if="pub.art">
-              <img :src="pub.art.light" alt="" class="pub-image size-full object-cover dark:hidden">
-              <img :src="pub.art.dark" alt="" class="pub-image hidden size-full object-cover dark:block">
+              <img :src="pub.art.light" alt="" class="object-cover size-full dark:hidden">
+              <img :src="pub.art.dark" alt="" class="object-cover hidden size-full dark:block">
             </template>
-            <NuxtImg v-else :src="pub.image" v-bind="PUB_IMAGE" alt="" class="pub-image object-cover size-full" />
+            <NuxtImg v-else :src="pub.image" v-bind="PUB_IMAGE" alt="" class="object-cover size-full" />
           </motion.div>
           <motion.div
             :initial="reveal(index).initial"
@@ -154,7 +154,7 @@ const PUB_IMAGE = {
         >
           <span class="whitespace-nowrap border border-neutral-300 px-1.5 py-0.5 text-xs text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">{{ pub.venue }}</span>
           <LinkArrow
-            class="h-2.5 w-2.5 transition-[opacity,transform] duration-300 ease-out"
+            class="h-2.5 w-2.5 transition-[opacity,transform] duration-150 ease-out"
             :class="hasLink(pub) ? 'opacity-30 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5' : 'opacity-0'"
           />
         </motion.div>
@@ -178,14 +178,14 @@ const PUB_IMAGE = {
         v-if="hasVisual(pub)"
         :layout-id="`pub-image-${pub.id}`"
         :transition="morph(index)"
-        class="relative z-1 aspect-[2/1] w-full overflow-hidden bg-neutral-100 dark:bg-neutral-800"
+        class="pub-image-frame relative z-1 aspect-[2/1] w-full overflow-hidden bg-neutral-100 dark:bg-neutral-800"
       >
         <!-- One file per site theme, swapped by the color mode; the photo is only a fallback -->
         <template v-if="pub.art">
-          <img :src="pub.art.light" alt="" class="pub-image size-full object-cover dark:hidden">
-          <img :src="pub.art.dark" alt="" class="pub-image hidden size-full object-cover dark:block">
+          <img :src="pub.art.light" alt="" class="object-cover size-full dark:hidden">
+          <img :src="pub.art.dark" alt="" class="object-cover hidden size-full dark:block">
         </template>
-        <NuxtImg v-else :src="pub.image" v-bind="PUB_IMAGE" alt="" class="pub-image object-cover size-full" />
+        <NuxtImg v-else :src="pub.image" v-bind="PUB_IMAGE" alt="" class="object-cover size-full" />
         <!-- Link affordance sits inside the image, so it never pushes past the card edge -->
         <span
           v-if="hasLink(pub)"
@@ -233,9 +233,18 @@ const PUB_IMAGE = {
   }
 }
 
-/* Hover zoom lives on the inner <img>: the wrapper's transform belongs to the layout morph. */
-.pub-image {
-  transition: transform 400ms var(--ease-out);
+/* A hairline edge of pure black/white keeps the light art frames from melting into the page.
+   An ::after overlay, since the frame clips its images and an outline on them would be cut. */
+.pub-image-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.1);
+}
+
+.dark .pub-image-frame::after {
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
 }
 
 .pub-link-badge {
@@ -245,10 +254,6 @@ const PUB_IMAGE = {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .group:hover .pub-image {
-    transform: scale(1.03);
-  }
-
   /* Pointer users get the badge on hover; touch users keep it visible as the only link cue. */
   .pub-link-badge {
     opacity: 0;

@@ -39,27 +39,27 @@ const PUBLICATION_VIEWS = [
       <div class="flex flex-col gap-8">
         <!-- Intro Section -->
         <ContentSection :animate="animate" :delay="0.3">
-          <p class="intro-text [--enter-blur:8px] [--enter-delay:0.4s]" :class="{ enter: animate }">
+          <p class="intro-text [--enter-blur:8px] [--enter-delay:0.4s] max-w-3xl" :class="{ enter: animate }">
             French PhD student at the
             <a
-              href="https://www.irit.fr/" target="_blank" class="intro-link pressable"
+              href="https://www.irit.fr/" target="_blank" class="intro-link"
               @mouseenter="setCursorLogo(ENTITY_LOGOS.irit)"
               @mouseleave="clearCursorLogo"
             >IRIT</a> lab in Toulouse, working in the
             <a
-              href="https://www.irit.fr/TALENT/site/" target="_blank" class="intro-link pressable"
+              href="https://www.irit.fr/TALENT/site/" target="_blank" class="intro-link"
               @mouseenter="setCursorLogo(ENTITY_LOGOS.talent)"
               @mouseleave="clearCursorLogo"
             >TALENT</a> team, in collaboration with
             <a
-              href="https://www.kosmos-education.com/" target="_blank" class="intro-link pressable"
+              href="https://www.kosmos-education.com/" target="_blank" class="intro-link"
               @mouseenter="setCursorLogo(ENTITY_LOGOS.kosmos)"
               @mouseleave="clearCursorLogo"
             >Kosmos Education</a>.
           </p>
-          <p class="[--enter-blur:8px] [--enter-delay:0.5s] mt-4 text-zinc-500 dark:text-zinc-400" :class="{ enter: animate }">
+          <p class="[--enter-blur:8px] [--enter-delay:0.5s] mt-4 max-w-3xl text-zinc-500 dark:text-zinc-400" :class="{ enter: animate }">
             I develop dashboards powered by AI and learning analytics to help teachers
-            support students' out-of-class activities in K-12 education. Interested in
+            support students’ <span class="whitespace-nowrap">out-of-class</span> activities in K-12 education. Interested in
             Human-AI Interaction and responsible AI integration in education.
           </p>
         </ContentSection>
