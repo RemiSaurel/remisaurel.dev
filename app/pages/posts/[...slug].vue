@@ -14,12 +14,14 @@ const { data: page, status } = await useAsyncData(
 const references = computed<Reference[]>(() => page.value?.references ?? [])
 provide(REFERENCES_KEY, references)
 
-useSeoMeta(() => ({
-  title: page.value?.title,
-  description: page.value?.description,
-  ogTitle: page.value?.title,
-  ogDescription: page.value?.description,
-}))
+usePageSeo({
+  title: () => page.value?.title ?? 'Post not found',
+  description: () => page.value?.description,
+  type: 'article',
+  publishedAt: () => page.value?.date ? new Date(page.value.date).toISOString() : undefined,
+  ogPath: page.value ? undefined : '/',
+  noindex: !page.value,
+})
 </script>
 
 <template>
@@ -50,9 +52,3 @@ useSeoMeta(() => ({
     </div>
   </div>
 </template>
-
-<style scoped>
-html {
-  scroll-behavior: smooth;
-}
-</style>

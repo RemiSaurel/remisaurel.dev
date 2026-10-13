@@ -1,9 +1,26 @@
+import { readdirSync } from 'node:fs'
+import { ogImagePath, SEO_PAGES } from './shared/utils/seo-pages'
+
+// OG images are drawn by server/routes/og: one per page, one per post. Nothing links to them
+// (they only appear in <meta> tags), so the crawler needs the list.
+const postPaths = readdirSync('content/posts')
+  .filter(file => file.endsWith('.md'))
+  .map(file => `/posts/${file.replace(/\.md$/, '')}`)
+const ogImageRoutes = [...Object.keys(SEO_PAGES), ...postPaths].map(ogImagePath)
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
     head: {
+      htmlAttrs: { lang: 'en' },
       link: [{ rel: 'icon', href: '/favicon.png' }],
+    },
+  },
+  runtimeConfig: {
+    public: {
+      // Absolute base for canonical and OG urls (override with NUXT_PUBLIC_SITE_URL)
+      siteUrl: 'https://remisaurel.dev',
     },
   },
   $production: {
@@ -107,6 +124,9 @@ export default defineNuxtConfig({
   },
 
   nitro: {
+    prerender: {
+      routes: ogImageRoutes,
+    },
     output: {
       dir: '{{ rootDir }}/.output/public',
       publicDir: '{{ output.dir }}',

@@ -1,11 +1,5 @@
 <script setup lang="ts">
-useSeoMeta({
-  title: 'Research',
-  ogTitle: 'Research · Rémi Saurel',
-  description: 'Research landscape: learning analytics dashboards, generative AI in education, human-AI interaction and responsible AI.',
-  ogImage: '/home.png',
-  twitterCard: 'summary_large_image',
-})
+usePageSeo()
 
 const { setCursorLogo, clearCursorLogo } = useCursorLogo()
 

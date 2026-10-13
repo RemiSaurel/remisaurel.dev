@@ -6,13 +6,7 @@ import { isGroup } from '~/art/art'
 // A tool, not a page: it takes the whole window instead of the site layout
 definePageMeta({ layout: false })
 
-useSeoMeta({
-  title: 'Lab',
-  ogTitle: 'Lab · Rémi Saurel',
-  description: 'A workbench for composing the generative illustrations used across the site.',
-  ogImage: '/home.png',
-  twitterCard: 'summary_large_image',
-})
+usePageSeo()
 
 onMounted(() => document.documentElement.classList.add('lab-page'))
 onBeforeUnmount(() => document.documentElement.classList.remove('lab-page'))

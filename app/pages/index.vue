@@ -2,13 +2,7 @@
 import { LayoutGroup } from 'motion-v'
 import { useFirstVisit } from '~/composables/useFirstVisit'
 
-useSeoMeta({
-  title: 'Rémi Saurel',
-  ogTitle: 'Rémi Saurel',
-  description: 'PhD Student in AI and Learning Analytics at IRIT Lab, Toulouse.',
-  ogImage: '/home.png',
-  twitterCard: 'summary_large_image',
-})
+usePageSeo()
 
 const { isFirstVisit, markAsVisited } = useFirstVisit()
 

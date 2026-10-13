@@ -3,11 +3,7 @@ import { motion } from 'motion-v'
 
 const { prefersReducedMotion } = usePrefersReducedMotion()
 
-useSeoMeta({
-  description: 'Yet another blog with projects, ideas, thoughts, and more.',
-  ogImage: '/blog.png',
-  twitterCard: 'summary_large_image',
-})
+usePageSeo()
 
 const { data } = await useAsyncData('posts', () =>
   queryCollection('posts').all())
