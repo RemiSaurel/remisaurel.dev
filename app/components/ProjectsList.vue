@@ -80,7 +80,7 @@ const REVEALED = { opacity: 1, y: 0, filter: 'blur(0px)' }
       :while-in-view="itemMotion(index, 1).whileInView"
       :viewport="{ once: true, margin: '0px 0px 80px 0px' }"
       :transition="itemMotion(index, 1).transition"
-      class="project-row px-3 py-2.5 transition-colors duration-300 ease-out hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60"
+      class="project-row px-3 py-2.5 transition-colors duration-150 ease-out hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60"
       :class="{ 'border-t border-neutral-200/70 dark:border-neutral-800': index > 0 && isFirstOfYear(index) }"
     >
       <span
@@ -93,7 +93,9 @@ const REVEALED = { opacity: 1, y: 0, filter: 'blur(0px)' }
       <div class="[grid-area:body] min-w-0 flex items-baseline gap-2">
         <span v-if="project.icon" class="shrink-0 text-sm leading-none opacity-70" aria-hidden="true">{{ project.icon }}</span>
         <div class="min-w-0 flex flex-col gap-0.5">
-          <span class="text-sm text-neutral-900 font-medium dark:text-neutral-100">{{ project.title }}</span>
+          <h2 class="m-0 text-sm text-neutral-900 font-medium dark:text-neutral-100">
+            {{ project.title }}
+          </h2>
           <span class="text-sm text-neutral-500 leading-snug dark:text-neutral-400">{{ project.description }}</span>
         </div>
       </div>
@@ -108,7 +110,7 @@ const REVEALED = { opacity: 1, y: 0, filter: 'blur(0px)' }
             target="_blank"
             rel="noopener noreferrer"
             :aria-label="`${project.title} ${key}`"
-            class="flex pressable text-neutral-500 transition-colors duration-200 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+            class="flex pressable p-1.5 text-neutral-500 transition-colors duration-200 -m-1.5 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
           >
             <Icon :name="LINK_ICONS[key] ?? ''" class="size-4" />
           </a>

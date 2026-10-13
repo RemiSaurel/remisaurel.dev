@@ -210,6 +210,14 @@ const { definitions: filterDefinitions, filters, filtered, hasFilters, clear: cl
 
 const { view, isRestoring } = useListView('projects')
 const PROJECT_VIEWS = [
+// Read out by a live region, so a filter change isn't silent for screen reader users
+const resultsMessage = computed(() => {
+  if (!hasFilters.value)
+    return ''
+  const count = filtered.value.length
+  return count ? `${count} ${count === 1 ? 'project' : 'projects'} shown` : 'No projects match these filters'
+})
+
   { value: 'list', label: 'List', icon: 'uil:list-ul' },
   { value: 'card', label: 'Cards', icon: 'uil:apps' },
 ]
@@ -271,6 +279,9 @@ const PROJECT_VIEWS = [
     </div>
     <ProjectsList :projects="filtered" :view="view" :instant="isRestoring" />
     <div v-if="hasFilters && !filtered.length" class="flex flex-col items-center gap-3 py-12 text-sm text-neutral-500 dark:text-neutral-400">
+    <p class="sr-only" role="status">
+      {{ resultsMessage }}
+    </p>
       No project matches these filters.
       <button
         type="button"

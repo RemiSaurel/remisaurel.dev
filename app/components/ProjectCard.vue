@@ -19,7 +19,7 @@ function getIconName(key: string) {
 
 <template>
   <div
-    class="group h-full flex flex-col justify-between gap-3 bg-neutral-100/60 px-4 pb-2 pt-4 transition-colors duration-300 ease-out dark:bg-neutral-800/60 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+    class="group h-full flex flex-col justify-between gap-3 bg-neutral-100/60 px-4 pb-2 pt-4 transition-colors duration-150 ease-out dark:bg-neutral-800/60 hover:bg-neutral-100 dark:hover:bg-neutral-800"
   >
     <div class="flex flex-col gap-2">
       <div class="flex items-start justify-between gap-3">
@@ -46,7 +46,7 @@ function getIconName(key: string) {
           target="_blank"
           rel="noopener noreferrer"
           :aria-label="`${project.title} ${key}`"
-          class="pressable text-neutral-500 transition-colors duration-200 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+          class="inline-flex pressable p-1.5 text-neutral-500 transition-colors duration-200 -m-1.5 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
         >
           <Icon :name="getIconName(key)" class="size-4" />
         </a>

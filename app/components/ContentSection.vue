@@ -37,9 +37,9 @@ const layoutTransition = computed(() => prefersReducedMotion.value ? { duration:
       class="group mb-3 mt-2 flex items-center justify-between"
       :class="{ pressable: link }"
     >
-      <div class="text-xl text-neutral-700 font-medium tracking-tight dark:text-neutral-300">
+      <h2 class="m-0 text-xl text-neutral-700 font-medium tracking-tight dark:text-neutral-300">
         {{ title }}
-      </div>
+      </h2>
       <slot name="actions" />
       <LinkArrow
         v-if="link"

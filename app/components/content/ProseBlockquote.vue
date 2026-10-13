@@ -16,7 +16,7 @@ const styles = {
     border: 'border-yellow-500',
     bg: 'bg-yellow-50/60 dark:bg-yellow-950/25',
     icon: 'uil:exclamation-triangle',
-    color: 'text-yellow-600 dark:text-yellow-300',
+    color: 'text-yellow-700 dark:text-yellow-300',
   },
   danger: {
     border: 'border-red-500',
@@ -28,7 +28,7 @@ const styles = {
     border: 'border-green-500',
     bg: 'bg-green-50/60 dark:bg-green-950/25',
     icon: 'uil:pen',
-    color: 'text-green-600 dark:text-green-300',
+    color: 'text-green-700 dark:text-green-300',
   },
   important: {
     border: 'border-purple-500',
