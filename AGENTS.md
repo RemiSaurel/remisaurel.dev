@@ -49,6 +49,10 @@ remisaurel.dev/
 ├── content/posts/          # Markdown blog posts
 ├── public/                 # Static assets
 ├── server/                 # Server-side code
+│   ├── routes/og/          # OG image route (/og/index.png, /og/posts/<slug>.png)
+│   ├── utils/og/           # OG image drawing (SVG + resvg), illustrations, text wrapping
+│   └── assets/fonts/       # Instrument Sans TTFs (resvg can't read woff2)
+├── shared/utils/           # Code shared by app and server (SEO_PAGES, ogImagePath)
 ├── nuxt.config.ts          # Nuxt configuration
 └── uno.config.ts           # UnoCSS configuration
 ```
@@ -189,7 +193,8 @@ import { motion } from 'motion-v'
 
 ## Nuxt-Specific Patterns
 
-- Use `useSeoMeta()` for page SEO metadata
+- Use `usePageSeo()` for page SEO metadata (title, description, canonical, OG/Twitter card). Static pages are described in `shared/utils/seo-pages.ts`; posts pass their own values
+- OG images are generated at build time by `server/routes/og` (one per page and post, prerendered by `nuxt generate`). Their illustrations use the /lab layers (`server/utils/og/compositions.ts`)
 - Use `NuxtImg` for optimized images
 - Use `NuxtLink` for internal navigation
 - Components are auto-imported from `app/components/`
