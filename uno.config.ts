@@ -3,6 +3,14 @@ import { defineConfig } from 'unocss'
 
 export default defineConfig({
   presets: [presetMini()],
+  // `hover:` and `group-hover:` only apply to devices that can really hover, so a tap
+  // on a touch screen never leaves a row or an arrow stuck in its hovered state.
+  postprocess: (util) => {
+    if (util.selector.includes(':hover')) {
+      const hoverOnly = '@media (hover: hover) and (pointer: fine)'
+      util.parent = util.parent ? `${util.parent} $$ ${hoverOnly}` : hoverOnly
+    }
+  },
   shortcuts: {
     'pressable': 'transition-transform duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97]',
     // Section titles of the /lab editor panels
