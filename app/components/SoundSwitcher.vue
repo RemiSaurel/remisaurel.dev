@@ -22,12 +22,12 @@ function toggleSound() {
       <Icon
         name="uil:volume"
         class="sound-icon"
-        :style="{ opacity: isEnabled ? 1 : 0 }"
+        :style="{ opacity: isEnabled ? 1 : 0, scale: isEnabled ? 1 : 0.25, filter: isEnabled ? 'blur(0px)' : 'blur(4px)' }"
       />
       <Icon
         name="uil:volume-mute"
         class="sound-icon text-neutral-500 dark:text-neutral-400"
-        :style="{ opacity: isEnabled ? 0 : 1 }"
+        :style="{ opacity: isEnabled ? 0 : 1, scale: isEnabled ? 0.25 : 1, filter: isEnabled ? 'blur(4px)' : 'blur(0px)' }"
       />
     </ClientOnly>
   </button>
@@ -40,6 +40,9 @@ function toggleSound() {
   margin: auto;
   height: 1rem;
   width: 1rem;
-  transition: opacity var(--duration-micro) var(--ease-out);
+  transition:
+    opacity var(--duration-micro) cubic-bezier(0.2, 0, 0, 1),
+    scale var(--duration-micro) cubic-bezier(0.2, 0, 0, 1),
+    filter var(--duration-micro) cubic-bezier(0.2, 0, 0, 1);
 }
 </style>

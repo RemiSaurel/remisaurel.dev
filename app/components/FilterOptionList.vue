@@ -7,6 +7,8 @@ interface Props {
   /** Checkboxes when true, a single choice (radio) otherwise. */
   multiple?: boolean
   searchPlaceholder?: string
+  /** Names the group for assistive technology. */
+  label?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -34,19 +36,21 @@ const isSelected = (option: FilterOption) => props.selected.includes(option.valu
       v-model="search"
       type="text"
       :placeholder="props.searchPlaceholder"
-      class="h-8 w-full shrink-0 border-0 border-b border-neutral-200 bg-transparent px-2.5 text-xs text-neutral-900 outline-none dark:border-neutral-800 dark:text-neutral-100 placeholder:text-neutral-400"
+      :aria-label="props.searchPlaceholder"
+      class="h-8 w-full shrink-0 border-0 border-b border-neutral-200 bg-transparent px-2.5 text-xs text-neutral-900 focus-visible:[outline-offset:-2px] dark:border-neutral-800 dark:text-neutral-100 placeholder:text-neutral-500 dark:placeholder:text-neutral-400"
     >
     <div
-      role="group"
+      :role="props.multiple ? 'group' : 'radiogroup'"
+      :aria-label="props.label"
       class="max-h-64 min-h-0 flex flex-1 flex-col overflow-y-auto p-1"
     >
       <button
         v-for="option in visibleOptions"
         :key="String(option.value)"
         type="button"
-        :role="props.multiple ? 'menuitemcheckbox' : 'menuitemradio'"
+        :role="props.multiple ? 'checkbox' : 'radio'"
         :aria-checked="isSelected(option)"
-        class="h-7 w-full flex shrink-0 cursor-pointer items-center gap-2 px-1.5 text-left text-xs text-neutral-700 outline-none focus-visible:bg-neutral-100 hover:bg-neutral-100 dark:text-neutral-300 dark:focus-visible:bg-neutral-800 dark:hover:bg-neutral-800"
+        class="h-7 w-full flex shrink-0 cursor-pointer items-center gap-2 px-1.5 text-left text-xs text-neutral-700 focus-visible:[outline-offset:-2px] focus-visible:bg-neutral-100 hover:bg-neutral-100 dark:text-neutral-300 dark:focus-visible:bg-neutral-800 dark:hover:bg-neutral-800"
         @click="emit('toggle', option.value)"
       >
         <span

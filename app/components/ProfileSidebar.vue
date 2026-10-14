@@ -104,18 +104,27 @@ const socialLinksAfterCv = [
   { icon: 'i-simple-icons-x', url: 'https://twitter.com/remisaurel', label: 'X' },
 ]
 
-const socialHover = useMotionHover({ scale: 1.08, y: -2 })
 const photoHover = useMotionHover({ scale: 1.02, rotate: -0.75 })
 
+// The hold is timed here, not on the fill's `transitionend`: under prefers-reduced-motion
+// every transition is shortened to ~0ms, which would navigate on a plain press.
+const CV_HOLD_MS = 900
 const isHoldingCv = ref(false)
+let cvHoldTimer: ReturnType<typeof setTimeout> | undefined
 
 function startCvHold() {
+  if (isHoldingCv.value)
+    return
   isHoldingCv.value = true
+  cvHoldTimer = setTimeout(completeCvHold, CV_HOLD_MS)
 }
 
 function cancelCvHold() {
+  clearTimeout(cvHoldTimer)
   isHoldingCv.value = false
 }
+
+onBeforeUnmount(() => clearTimeout(cvHoldTimer))
 
 function completeCvHold() {
   if (!isHoldingCv.value)
@@ -189,19 +198,17 @@ const PHOTO = {
 
       <!-- Social links below -->
       <div class="mt-4 flex items-center gap-2">
-        <motion.a
+        <a
           v-for="link in socialLinksBeforeCv"
           :key="link.url"
           :href="link.url"
           target="_blank"
           rel="noopener noreferrer"
           :aria-label="link.label"
-          class="size-8 inline-flex pressable items-center justify-center bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
-          :while-hover="socialHover"
-          :transition="{ type: 'spring', stiffness: 400, damping: 17 }"
+          class="social-link size-8 inline-flex pressable items-center justify-center bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
         >
           <Icon :name="link.icon" class="size-4" />
-        </motion.a>
+        </a>
 
         <div class="relative size-8 shrink-0">
           <button
@@ -213,13 +220,15 @@ const PHOTO = {
             @pointerup="cancelCvHold"
             @pointerleave="cancelCvHold"
             @pointercancel="cancelCvHold"
+            @keydown.enter.space.prevent="startCvHold"
+            @keyup.enter.space="cancelCvHold"
+            @blur="cancelCvHold"
             @contextmenu.prevent
           >
             <Icon name="uil:padlock" class="pointer-events-none absolute inset-0 z-1 m-auto size-4" />
             <span
-              class="pointer-events-none absolute inset-0 z-2 bg-[rgb(244_114_182)]"
+              class="pointer-events-none absolute inset-0 z-2 bg-[rgb(var(--annotation))]"
               :class="isHoldingCv ? '[clip-path:inset(0_0_0_0)] [transition:clip-path_900ms_linear]' : '[clip-path:inset(0_100%_0_0)] [transition:clip-path_200ms_var(--ease-out)]'"
-              @transitionend="completeCvHold"
             />
             <Icon
               name="uil:padlock"
@@ -227,7 +236,7 @@ const PHOTO = {
               :class="isHoldingCv ? '[clip-path:inset(0_0_0_0)] [transition:clip-path_900ms_linear]' : '[clip-path:inset(0_100%_0_0)] [transition:clip-path_200ms_var(--ease-out)]'"
             />
           </button>
-          <span class="font-hand pointer-events-none absolute flex flex-col rotate-[-9deg] select-none items-center whitespace-nowrap text-[0.95rem] text-[rgb(244_114_182)] font-700 leading-none -right-[0.65rem] -top-[0.85rem]" aria-hidden="true">
+          <span class="font-hand pointer-events-none absolute flex flex-col rotate-[-9deg] select-none items-center whitespace-nowrap text-[0.95rem] text-[rgb(var(--annotation))] font-700 leading-none -right-[0.65rem] -top-[0.85rem]" aria-hidden="true">
             Soon
             <svg class="mt-[-1px] h-[8px] w-[28px]" viewBox="0 0 44 12" aria-hidden="true">
               <path d="M2 6c6-4 10-4 15-1.5s9 3 14-1 8-2 11 1" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
@@ -235,19 +244,17 @@ const PHOTO = {
           </span>
         </div>
 
-        <motion.a
+        <a
           v-for="link in socialLinksAfterCv"
           :key="link.url"
           :href="link.url"
           target="_blank"
           rel="noopener noreferrer"
           :aria-label="link.label"
-          class="size-8 inline-flex pressable items-center justify-center bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
-          :while-hover="socialHover"
-          :transition="{ type: 'spring', stiffness: 400, damping: 17 }"
+          class="social-link size-8 inline-flex pressable items-center justify-center bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
         >
           <Icon :name="link.icon" class="size-4" />
-        </motion.a>
+        </a>
       </div>
     </div>
 
@@ -264,7 +271,7 @@ const PHOTO = {
           <NuxtImg
             v-bind="PHOTO"
             fetchpriority="high"
-            class="h-auto max-w-48 w-full transition-all duration-300"
+            class="h-auto max-w-48 w-full"
           />
           <span
             v-for="p in particles"
@@ -295,19 +302,17 @@ const PHOTO = {
 
       <!-- Social Links -->
       <div v-bind="enter(0.3)" class="flex gap-2">
-        <motion.a
+        <a
           v-for="link in socialLinksBeforeCv"
           :key="link.url"
           :href="link.url"
           target="_blank"
           rel="noopener noreferrer"
           :aria-label="link.label"
-          class="size-8 inline-flex pressable items-center justify-center bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
-          :while-hover="socialHover"
-          :transition="{ type: 'spring', stiffness: 400, damping: 17 }"
+          class="social-link size-8 inline-flex pressable items-center justify-center bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
         >
           <Icon :name="link.icon" class="size-4" />
-        </motion.a>
+        </a>
 
         <div class="relative size-8 shrink-0">
           <button
@@ -319,13 +324,15 @@ const PHOTO = {
             @pointerup="cancelCvHold"
             @pointerleave="cancelCvHold"
             @pointercancel="cancelCvHold"
+            @keydown.enter.space.prevent="startCvHold"
+            @keyup.enter.space="cancelCvHold"
+            @blur="cancelCvHold"
             @contextmenu.prevent
           >
             <Icon name="uil:padlock" class="pointer-events-none absolute inset-0 z-1 m-auto size-4" />
             <span
-              class="pointer-events-none absolute inset-0 z-2 bg-[rgb(244_114_182)]"
+              class="pointer-events-none absolute inset-0 z-2 bg-[rgb(var(--annotation))]"
               :class="isHoldingCv ? '[clip-path:inset(0_0_0_0)] [transition:clip-path_900ms_linear]' : '[clip-path:inset(0_100%_0_0)] [transition:clip-path_200ms_var(--ease-out)]'"
-              @transitionend="completeCvHold"
             />
             <Icon
               name="uil:padlock"
@@ -333,7 +340,7 @@ const PHOTO = {
               :class="isHoldingCv ? '[clip-path:inset(0_0_0_0)] [transition:clip-path_900ms_linear]' : '[clip-path:inset(0_100%_0_0)] [transition:clip-path_200ms_var(--ease-out)]'"
             />
           </button>
-          <span class="font-hand pointer-events-none absolute flex flex-col rotate-[-9deg] select-none items-center whitespace-nowrap text-[0.95rem] text-[rgb(244_114_182)] font-700 leading-none -right-[0.65rem] -top-[0.85rem]" aria-hidden="true">
+          <span class="font-hand pointer-events-none absolute flex flex-col rotate-[-9deg] select-none items-center whitespace-nowrap text-[0.95rem] text-[rgb(var(--annotation))] font-700 leading-none -right-[0.65rem] -top-[0.85rem]" aria-hidden="true">
             Soon
             <svg class="mt-[-1px] h-[8px] w-[28px]" viewBox="0 0 44 12" aria-hidden="true">
               <path d="M2 6c6-4 10-4 15-1.5s9 3 14-1 8-2 11 1" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
@@ -341,20 +348,36 @@ const PHOTO = {
           </span>
         </div>
 
-        <motion.a
+        <a
           v-for="link in socialLinksAfterCv"
           :key="link.url"
           :href="link.url"
           target="_blank"
           rel="noopener noreferrer"
           :aria-label="link.label"
-          class="size-8 inline-flex pressable items-center justify-center bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
-          :while-hover="socialHover"
-          :transition="{ type: 'spring', stiffness: 400, damping: 17 }"
+          class="social-link size-8 inline-flex pressable items-center justify-center bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
         >
           <Icon :name="link.icon" class="size-4" />
-        </motion.a>
+        </a>
       </div>
     </div>
   </aside>
 </template>
+
+<style scoped>
+/* Hover lift as a CSS transition: no spring overshoot on utility links, and `translate`
+   composes with the press scale from `.pressable`. */
+.social-link {
+  transition:
+    transform 160ms var(--ease-out),
+    translate 160ms var(--ease-out),
+    background-color 150ms var(--ease-out),
+    color 150ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .social-link:hover {
+    translate: 0 -1px;
+  }
+}
+</style>

@@ -79,18 +79,26 @@ function handleClose() {
 // Restarting discards the current game, so it requires a deliberate 1.5s hold
 // (button or the R key) instead of a single press — mirrors a hold-to-delete
 // pattern. Restarting from 'ready'/'over', where there's nothing to lose, is instant.
+// The hold is timed here, not on the fill's `transitionend`: under prefers-reduced-motion
+// the fill's transition is shortened to ~0ms, which would restart the game on a plain press.
+const HOLD_RESTART_MS = 1500
 const isHoldingRestart = ref(false)
 const canRestartInstantly = computed(() => status.value === 'ready' || status.value === 'over')
+let holdRestartTimer: ReturnType<typeof setTimeout> | undefined
 
 function startHoldRestart() {
   if (canRestartInstantly.value) {
     start()
     return
   }
+  if (isHoldingRestart.value)
+    return
   isHoldingRestart.value = true
+  holdRestartTimer = setTimeout(completeHoldRestart, HOLD_RESTART_MS)
 }
 
 function cancelHoldRestart() {
+  clearTimeout(holdRestartTimer)
   isHoldingRestart.value = false
 }
 
@@ -100,6 +108,8 @@ function completeHoldRestart() {
   isHoldingRestart.value = false
   start()
 }
+
+onBeforeUnmount(() => clearTimeout(holdRestartTimer))
 
 // --- Input handling -------------------------------------------------------
 // Left/right/soft-drop use a small DAS/ARR repeat so holding a key (or a touch
@@ -251,11 +261,11 @@ watch(isOpen, (open) => {
             </span>
             <div class="flex items-center gap-4">
               <div class="flex flex-col items-end leading-tight">
-                <span class="uppercase text-[0.6rem] text-neutral-400 tracking-wide dark:text-neutral-500">Score</span>
+                <span class="uppercase text-xs text-neutral-500 tracking-wide dark:text-neutral-400">Score</span>
                 <span class="tabular-nums text-sm font-medium">{{ score }}</span>
               </div>
               <div class="flex flex-col items-end leading-tight">
-                <span class="uppercase text-[0.6rem] text-neutral-400 tracking-wide dark:text-neutral-500">Best</span>
+                <span class="uppercase text-xs text-neutral-500 tracking-wide dark:text-neutral-400">Best</span>
                 <span class="tabular-nums text-sm font-medium">{{ Math.max(score, bestScore) }}</span>
               </div>
               <button
@@ -268,7 +278,6 @@ watch(isOpen, (open) => {
                 <span
                   class="restart-hold-fill"
                   :class="{ 'is-filling': isHoldingRestart }"
-                  @transitionend="completeHoldRestart"
                 />
                 <Icon name="uil:refresh" class="relative z-1 size-4" />
               </button>
@@ -520,14 +529,14 @@ watch(isOpen, (open) => {
 
 .stat-label {
   margin: 0 0 0.25rem;
-  font-size: 0.6rem;
-  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgb(163 163 163);
+  color: rgb(115 115 115);
 }
 
 .dark .stat-label {
-  color: rgb(115 115 115);
+  color: rgb(163 163 163);
 }
 
 .key {
@@ -540,7 +549,7 @@ watch(isOpen, (open) => {
   border-radius: 3px;
   border: 1px solid rgb(212 212 212);
   background: rgb(245 245 245);
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: rgb(82 82 82);
 }

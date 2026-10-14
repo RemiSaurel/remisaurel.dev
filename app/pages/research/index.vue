@@ -1,11 +1,5 @@
 <script setup lang="ts">
-useSeoMeta({
-  title: 'Research',
-  ogTitle: 'Research · Rémi Saurel',
-  description: 'Research landscape: learning analytics dashboards, generative AI in education, human-AI interaction and responsible AI.',
-  ogImage: '/home.png',
-  twitterCard: 'summary_large_image',
-})
+usePageSeo()
 
 const { setCursorLogo, clearCursorLogo } = useCursorLogo()
 
@@ -54,7 +48,7 @@ function itemReveal(index: number) {
 
     <!-- Research landscape graph -->
     <section
-      v-bind="reveal(0.1)"
+      v-bind="reveal(0.05)"
       class="flex flex-col"
     >
       <div class="mb-3 mt-2 flex items-center justify-between">
@@ -70,7 +64,7 @@ function itemReveal(index: number) {
 
     <!-- Approach -->
     <section
-      v-bind="reveal(0.3)"
+      v-bind="reveal(0.1)"
       class="flex flex-col"
     >
       <div class="mb-3 mt-2 flex items-center justify-between">
@@ -97,7 +91,7 @@ function itemReveal(index: number) {
 
     <!-- Context -->
     <section
-      v-bind="reveal(0.4)"
+      v-bind="reveal(0.15)"
       class="flex flex-col"
     >
       <div class="mb-3 mt-2 flex items-center justify-between">
@@ -109,21 +103,21 @@ function itemReveal(index: number) {
         PhD student at the
         <a
           href="https://www.irit.fr/" target="_blank" rel="noopener noreferrer"
-          class="intro-link pressable text-neutral-900 dark:text-neutral-100"
+          class="intro-link text-neutral-900 dark:text-neutral-100"
           @mouseenter="setCursorLogo(ENTITY_LOGOS.irit)"
           @mouseleave="clearCursorLogo"
         >IRIT</a>
         lab in Toulouse, in the
         <a
           href="https://www.irit.fr/TALENT/site/" target="_blank" rel="noopener noreferrer"
-          class="intro-link pressable text-neutral-900 dark:text-neutral-100"
+          class="intro-link text-neutral-900 dark:text-neutral-100"
           @mouseenter="setCursorLogo(ENTITY_LOGOS.talent)"
           @mouseleave="clearCursorLogo"
         >TALENT</a>
         team, in collaboration with
         <a
           href="https://www.kosmos-education.com/" target="_blank" rel="noopener noreferrer"
-          class="intro-link pressable text-neutral-900 dark:text-neutral-100"
+          class="intro-link text-neutral-900 dark:text-neutral-100"
           @mouseenter="setCursorLogo(ENTITY_LOGOS.kosmos)"
           @mouseleave="clearCursorLogo"
         >Kosmos Education</a>.
@@ -132,14 +126,14 @@ function itemReveal(index: number) {
         out-of-class study app.
       </p>
       <div class="mt-6 flex flex-wrap items-center gap-4 text-sm">
-        <NuxtLink to="/" class="intro-link pressable">
+        <NuxtLink to="/" class="intro-link">
           Publications
         </NuxtLink>
         <a
           href="https://scholar.google.com/citations?hl=fr&user=r8AM0OIAAAAJ"
           target="_blank"
           rel="noopener noreferrer"
-          class="intro-link pressable"
+          class="intro-link"
         >
           Google Scholar ↗
         </a>

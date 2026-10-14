@@ -79,12 +79,12 @@ const isDark = computed(() => colorMode.value === 'dark')
       <Icon
         name="uil:sun"
         class="theme-icon text-white"
-        :style="{ opacity: isDark ? 1 : 0 }"
+        :style="{ opacity: isDark ? 1 : 0, scale: isDark ? 1 : 0.25, filter: isDark ? 'blur(0px)' : 'blur(4px)' }"
       />
       <Icon
         name="uil:moon"
         class="theme-icon"
-        :style="{ opacity: isDark ? 0 : 1 }"
+        :style="{ opacity: isDark ? 0 : 1, scale: isDark ? 0.25 : 1, filter: isDark ? 'blur(4px)' : 'blur(0px)' }"
       />
     </ClientOnly>
   </button>
@@ -97,6 +97,9 @@ const isDark = computed(() => colorMode.value === 'dark')
   margin: auto;
   height: 1rem;
   width: 1rem;
-  transition: opacity var(--duration-micro) var(--ease-out);
+  transition:
+    opacity var(--duration-micro) cubic-bezier(0.2, 0, 0, 1),
+    scale var(--duration-micro) cubic-bezier(0.2, 0, 0, 1),
+    filter var(--duration-micro) cubic-bezier(0.2, 0, 0, 1);
 }
 </style>

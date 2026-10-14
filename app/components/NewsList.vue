@@ -73,6 +73,14 @@ const filteredNews = computed(() => {
   )
 })
 
+// Read out by a live region, so a filter change isn't silent for screen reader users
+const resultsMessage = computed(() => {
+  if (!hasFilters.value)
+    return ''
+  const count = filteredNews.value.length
+  return count ? `${count} ${count === 1 ? 'update' : 'updates'} shown` : 'No updates match these filters'
+})
+
 interface NewsYear {
   year: number
   items: typeof news
@@ -159,6 +167,10 @@ function itemEnter(index: number) {
     <!-- Hydrated on first hover/focus/tap: keeps the popover code off the critical path -->
     <LazyFilterBar v-model="filters" hydrate-on-interaction class="mt-2" :definitions="filterDefinitions" />
 
+    <p class="sr-only" role="status">
+      {{ resultsMessage }}
+    </p>
+
     <!-- News list -->
     <div class="flex flex-col gap-1">
       <template v-for="group in newsByYear" :key="group.year">
@@ -168,13 +180,13 @@ function itemEnter(index: number) {
           class="group flex cursor-pointer items-center gap-3 py-2 text-left"
           :class="{ 'mt-3': group.year !== newsByYear[0]?.year }"
           :aria-expanded="isOpen(group.year)"
-          :aria-label="`${isOpen(group.year) ? 'Hide' : 'Show'} the ${group.items.length} news from ${group.year}`"
+          :aria-label="`${isOpen(group.year) ? 'Hide' : 'Show'} the ${group.items.length} ${group.items.length === 1 ? 'update' : 'updates'} from ${group.year}`"
           @click="toggleYear(group.year)"
         >
           <span class="tabular-nums text-xs text-neutral-600 font-medium dark:text-neutral-300">{{ group.year }}</span>
           <span class="h-px flex-1 bg-neutral-200 transition-colors duration-200 dark:bg-neutral-800 group-hover:bg-neutral-300 dark:group-hover:bg-neutral-700" />
           <span class="tabular-nums text-xs text-neutral-500 transition-colors duration-200 dark:text-neutral-400 group-hover:text-neutral-700 dark:group-hover:text-neutral-300">
-            {{ group.items.length }} news
+            {{ group.items.length }} {{ group.items.length === 1 ? 'update' : 'updates' }}
           </span>
           <!-- Not `rotate-180`: another stylesheet also defines it (`rotate: 180deg`), the two add up to 360deg -->
           <Icon
@@ -196,7 +208,7 @@ function itemEnter(index: number) {
               :href="hasLink(item) ? getFirstLink(item) : undefined"
               :target="hasLink(item) ? '_blank' : undefined"
               :rel="hasLink(item) ? 'noopener noreferrer' : undefined"
-              class="block px-3 py-3 transition-colors duration-300 ease-out -mx-3"
+              class="block px-3 py-3 transition-colors duration-150 ease-out -mx-3"
               :class="{ 'pressable hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer group': hasLink(item) }"
             >
               <!-- Mobile: Stacked layout -->
@@ -218,7 +230,7 @@ function itemEnter(index: number) {
                       </span>
                     </div>
                     <LinkArrow
-                      class="h-2.5 w-2.5 transition-[opacity,transform] duration-300"
+                      class="h-2.5 w-2.5 transition-[opacity,transform] duration-150"
                       :class="hasLink(item) ? 'opacity-30 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5' : 'opacity-0'"
                     />
                   </div>
@@ -253,7 +265,7 @@ function itemEnter(index: number) {
                     </span>
                   </div>
                   <LinkArrow
-                    class="h-2.5 w-2.5 transition-[opacity,transform] duration-300"
+                    class="h-2.5 w-2.5 transition-[opacity,transform] duration-150"
                     :class="hasLink(item) ? 'opacity-30 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5' : 'opacity-0'"
                   />
                 </div>
@@ -265,7 +277,7 @@ function itemEnter(index: number) {
     </div>
 
     <div v-if="hasFilters && !filteredNews.length" class="flex flex-col items-center gap-3 py-8 text-sm text-neutral-500 dark:text-neutral-400">
-      No news matches these filters.
+      No updates match these filters.
       <button
         type="button"
         class="pressable cursor-pointer text-xs text-neutral-900 underline decoration-neutral-300 underline-offset-4 dark:text-neutral-100 dark:decoration-neutral-600 hover:decoration-current"

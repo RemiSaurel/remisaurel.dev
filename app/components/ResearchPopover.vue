@@ -77,7 +77,7 @@ const placement = computed(() => {
       :style="placement.style"
       role="tooltip"
     >
-      <p v-if="node.venue" class="rl-popover-venue uppercase m-0 flex items-center gap-1.5 text-[0.62rem] font-500 tracking-[0.08em]">
+      <p v-if="node.venue" class="rl-popover-venue uppercase m-0 flex items-center gap-1.5 text-[0.75rem] font-500 tracking-[0.06em]">
         <span class="rl-popover-dot" />
         {{ node.venue }}
       </p>
@@ -113,7 +113,7 @@ const placement = computed(() => {
 }
 
 .rl-popover-cta {
-  color: rgb(var(--c));
+  color: rgb(var(--c-ink));
   border-top: 1px solid var(--rl-hairline);
 }
 

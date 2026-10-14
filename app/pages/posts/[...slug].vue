@@ -11,12 +11,17 @@ const { data: page, status } = await useAsyncData(
   () => queryCollection('posts').path(`/posts/${slug.value}`).first(),
 )
 
-useSeoMeta(() => ({
-  title: page.value?.title,
-  description: page.value?.description,
-  ogTitle: page.value?.title,
-  ogDescription: page.value?.description,
-}))
+const references = computed<Reference[]>(() => page.value?.references ?? [])
+provide(REFERENCES_KEY, references)
+
+usePageSeo({
+  title: () => page.value?.title ?? 'Post not found',
+  description: () => page.value?.description,
+  type: 'article',
+  publishedAt: () => page.value?.date ? new Date(page.value.date).toISOString() : undefined,
+  ogPath: page.value ? undefined : '/',
+  noindex: !page.value,
+})
 </script>
 
 <template>
@@ -26,6 +31,7 @@ useSeoMeta(() => ({
         {{ page.title }}
       </h1>
       <ContentRenderer :value="page" />
+      <PostReferences v-if="references.length" :references="references" />
     </article>
 
     <div v-else-if="status === 'pending'" class="py-12 text-center text-neutral-500 dark:text-neutral-400">
@@ -46,9 +52,3 @@ useSeoMeta(() => ({
     </div>
   </div>
 </template>
-
-<style scoped>
-html {
-  scroll-behavior: smooth;
-}
-</style>

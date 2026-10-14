@@ -1,7 +1,9 @@
 <script setup lang="ts">
-useSeoMeta({
-  title: '404 - Page Not Found',
+usePageSeo({
+  title: 'Page not found',
   description: 'The page you are looking for does not exist.',
+  ogPath: '/',
+  noindex: true,
 })
 </script>
 

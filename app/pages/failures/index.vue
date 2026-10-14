@@ -2,13 +2,7 @@
 import type { FailureType } from '~/failures/failures'
 import { failures, TYPE_LABELS } from '~/failures/failures'
 
-useSeoMeta({
-  title: 'Failures',
-  ogTitle: 'Failures · Rémi Saurel',
-  description: 'The failure resume: rejected papers, failed experiments and abandoned projects, and what each one taught me.',
-  ogImage: '/home.png',
-  twitterCard: 'summary_large_image',
-})
+usePageSeo()
 
 const sortedFailures = computed(() => {
   return failures.toSorted((a, b) => b.date.getTime() - a.date.getTime())

@@ -45,7 +45,7 @@ const displayTitle = computed(() =>
       <Icon
         v-if="!disabled"
         name="uil:arrow-up-right"
-        class="size-4 opacity-0 transition-[opacity,transform] duration-300 -translate-x-1 group-hover:translate-x-0 group-hover:opacity-100"
+        class="size-4 opacity-0 transition-[opacity,transform] duration-150 -translate-x-1 group-hover:translate-x-0 group-hover:opacity-100"
       />
     </h3>
     <p :class="descriptionClasses">

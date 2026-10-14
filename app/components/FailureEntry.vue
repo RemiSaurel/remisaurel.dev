@@ -20,7 +20,8 @@ const stampAngle = computed(() => STAMP_ANGLES[props.index % STAMP_ANGLES.length
 const noteAngle = computed(() => NOTE_ANGLES[props.index % NOTE_ANGLES.length])
 
 // The red pen goes over each entry in order: cross out, stamp, then scribble the lesson
-const baseDelay = computed(() => 0.1 + props.index * 0.12)
+// Only the first entries cascade: the others start as soon as they scroll into view.
+const baseDelay = computed(() => Math.min(props.index, 2) * 0.12)
 
 function ink(from: Record<string, unknown>, to: Record<string, unknown>, delay: number, duration = 0.35) {
   if (prefersReducedMotion.value)
@@ -55,7 +56,7 @@ function ink(from: Record<string, unknown>, to: Record<string, unknown>, delay: 
     </div>
 
     <div class="flex flex-col gap-1.5">
-      <h3 class="m-0 text-base font-semibold leading-snug">
+      <h2 class="m-0 text-base font-semibold leading-snug">
         <motion.span
           class="failure-strike"
           v-bind="ink({ backgroundSize: '0% 2px' }, { backgroundSize: '100% 2px' }, 0.2, 0.6)"
@@ -63,7 +64,7 @@ function ink(from: Record<string, unknown>, to: Record<string, unknown>, delay: 
         >
           {{ failure.title }}
         </motion.span>
-      </h3>
+      </h2>
       <p class="m-0 text-sm text-neutral-500 leading-relaxed dark:text-neutral-400">
         {{ failure.description }}
       </p>
@@ -72,14 +73,14 @@ function ink(from: Record<string, unknown>, to: Record<string, unknown>, delay: 
         :href="failure.url"
         target="_blank"
         rel="noopener noreferrer"
-        class="intro-link mt-1 w-fit pressable text-xs text-neutral-500 dark:text-neutral-400"
+        class="intro-link mt-1 w-fit text-xs text-neutral-500 dark:text-neutral-400"
       >
         {{ failure.url.replace(/^https?:\/\//, '') }}
       </a>
     </div>
 
     <motion.p
-      class="font-note relative m-0 pl-6 text-[1.12rem] text-[rgb(var(--failure-ink))] leading-[1.45] md:pl-0 md:pt-1"
+      class="font-note relative m-0 pl-6 text-[1.35rem] text-[rgb(var(--failure-ink))] leading-[1.4] md:pl-0 md:pt-1"
       :style="{ rotate: `${noteAngle}deg` }"
       v-bind="ink({ opacity: 0 }, { opacity: 1 }, 0.75, 0.4)"
       :viewport="{ once: true }"

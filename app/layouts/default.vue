@@ -29,11 +29,11 @@ function isActive(path: string) {
 
     <!-- Navigation -->
     <nav>
-      <div class="mx-auto max-w-7xl px-4 py-3 sm:px-6 sm:py-4">
+      <div class="mx-auto max-w-7xl px-6 py-3 sm:py-4">
         <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
           <!-- Logo/Name -->
           <div class="enter [--enter-duration:0.4s] [--enter-x:-10px] [--enter-y:0] shrink-0">
-            <NuxtLink to="/" class="pressable whitespace-nowrap rounded-sm text-xs font-medium tracking-tight sm:text-sm">
+            <NuxtLink to="/" class="inline-block whitespace-nowrap rounded-sm py-2 text-xs font-medium tracking-tight -my-2 sm:text-sm">
               Rémi Saurel
             </NuxtLink>
           </div>
@@ -48,7 +48,7 @@ function isActive(path: string) {
             >
               <NuxtLink
                 :to="item.route"
-                class="pressable whitespace-nowrap rounded-sm text-xs text-neutral-500 transition-colors duration-200 sm:text-sm dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+                class="inline-block whitespace-nowrap rounded-sm py-2 text-xs text-neutral-500 transition-colors duration-150 -my-2 sm:text-sm dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
                 :class="{ 'text-neutral-900! dark:text-neutral-100!': isActive(item.route) }"
                 @click="play(MINIMAL.tap)"
               >
@@ -80,9 +80,9 @@ function isActive(path: string) {
           </p>
           <NuxtLink
             to="/failures"
-            class="pressable transition-colors duration-200 hover:text-neutral-900 dark:hover:text-neutral-100"
+            class="inline-block py-2 transition-colors duration-150 -my-2 hover:text-neutral-900 dark:hover:text-neutral-100"
           >
-            failures
+            Failures
           </NuxtLink>
         </div>
       </div>

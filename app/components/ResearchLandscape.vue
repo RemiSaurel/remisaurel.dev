@@ -395,7 +395,7 @@ const enter = computed(() =>
               :target="node.url ? '_blank' : undefined"
               :rel="node.url ? 'noopener noreferrer' : undefined"
               class="font-medium"
-              :class="node.url ? 'intro-link pressable inline-flex items-center gap-1' : ''"
+              :class="node.url ? 'intro-link inline-flex items-center gap-1' : ''"
             >
               {{ node.label }}
               <Icon v-if="node.url" name="uil:arrow-up-right" class="size-3.5 shrink-0" />

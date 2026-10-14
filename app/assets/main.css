@@ -11,6 +11,14 @@
   --duration-micro: 160ms;
   --duration-short: 200ms;
   --duration-theme: 500ms;
+
+  /* Handwritten annotations ("Soon", "& more!", the CV hold fill): 4.5:1 on white,
+     lightened in dark mode like the other muted RGB triples below. */
+  --annotation: 182 85 136;
+}
+
+.dark {
+  --annotation: 244 114 182;
 }
 
 html {
@@ -52,14 +60,20 @@ body {
 }
 
 .font-note {
-  font-family: "Patrick Hand", "Bradley Hand", cursive;
+  font-family: "Caveat", "Bradley Hand", cursive;
+  font-weight: 600;
+}
+
+/* Editorial pull quotes (Quote component) */
+.font-quote {
+  font-family: "Newsreader", Georgia, serif;
+  font-style: italic;
 }
 
 /* Research landscape cluster color tokens — shared across ResearchLandscape's
    child components, so they must be global (Vue's scoped CSS doesn't reach
    into nested elements of child components). */
 .rl-root {
-  font-family: "Geist Sans", -apple-system, BlinkMacSystemFont, sans-serif;
   --rl-text: #262626;
   --rl-muted: #737373;
   --rl-surface: #ffffff;
@@ -96,17 +110,19 @@ body {
   --rl-shadow-pop: 0 2px 4px rgb(0 0 0 / 0.35), 0 12px 32px -8px rgb(0 0 0 / 0.55);
 }
 
-.rl-la { --c: 59 110 170; }
-.rl-hai { --c: 178 126 54; }
-.rl-aied { --c: 176 84 106; }
-.rl-ethics { --c: 70 140 108; }
-.rl-hub { --c: 64 64 64; }
+/* --c colors the dots, regions and edges; --c-ink is the same hue darkened to 4.5:1
+   on the tinted chip and on white, for the cluster's text. */
+.rl-la { --c: 59 110 170; --c-ink: 59 110 170; }
+.rl-hai { --c: 178 126 54; --c-ink: 144 102 44; }
+.rl-aied { --c: 176 84 106; --c-ink: 168 80 101; }
+.rl-ethics { --c: 70 140 108; --c-ink: 61 121 93; }
+.rl-hub { --c: 64 64 64; --c-ink: 64 64 64; }
 
-.dark .rl-la { --c: 138 178 226; }
-.dark .rl-hai { --c: 222 178 106; }
-.dark .rl-aied { --c: 219 145 163; }
-.dark .rl-ethics { --c: 126 194 162; }
-.dark .rl-hub { --c: 212 212 212; }
+.dark .rl-la { --c: 138 178 226; --c-ink: 138 178 226; }
+.dark .rl-hai { --c: 222 178 106; --c-ink: 222 178 106; }
+.dark .rl-aied { --c: 219 145 163; --c-ink: 219 145 163; }
+.dark .rl-ethics { --c: 126 194 162; --c-ink: 126 194 162; }
+.dark .rl-hub { --c: 212 212 212; --c-ink: 212 212 212; }
 
 /* Tetris piece colors — same "muted RGB triple, lightened for dark mode" recipe
    as the research landscape clusters above, kept as its own token set so the
@@ -227,7 +243,7 @@ a {
 }
 
 .enter {
-  animation: enter var(--enter-duration, 0.6s) var(--enter-ease, cubic-bezier(0.25, 0.46, 0.45, 0.94)) var(--enter-delay, 0s) backwards;
+  animation: enter var(--enter-duration, 0.4s) var(--enter-ease, var(--ease-out)) var(--enter-delay, 0s) backwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -259,6 +275,17 @@ a {
 }
 
 /* Typography */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+/* Descriptions and intros: no single short word left alone on the last line */
+p {
+  text-wrap: pretty;
+}
+
 h1 {
   font-size: 1.5rem;
   font-weight: 600;
@@ -298,12 +325,14 @@ figcaption {
   line-height: 1.8;
 }
 
-/* Intro links with animated underline */
+/* Intro links: a faint underline at rest so they read as links on touch and without
+   a pointer, drawn at full strength on hover and keyboard focus. */
 .intro-link {
   position: relative;
   font-weight: 500;
 }
 
+.intro-link::before,
 .intro-link::after {
   content: '';
   position: absolute;
@@ -312,12 +341,25 @@ figcaption {
   width: 100%;
   height: 1px;
   background-color: currentColor;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s ease-out;
 }
 
-.intro-link:hover::after {
+.intro-link::before {
+  opacity: 0.35;
+}
+
+.intro-link::after {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .intro-link:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+.intro-link:focus-visible::after {
   transform: scaleX(1);
 }
 
@@ -357,6 +399,7 @@ article h3 {
 }
 
 article p {
+  text-wrap: wrap;
   font-size: 1rem;
   line-height: 1.8;
   margin-bottom: 1.25rem;
@@ -379,6 +422,13 @@ article img {
   height: auto;
   margin: 1.5rem 0;
   border-radius: 4px;
+  /* Pure black/white at low opacity: a hairline edge that never picks up the page tint */
+  outline: 1px solid rgb(0 0 0 / 0.1);
+  outline-offset: -1px;
+}
+
+.dark article img {
+  outline-color: rgb(255 255 255 / 0.1);
 }
 
 article code:not(pre code) {

@@ -126,14 +126,13 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
              content, the values grow up to their max. The ring is drawn outside each box, so a 1px
              gap puts both rings on the same pixel column and they read as one border. -->
         <div class="flex items-start">
-          <div role="tablist" aria-orientation="vertical" class="relative z-1 w-32 flex shrink-0 flex-col p-1" :class="PANEL_BOX">
+          <div role="group" aria-label="Filters" class="relative z-1 w-32 flex shrink-0 flex-col p-1" :class="PANEL_BOX">
             <button
               v-for="definition in props.definitions"
               :key="definition.key"
               type="button"
-              role="tab"
-              :aria-selected="panelDefinition.key === definition.key"
-              class="h-7 flex cursor-pointer items-center gap-2 px-1.5 text-left text-xs outline-none focus-visible:bg-neutral-100 dark:focus-visible:bg-neutral-800"
+              :aria-current="panelDefinition.key === definition.key || undefined"
+              class="h-7 flex cursor-pointer items-center gap-2 px-1.5 text-left text-xs focus-visible:[outline-offset:-2px] focus-visible:bg-neutral-100 dark:focus-visible:bg-neutral-800"
               :class="panelDefinition.key === definition.key
                 ? 'bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100'
                 : 'text-neutral-600 dark:text-neutral-400'"
@@ -148,10 +147,10 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
           </div>
           <FilterOptionList
             :key="panelDefinition.key"
-            role="tabpanel"
             class="ml-px w-44"
             :class="PANEL_BOX"
             :style="{ marginTop: panelOffset }"
+            :label="panelDefinition.label"
             :options="panelDefinition.options"
             :selected="selectedFor(panelDefinition.key)"
             :multiple="panelDefinition.multiple"
@@ -198,6 +197,7 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
           <template #content>
             <FilterOptionList
               class="w-36"
+              :label="`${definition.label} operator`"
               :options="modeOptions(definition)"
               :selected="[effectiveMode(entryFor(definition.key))]"
               @toggle="setMode(definition, $event as FilterMode)"
@@ -242,6 +242,7 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
           <template #content>
             <FilterOptionList
               class="w-48"
+              :label="definition.label"
               :options="definition.options"
               :selected="selectedFor(definition.key)"
               :multiple="definition.multiple"
@@ -272,7 +273,7 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
         class="h-8 inline-flex shrink-0 pressable cursor-pointer items-center px-2 text-xs text-neutral-500 transition-colors duration-150 ease-out dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
         @click="clearAll()"
       >
-        Clear
+        Clear filters
       </motion.button>
     </AnimatePresence>
   </div>
