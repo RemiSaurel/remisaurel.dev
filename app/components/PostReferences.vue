@@ -21,7 +21,9 @@ const sorted = computed(() => [...props.references].sort((a, b) =>
         class="reference list-none rounded-md pl-6 -indent-6"
       >
         {{ fullAuthors(ref) }} ({{ ref.year }}). {{ ref.title }}.
-        <em v-if="ref.venue">{{ ref.venue }}.</em>
+        <template v-if="ref.venue">
+          <em>{{ ref.venue }}.</em>{{ ' ' }}
+        </template>
         <a
           v-if="ref.url"
           :href="ref.url"
