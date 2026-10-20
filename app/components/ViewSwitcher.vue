@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { motion } from 'motion-v'
-import { MINIMAL } from '~/sounds/sounds'
 
 export interface ViewOption<T extends string = string> {
   value: T
@@ -26,7 +25,7 @@ function select(value: string) {
   if (model.value === value)
     return
   model.value = value
-  play(MINIMAL.tap)
+  play('select')
 }
 </script>
 

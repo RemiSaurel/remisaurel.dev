@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { MINIMAL } from '~/sounds/sounds'
-
 const { isEnabled, play, toggle } = useSound()
 
 function toggleSound() {
   toggle()
   // Only audible when turning sound on: confirms it works without startling anyone muting it.
-  play(MINIMAL.toggleOn)
+  play('toggle')
 }
 </script>
 

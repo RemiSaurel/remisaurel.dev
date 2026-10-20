@@ -39,7 +39,7 @@ function registerNode(id: string) {
   }
 }
 
-let userMoved = false
+const userMoved = ref(false)
 
 function scale() {
   const width = container.value?.clientWidth
@@ -68,7 +68,7 @@ function measure() {
   }
   boxes.value = next
 
-  if (!userMoved)
+  if (!userMoved.value)
     resolveOverlaps()
 }
 
@@ -169,7 +169,7 @@ for (const node of researchNodes) {
         draggingId.value = node.id
       }
 
-      userMoved = true
+      userMoved.value = true
       const s = scale()
       const box = boxes.value[node.id] ?? { hw: 40, hh: 20 }
       clampInto(positions[node.id]!, start.pos.x + dx * s, start.pos.y + dy * s, box)
@@ -190,6 +190,7 @@ function consumeDragClick(nodeId: string, event: MouseEvent) {
   }
 }
 
+/** Dragging a region carries the nodes it owns alone: seam nodes stay put and the region stretches to keep them. */
 for (const cluster of clusters) {
   let start: { clientX: number, clientY: number, positions: Record<string, { x: number, y: number }> } | null = null
 
@@ -197,7 +198,7 @@ for (const cluster of clusters) {
     onStart: (_pos, event) => {
       const snapshot: Record<string, { x: number, y: number }> = {}
       for (const node of researchNodes) {
-        if (node.clusters[0] === cluster.id)
+        if (node.clusters.length === 1 && node.clusters[0] === cluster.id)
           snapshot[node.id] = { ...positions[node.id]! }
       }
       start = { clientX: event.clientX, clientY: event.clientY, positions: snapshot }
@@ -205,7 +206,7 @@ for (const cluster of clusters) {
     onMove: (_pos, event) => {
       if (!start)
         return
-      userMoved = true
+      userMoved.value = true
       const s = scale()
       const dx = (event.clientX - start.clientX) * s
       const dy = (event.clientY - start.clientY) * s
@@ -222,23 +223,48 @@ for (const cluster of clusters) {
 }
 
 /**
- * A region wraps the nodes whose primary cluster it is. Papers that bridge two clusters
- * sit in their first one and show the second as a dot, so regions never overlap into a
- * muddy intersection.
+ * A region wraps every node that belongs to its cluster, bridging ones included. Since
+ * those sit on the seams of the 2 × 2 layout, regions overlap only along the seams, and
+ * the overlap is exactly where the papers that join two themes live.
  */
-const regions = computed(() => {
+const rawRegions = computed(() => {
   return clusters
     .map((cluster) => {
       const clusterBoxes = researchNodes
-        .filter(node => node.clusters[0] === cluster.id)
+        .filter(node => node.clusters.includes(cluster.id))
         .flatMap((node) => {
           const box = boxes.value[node.id]
           const pos = positions[node.id]
           return box && pos ? [{ x: pos.x, y: pos.y, hw: box.hw, hh: box.hh }] : []
         })
-      return { id: cluster.id, rect: regionRect(clusterBoxes) }
+      return { id: cluster.id, cell: cluster.cell, rect: regionRect(clusterBoxes) }
     })
-    .filter((region): region is { id: ClusterId, rect: NonNullable<typeof region.rect> } => !!region.rect)
+    .filter((region): region is typeof region & { rect: NonNullable<typeof region.rect> } => !!region.rect)
+})
+
+/**
+ * Regions in the same column share both their sides, and regions in the same row both
+ * their top and bottom, so the four read as one grid whose seams run straight through
+ * the hub, even where no node bridges two regions. Once the reader drags things around,
+ * each region follows its own nodes again.
+ */
+const regions = computed(() => {
+  const raw = rawRegions.value
+  if (userMoved.value)
+    return raw.map(({ id, rect }) => ({ id, rect }))
+
+  const span = (pick: (r: typeof raw[number]) => boolean, from: (r: typeof raw[number]) => number, to: (r: typeof raw[number]) => number) => {
+    const group = raw.filter(pick)
+    return { start: Math.min(...group.map(from)), end: Math.max(...group.map(to)) }
+  }
+  const cols = [0, 1].map(col => span(r => r.cell.col === col, r => r.rect.x, r => r.rect.x + r.rect.width))
+  const rows = [0, 1].map(row => span(r => r.cell.row === row, r => r.rect.y, r => r.rect.y + r.rect.height))
+
+  return raw.map(({ id, cell }) => {
+    const col = cols[cell.col]!
+    const row = rows[cell.row]!
+    return { id, rect: { x: col.start, y: row.start, width: col.end - col.start, height: row.end - row.start } }
+  })
 })
 
 function edgePath(a: { x: number, y: number }, b: { x: number, y: number }) {
@@ -249,6 +275,12 @@ function edgePath(a: { x: number, y: number }, b: { x: number, y: number }) {
   const mx = (a.x + b.x) / 2 - (dy / len) * offset
   const my = (a.y + b.y) / 2 + (dx / len) * offset
   return `M${a.x} ${a.y}Q${mx.toFixed(1)} ${my.toFixed(1)} ${b.x} ${b.y}`
+}
+
+const clusterLabels = Object.fromEntries(clusters.map(cluster => [cluster.id, cluster.label])) as Record<ClusterId, string>
+
+function clusterLabel(id: ClusterId) {
+  return clusterLabels[id]
 }
 
 const nodeById = new Map(researchNodes.map(node => [node.id, node]))
@@ -401,6 +433,9 @@ const enter = computed(() =>
               <Icon v-if="node.url" name="uil:arrow-up-right" class="size-3.5 shrink-0" />
             </component>
             <span v-if="node.venue" class="ml-1.5 text-xs text-neutral-500 dark:text-neutral-400">{{ node.venue }}</span>
+            <span v-if="node.clusters.length > 1" class="ml-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+              also {{ clusterLabel(node.clusters[1]!) }}
+            </span>
             <span v-if="node.description" class="block text-neutral-500 dark:text-neutral-400">{{ node.description }}</span>
           </li>
         </ul>

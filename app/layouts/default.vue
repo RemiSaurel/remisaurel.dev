@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { MINIMAL } from '~/sounds/sounds'
-
 const route = useRoute()
 const { play } = useSound()
 
@@ -50,7 +48,7 @@ function isActive(path: string) {
                 :to="item.route"
                 class="inline-block whitespace-nowrap rounded-sm py-2 text-xs text-neutral-500 transition-colors duration-150 -my-2 sm:text-sm dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
                 :class="{ 'text-neutral-900! dark:text-neutral-100!': isActive(item.route) }"
-                @click="play(MINIMAL.tap)"
+                @click="play('navigate', { emphasis: 'subtle', volume: 0.5 })"
               >
                 {{ item.label }}
               </NuxtLink>

@@ -7,6 +7,8 @@ export interface Cluster {
   id: ClusterId
   label: string
   description: string
+  /** Quadrant of the 2 × 2 layout, used to line up the outer edges of the regions. */
+  cell: { col: 0 | 1, row: 0 | 1 }
 }
 
 /**
@@ -17,7 +19,8 @@ export interface Cluster {
  * - `paper` nodes are cards resolved from `publications.ts`.
  * - `hub` is the single neutral node every cluster hangs off.
  *
- * `clusters` drives both the colour and the region(s) a node belongs to.
+ * `clusters` drives both the colour and the region(s) a node belongs to. A node
+ * listing two clusters is part of both regions, so it sits on the seam between them.
  * `x` / `y` are placed by `computeLayout` below, never by hand: to add or
  * remove a node, only touch `rawNodes` and `researchLinks`.
  */
@@ -51,21 +54,25 @@ export const clusters: Cluster[] = [
     id: 'la',
     label: 'Learning Analytics',
     description: 'Turning traces of learning activity into indicators teachers can read, trust and act on.',
+    cell: { col: 0, row: 0 },
   },
   {
     id: 'hai',
     label: 'Human-AI Interaction',
     description: 'Designing with teachers and learners rather than for them, and studying what they do with AI.',
+    cell: { col: 0, row: 1 },
   },
   {
     id: 'aied',
     label: 'AI in Education',
     description: 'Assessing what generative models can and cannot do when they grade, tutor or recommend.',
+    cell: { col: 1, row: 0 },
   },
   {
     id: 'ethics',
     label: 'AI & Ethics',
     description: 'Naming the risks of generative AI in schools and turning them into actionable strategy.',
+    cell: { col: 1, row: 1 },
   },
 ]
 
@@ -118,7 +125,7 @@ const rawNodes: RawNode[] = [
     label: 'Co-designing Dashboards',
     kind: 'paper',
     clusters: ['la', 'hai'],
-    maxW: 150,
+    maxW: 170,
     publication: 'rjceiah-2026',
   },
 
@@ -175,7 +182,7 @@ const rawNodes: RawNode[] = [
     id: 'asag',
     label: 'Automatic Short Answer Grading',
     kind: 'topic',
-    clusters: ['aied'],
+    clusters: ['la', 'aied'],
     maxW: 132,
     description: 'Grading open-ended answers automatically, and measuring the gap with human graders.',
   },
@@ -183,14 +190,14 @@ const rawNodes: RawNode[] = [
     id: 'ectel',
     label: 'MAESTRO',
     kind: 'paper',
-    clusters: ['aied'],
+    clusters: ['la', 'aied'],
     publication: 'ectel-2025',
   },
   {
     id: 'lak',
     label: 'Mind the Gap',
     kind: 'paper',
-    clusters: ['aied'],
+    clusters: ['la', 'aied'],
     publication: 'lak-2026',
   },
 
@@ -199,7 +206,7 @@ const rawNodes: RawNode[] = [
     id: 'eiah',
     label: 'Responsible GenAI Integration',
     kind: 'paper',
-    clusters: ['ethics', 'aied'],
+    clusters: ['aied', 'ethics'],
     maxW: 150,
     publication: 'eiah-2025',
   },
@@ -254,6 +261,8 @@ export const researchLinks: ResearchLink[] = [
   { from: 'llm', to: 'asag' },
   { from: 'multi-agent', to: 'ectel' },
   { from: 'llm', to: 'ectel' },
+  { from: 'la', to: 'asag' },
+  { from: 'la', to: 'lak' },
   { from: 'asag', to: 'lak' },
   { from: 'llm', to: 'lak' },
   { from: 'aied', to: 'eiah' },
@@ -273,13 +282,15 @@ export const researchLinks: ResearchLink[] = [
 ]
 
 /* ── Layout ────────────────────────────────────────────────────────────
- * Hand-placed centres, in design units (`VIEW_W` × `VIEW_H`). Composed by
- * hand rather than force-directed: the arrangement carries meaning the
- * springs cannot know about (papers reading left-to-right within their
- * cluster, the hub bridging the four regions, room left for the popover
- * on either side). The client only nudges these apart when a narrow
- * viewport makes two boxes actually overlap, so what is written here is
- * what renders at desktop width.
+ * Hand-placed centres, in design units (`VIEW_W` × `VIEW_H`). The four
+ * clusters form a 2 × 2 grid (LA | AIED over HAI | Ethics) and every node
+ * that bridges two clusters sits on the seam between them: the vertical
+ * seam at x = 500, the horizontal one at y = 255. Regions are wrapped
+ * around all their members, so the seams are where they overlap, and the
+ * hub sits on the crossing. Composed by hand rather than force-directed:
+ * the client only nudges these apart when a narrow viewport makes two
+ * boxes actually overlap, so what is written here is what renders at
+ * desktop width.
  *
  * To move a node, edit its pair below. To add one, append it here too:
  * a node missing from this map throws at import time rather than landing
@@ -289,32 +300,34 @@ export const researchLinks: ResearchLink[] = [
 interface Vec { x: number, y: number }
 
 const LAYOUT: Record<string, Vec> = {
-  'tel': { x: 499, y: 297 },
+  'tel': { x: 500, y: 255 },
 
-  // Learning Analytics
-  'la': { x: 337, y: 92 },
-  'indicators': { x: 160, y: 35 },
-  'dashboards': { x: 54, y: 100 },
-  'rjceiah': { x: 185, y: 200 },
+  // Learning Analytics (top left)
+  'la': { x: 290, y: 120 },
+  'indicators': { x: 140, y: 50 },
+  'dashboards': { x: 100, y: 155 },
 
-  // Human-AI Interaction
-  'hai': { x: 287, y: 380 },
-  'co-design': { x: 163, y: 339 },
-  'decisions': { x: 94, y: 408 },
+  // Human-AI Interaction (bottom left)
+  'hai': { x: 340, y: 370 },
+  'co-design': { x: 140, y: 340 },
+  'decisions': { x: 150, y: 420 },
 
-  // AI in Education
-  'aied': { x: 644, y: 148 },
-  'llm': { x: 746, y: 72 },
-  'multi-agent': { x: 586, y: 101 },
-  'asag': { x: 905, y: 144 },
-  'ectel': { x: 551, y: 44 },
-  'lak': { x: 914, y: 43 },
+  // AI in Education (top right)
+  'aied': { x: 720, y: 160 },
+  'multi-agent': { x: 680, y: 50 },
+  'llm': { x: 860, y: 70 },
 
-  // AI & Ethics
-  'ethics': { x: 711, y: 357 },
-  'eiah': { x: 789, y: 240 },
-  'responsible-ai': { x: 894, y: 357 },
-  'governance': { x: 841, y: 423 },
+  // AI & Ethics (bottom right)
+  'ethics': { x: 660, y: 370 },
+  'responsible-ai': { x: 860, y: 340 },
+  'governance': { x: 850, y: 420 },
+
+  // Seams
+  'ectel': { x: 500, y: 40 }, // LA | AIED
+  'asag': { x: 500, y: 112 }, // LA | AIED
+  'lak': { x: 500, y: 184 }, // LA | AIED
+  'rjceiah': { x: 210, y: 255 }, // LA | HAI
+  'eiah': { x: 800, y: 255 }, // AIED | Ethics
 }
 
 function findPublication(id: string): Publication | undefined {

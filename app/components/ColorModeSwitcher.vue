@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { MINIMAL } from '~/sounds/sounds'
-
 const colorMode = useColorMode()
 const { play } = useSound()
 
@@ -19,7 +17,7 @@ function cssTimeToMs(value: string): number {
 
 function toggleColorMode(event: MouseEvent) {
   // Rising two-note blip towards light, falling towards dark.
-  play(colorMode.value === 'dark' ? MINIMAL.toggleOn : MINIMAL.toggleOff)
+  play('toggle', { direction: colorMode.value === 'dark' ? 'forward' : 'back' })
 
   const supportsViewTransition = typeof document.startViewTransition === 'function'
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches

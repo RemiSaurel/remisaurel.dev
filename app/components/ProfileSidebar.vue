@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { animate, motion } from 'motion-v'
-import { MINIMAL, RETRO } from '~/sounds/sounds'
 
 interface Props {
   animate?: boolean
@@ -70,12 +69,12 @@ function handlePhotoClick(event: MouseEvent) {
   const { progress, triggered } = registerClick()
   const target = event.currentTarget as HTMLElement
 
-  // Each pop climbs in pitch as the streak builds (up to an octave), then the
-  // retro swoosh hints at what's about to open.
+  // Each tap gets heavier as the streak builds, then an opening cue hints at
+  // what's about to open.
   if (triggered)
-    play(RETRO.swoosh, { volume: 0.6 })
+    play('open', { emphasis: 'strong' })
   else
-    play(MINIMAL.pop, { detune: progress * 1200, jitter: { volume: 0.1 } })
+    play('tap', { emphasis: progress < 0.4 ? 'subtle' : progress < 0.8 ? 'normal' : 'strong' })
 
   if (!prefersReducedMotion.value) {
     const amplitude = 1.5 + progress * 2.5
@@ -130,7 +129,7 @@ function completeCvHold() {
   if (!isHoldingCv.value)
     return
   isHoldingCv.value = false
-  play(MINIMAL.success)
+  play('success', { emphasis: 'strong' })
   navigateTo('/failures')
 }
 

@@ -1,8 +1,7 @@
-import type { PlayOptions, SoundDefinition } from '@web-kits/audio'
+import type { PlayOptions, SoundName } from 'cuelume'
 import type { Board, PieceId, PieceState } from '~/tetris/tetris'
 import { useDocumentVisibility, useLocalStorage, useRafFn } from '@vueuse/core'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { RETRO } from '~/sounds/sounds'
 import {
   BUFFER_ROWS,
   clearFullRows,
@@ -45,8 +44,8 @@ export function useTetrisGame() {
   const canHold = ref(true)
   const bestScore = useLocalStorage('tetris-best-score', 0)
   const { play: playSound } = useSound()
-  const sfx = (definition: SoundDefinition, opts?: PlayOptions) =>
-    playSound(definition, { volume: GAME_VOLUME, ...opts })
+  const sfx = (name: SoundName, opts?: PlayOptions) =>
+    playSound(name, { volume: GAME_VOLUME, ...opts })
 
   const level = computed(() => Math.floor(lines.value / 10) + 1)
 
@@ -104,7 +103,7 @@ export function useTetrisGame() {
     if (score.value > bestScore.value)
       bestScore.value = score.value
     pauseLoop()
-    sfx(RETRO.error)
+    sfx('error')
   }
 
   function spawnNext() {
@@ -124,7 +123,7 @@ export function useTetrisGame() {
     if (status.value !== 'playing' || !current.value || !canHold.value)
       return
     const currentId = current.value.id
-    sfx(RETRO.tabSwitch)
+    sfx('select')
 
     if (held.value === null) {
       held.value = currentId
@@ -156,7 +155,7 @@ export function useTetrisGame() {
     const { board: cleared, rows } = clearFullRows(board.value)
     if (rows.length === 0) {
       if (!quiet)
-        sfx(RETRO.click, { volume: GAME_VOLUME * 0.5, detune: -1200 })
+        sfx('tap', { emphasis: 'subtle' })
       spawnNext()
       return
     }
@@ -166,10 +165,10 @@ export function useTetrisGame() {
     const previousLevel = level.value
     score.value += lineScore(rows.length, level.value)
     lines.value += rows.length
-    // The arpeggio climbs a step per extra row, so a Tetris sounds like the jackpot it is.
-    sfx(RETRO.success, { detune: (rows.length - 1) * 200 })
+    // Four rows at once is a Tetris, so it gets the strong chord.
+    sfx('success', { emphasis: rows.length >= 4 ? 'strong' : 'normal' })
     if (level.value > previousLevel)
-      setTimeout(sfx, 260, RETRO.notification)
+      setTimeout(sfx, 260, 'ready')
 
     setTimeout(() => {
       board.value = cleared
@@ -206,7 +205,7 @@ export function useTetrisGame() {
     const moved = tryMove(board.value, current.value, 0, dir)
     if (moved) {
       current.value = moved
-      sfx(RETRO.tap, { volume: GAME_VOLUME * 0.6 })
+      sfx('select', { emphasis: 'subtle' })
     }
   }
 
@@ -216,7 +215,7 @@ export function useTetrisGame() {
     const rotated = tryRotate(board.value, current.value, dir)
     if (rotated) {
       current.value = rotated
-      sfx(RETRO.click, { volume: GAME_VOLUME * 0.7, detune: dir === 1 ? 0 : -300 })
+      sfx('select', { emphasis: 'subtle', direction: dir === 1 ? 'forward' : 'back' })
     }
   }
 
@@ -226,7 +225,7 @@ export function useTetrisGame() {
     const { piece, distance } = hardDropDistance(board.value, current.value)
     current.value = piece
     score.value += distance * 2
-    sfx(RETRO.pop)
+    sfx('tap', { emphasis: 'strong' })
     lockCurrent(true)
   }
 
@@ -242,7 +241,7 @@ export function useTetrisGame() {
     clearingRows.value = []
     gravityElapsed = 0
     status.value = 'playing'
-    sfx(RETRO.pageEnter)
+    sfx('open')
     spawnNext()
     resumeLoop()
   }
@@ -267,7 +266,7 @@ export function useTetrisGame() {
     status.value = 'paused'
     pauseLoop()
     if (!quiet)
-      sfx(RETRO.toggleOff)
+      sfx('toggle', { direction: 'back' })
   }
 
   function resume() {
@@ -275,7 +274,7 @@ export function useTetrisGame() {
       return
     status.value = 'playing'
     resumeLoop()
-    sfx(RETRO.toggleOn)
+    sfx('toggle')
   }
 
   function togglePause() {

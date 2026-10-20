@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { FilterDefinition, FilterEntry, FilterMode, FilterOption, FilterState, FilterValue } from '~/utils/filters'
 import { AnimatePresence, motion } from 'motion-v'
-import { MINIMAL } from '~/sounds/sounds'
 import { effectiveMode, emptyFilterEntry, emptyFilterState, filterModes, modeLabel } from '~/utils/filters'
 
 interface Props {
@@ -33,22 +32,22 @@ function toggle(definition: FilterDefinition, value: FilterValue) {
   // An emptied filter disappears, so it comes back as a plain "is" next time.
   const mode = next.length ? entryFor(definition.key).mode : 'include'
   filters.value = { ...filters.value, [definition.key]: { mode, values: next } }
-  play(MINIMAL.tap)
+  play('toggle', { direction: next.includes(value) ? 'forward' : 'back' })
 }
 
 function setMode(definition: FilterDefinition, mode: FilterMode) {
   filters.value = { ...filters.value, [definition.key]: { ...entryFor(definition.key), mode } }
-  play(MINIMAL.tap)
+  play('select', { emphasis: 'subtle' })
 }
 
 function remove(definition: FilterDefinition) {
   filters.value = { ...filters.value, [definition.key]: emptyFilterEntry() }
-  play(MINIMAL.pop)
+  play('close', { emphasis: 'subtle' })
 }
 
 function clearAll() {
   filters.value = emptyFilterState(props.definitions)
-  play(MINIMAL.pop)
+  play('close', { emphasis: 'subtle' })
 }
 
 const activeDefinitions = computed(() => props.definitions.filter(definition => selectedFor(definition.key).length))
