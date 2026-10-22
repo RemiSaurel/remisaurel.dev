@@ -373,6 +373,14 @@ article {
   margin-right: auto;
 }
 
+/* Interactive blocks (a workflow canvas, a comparison) widen out of the reading column, still centred */
+.breakout {
+  width: min(960px, 100vw - 48px);
+  max-width: none;
+  margin-left: calc(50% - min(480px, 50vw - 24px));
+  margin-right: 0;
+}
+
 article h1 {
   font-size: 2rem;
   font-weight: 700;

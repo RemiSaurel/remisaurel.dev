@@ -2,7 +2,7 @@ import { pageComposition, postComposition } from '../../utils/og/compositions'
 import { renderOgImage } from '../../utils/og/render'
 
 /**
- * `/og/index.png`, `/og/research.png`, `/og/posts/my-post.png`: the OG image of the page at the
+ * `/og/index.png`, `/og/research.png`, `/og/posts/my-post.png`, `/og/explorations/my-exploration.png`: the OG image of the page at the
  * same path (see `ogImagePath`). `nuxt generate` writes them as static files.
  */
 export default defineEventHandler(async (event) => {
@@ -24,6 +24,19 @@ export default defineEventHandler(async (event) => {
       label: 'Post',
       date: new Date(post.date),
       composition: postComposition(path.slice('/posts/'.length)),
+    })
+  }
+  else if (path.startsWith('/explorations/')) {
+    const exploration = await queryCollection(event, 'explorations').path(path).first()
+    if (!exploration || ('status' in exploration && exploration.status === 'draft'))
+      throw createError({ statusCode: 404, statusMessage: `No exploration at ${path}` })
+    png = renderOgImage({
+      title: exploration.title,
+      description: exploration.description,
+      label: 'Exploration',
+      date: new Date(exploration.date),
+      // Drawn like a post's: the same slug always gets the same picture
+      composition: postComposition(path.slice('/explorations/'.length)),
     })
   }
   else {

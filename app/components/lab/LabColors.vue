@@ -133,7 +133,7 @@ const POPOVER_UI = { content: 'rounded-none bg-white shadow-lg ring-1 ring-neutr
       class="lab-swatches grid grid-cols-11 p-0.5"
       :style="{ '--swatch-ground': ART_PALETTES[canvasTheme].bg, '--swatch-ring': ART_PALETTES[canvasTheme].ink }"
     >
-      <div role="radiogroup" aria-label="Palette" class="col-span-10 grid grid-cols-10">
+      <div role="radiogroup" aria-label="Palette" class="grid col-span-10 grid-cols-10">
         <button
           v-for="(color, index) in ART_COLOR_ORDER"
           ref="swatches"

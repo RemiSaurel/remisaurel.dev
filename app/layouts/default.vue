@@ -2,12 +2,16 @@
 const route = useRoute()
 const { play } = useSound()
 
-const navItems = [
+const { data: explorations } = await useExplorations()
+
+// Explorations only join the nav once there is one to open
+const navItems = computed(() => [
   { route: '/', label: 'About' },
   { route: '/research', label: 'Research' },
+  ...(explorations.value.length ? [{ route: '/explorations', label: 'Explorations' }] : []),
   { route: '/posts', label: 'Posts' },
   { route: '/projects', label: 'Projects' },
-]
+])
 
 function isActive(path: string) {
   if (path === '/')

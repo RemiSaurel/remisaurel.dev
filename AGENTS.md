@@ -25,12 +25,15 @@ pnpm generate
 
 # Preview production build
 pnpm preview
+
+# Unit tests (pure helpers in app/utils only)
+pnpm test
 ```
 
 ### Notes
 
-- No test framework is configured in this project
-- No ESLint or Prettier configuration exists
+- Vitest only covers pure functions (`app/utils/**/*.test.ts`); components are checked in the browser
+- ESLint uses `@antfu/eslint-config` with the UnoCSS plugin (`pnpm lint`)
 - TypeScript checking is handled by Nuxt's built-in type system
 
 ## Project Structure
@@ -45,8 +48,12 @@ remisaurel.dev/
 │   ├── composables/        # Vue composables (useAnimations, useNews, useFirstVisit)
 │   ├── layouts/default.vue # Default layout
 │   ├── news/news.ts        # News data with typed interfaces
-│   └── pages/              # Page routes (index, posts, projects, teaching)
+│   ├── components/flow/    # Workflow canvas kit (FlowCanvas, FlowNode, FlowStack...)
+│   ├── components/explorations/<slug>/  # Components of one exploration (`*.global.vue`, used in MDC)
+│   ├── utils/flow/         # Pure geometry and graph helpers of the canvas, with their tests
+│   └── pages/              # Page routes (index, posts, projects, explorations, research...)
 ├── content/posts/          # Markdown blog posts
+├── content/explorations/   # Explorations: Markdown + interactive components
 ├── public/                 # Static assets
 ├── server/                 # Server-side code
 │   ├── routes/og/          # OG image route (/og/index.png, /og/posts/<slug>.png)
@@ -183,7 +190,16 @@ import { motion } from 'motion-v'
 - Markdown files in `content/posts/` with YAML frontmatter
 - Required frontmatter: `title`, `description`, `date`
 - Custom components available: `:tag{color="green"}[text]`, `::blockquote{type="info"}`
+- `::compare` with `:::compare-item{label="…" verdict="works|partial|fails" note="…"}` children: takes side by side (one frame of columns on desktop, a snapping carousel with a pager on phones). Use the `note` prop, not a `#note` slot: MDC drops the following items after a slot in a nested block
 - Code blocks use catppuccin themes (latte for light, mocha for dark)
+
+### Explorations
+
+- One Markdown file per exploration in `content/explorations/` (frontmatter: `title`, `description`, `date`, `tags`, `status`, `icon`)
+- `status`: `draft` (the default) shows it in dev only, never listed, linked nor generated in production; `wip` publishes it with a "Work in progress" mark; `published` publishes it. The nav shows "Explorations" once one is visible
+- Interactive parts live in `app/components/explorations/<slug>/` as `*.global.vue`, embedded with MDC (`::explorations-<slug>-<name>`)
+- Workflows use `FlowCanvas` with a `FlowGraph` (nodes with x/y, edges, optional loop). A player (`useFlowPlayer`) drives what happens: node statuses and balls along edges, all on its own clock (pause, speed). `useFlowDemo` plays a graph on its own until there is real logic to drive it
+- Node footers and the side panel come from the `footer` and `inspector` slots. Below `md`, the same graph renders as a vertical list (`FlowStack`)
 
 ### Data Files
 

@@ -71,6 +71,7 @@ const BUILDERS: Record<CompositionName, (seed: number, turn: number) => ArtCompo
 const PAGE_COMPOSITIONS: Record<string, CompositionName> = {
   '/': 'signal',
   '/research': 'agents',
+  '/explorations': 'rays',
   '/posts': 'lines',
   '/projects': 'matrix',
   '/failures': 'decay',

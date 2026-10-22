@@ -193,7 +193,7 @@ function onPaste(event: ClipboardEvent) {
           maxlength="7"
           spellcheck="false"
           autocomplete="off"
-          class="lab-hex min-w-0 flex-1 border-0 bg-transparent p-0 text-xs text-neutral-900 uppercase outline-none dark:text-neutral-100"
+          class="lab-hex uppercase min-w-0 flex-1 border-0 bg-transparent p-0 text-xs text-neutral-900 outline-none dark:text-neutral-100"
           @focus="editingHex = true"
           @blur="applyDraft"
           @keydown.enter.prevent="applyDraft"

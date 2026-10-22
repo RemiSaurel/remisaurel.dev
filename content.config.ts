@@ -21,5 +21,19 @@ export default defineContentConfig({
         })).optional(),
       }),
     }),
+    explorations: defineCollection({
+      type: 'page',
+      source: 'explorations/**',
+      schema: z.object({
+        title: z.string(),
+        description: z.string(),
+        date: z.date(),
+        tags: z.array(z.string()).default([]),
+        // draft: dev only, never listed nor generated in production · wip: public, marked as in progress
+        status: z.enum(['draft', 'wip', 'published']).default('draft'),
+        // Lucide icon of the row tile on /explorations; a sheet of lines when omitted
+        icon: z.string().optional(),
+      }),
+    }),
   },
 })

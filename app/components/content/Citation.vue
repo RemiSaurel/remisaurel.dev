@@ -24,7 +24,7 @@ const cited = computed(() => props.id.split(',').map((id) => {
       <UTooltip v-if="c.ref" :text="c.ref.title">
         <a
           :href="`#ref-${c.id}`"
-          class="text-zinc-500 underline decoration-zinc-300 decoration-dotted underline-offset-2 transition-colors duration-300 hover:text-blue-600 dark:text-zinc-400 dark:decoration-zinc-600 hover:decoration-blue-500 dark:hover:text-blue-300"
+          class="text-zinc-500 underline decoration-zinc-300 underline-offset-2 decoration-dotted transition-colors duration-300 dark:text-zinc-400 hover:text-blue-600 dark:decoration-zinc-600 hover:decoration-blue-500 dark:hover:text-blue-300"
         >
           <template v-if="narrative">{{ citationAuthors(c.ref) }} ({{ c.ref.year }})</template>
           <template v-else>{{ citationAuthors(c.ref) }}, {{ c.ref.year }}</template>
