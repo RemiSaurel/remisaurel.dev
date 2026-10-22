@@ -14,6 +14,9 @@ const { data: found, status } = await useAsyncData(
 // A draft does not exist outside of development
 const page = computed(() => (found.value && (SHOW_DRAFTS || found.value.status !== 'draft') ? found.value : null))
 const body = useTemplateRef<HTMLElement>('body')
+
+const references = computed<Reference[]>(() => page.value?.references ?? [])
+provide(REFERENCES_KEY, references)
 const tags = computed(() => page.value?.tags ?? [])
 
 // "In progress since October 2026, about AI, ASAG and Workflow." Built as parts, so no template
@@ -81,6 +84,7 @@ usePageSeo({
         <ContentRenderer :value="page" />
       </div>
       <PostHighlighter :root="body" :storage-key="`/explorations/${slug}`" />
+      <PostReferences v-if="references.length" :references="references" />
     </article>
 
     <div v-else-if="status === 'pending'" class="py-12 text-center text-neutral-500 dark:text-neutral-400">
