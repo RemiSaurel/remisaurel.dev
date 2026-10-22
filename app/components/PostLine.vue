@@ -4,6 +4,7 @@ interface Props {
   title: string
   description: string
   disabled?: boolean
+  date?: Date | string
 }
 const props = withDefaults(defineProps<Props>(), {
   disabled: false,
@@ -13,7 +14,7 @@ const nuxtLink = resolveComponent('NuxtLink')
 
 // Computed classes for better maintainability
 const containerClasses = computed(() => [
-  'origin-left w-full flex items-center gap-4',
+  'origin-left flex items-center gap-4 rounded-xl px-2 py-2 -mx-2',
   props.disabled ? 'opacity-40' : 'group',
 ])
 
@@ -28,6 +29,18 @@ const descriptionClasses = computed(() => [
   'dark:text-zinc-400 text-zinc-500',
   !props.disabled && 'group-hover:text-zinc-600 dark:group-hover:text-zinc-300',
 ].filter(Boolean))
+
+// Each post gets its own mix of strong and faint lines, stable from its path so SSR and client agree.
+// The last line is the short one and never the strong one
+const LINE_OPACITIES = [0.35, 0.5, 0.65]
+const lineOpacities = computed(() => {
+  let hash = 0
+  for (const char of props.to)
+    hash = (hash * 31 + char.charCodeAt(0)) >>> 0
+  const strong = hash % 3
+  return Array.from({ length: 4 }, (_, i) =>
+    i === strong ? 1 : LINE_OPACITIES[(hash >>> (i * 2 + 2)) % LINE_OPACITIES.length])
+})
 
 const displayTitle = computed(() =>
   props.disabled ? `${props.title} 🔜` : props.title,
@@ -45,22 +58,21 @@ const displayTitle = computed(() =>
       class="tile grid size-11 shrink-0 place-items-center border border-neutral-200 rounded-xl bg-white text-neutral-400 dark:border-neutral-700/80 dark:bg-neutral-800 dark:text-neutral-500"
       aria-hidden="true"
     >
-      <span class="w-[18px] flex flex-col gap-[3px]">
-        <span class="h-[1.5px] w-full rounded-full bg-current" />
-        <span class="h-[1.5px] w-full rounded-full bg-current" />
-        <span class="h-[1.5px] w-full rounded-full bg-current" />
-        <span class="h-[1.5px] w-3/5 rounded-full bg-current" />
+      <span class="w-[20px] flex flex-col gap-[4px]">
+        <span
+          v-for="(opacity, i) in lineOpacities"
+          :key="i"
+          class="h-[2px] rounded-full bg-current"
+          :class="i === 3 ? 'w-3/5' : 'w-full'"
+          :style="{ opacity }"
+        />
       </span>
     </span>
 
     <span class="min-w-0 flex flex-col gap-1">
       <h3 :class="titleClasses">
         {{ displayTitle }}
-        <Icon
-          v-if="!disabled"
-          name="uil:arrow-up-right"
-          class="size-4 opacity-0 transition-[opacity,transform] duration-150 -translate-x-1 group-hover:translate-x-0 group-hover:opacity-100"
-        />
+        <NewTag v-if="!disabled && isNew(date)" />
       </h3>
       <p :class="descriptionClasses">
         {{ description }}

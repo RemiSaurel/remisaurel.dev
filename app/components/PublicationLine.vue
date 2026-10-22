@@ -9,7 +9,7 @@ function formatAuthors(authors: string[]) {
 
 const PUB_IMAGE = {
   width: 320,
-  height: 160,
+  height: 256,
   fit: 'cover',
   format: 'webp',
   densities: 'x1 x2',
@@ -26,7 +26,7 @@ const PUB_IMAGE = {
   >
     <span
       v-if="publication.art || publication.image"
-      class="relative mt-0.5 h-10 w-20 shrink-0 overflow-hidden bg-neutral-100 dark:bg-neutral-800"
+      class="relative mt-0.5 h-16 w-20 shrink-0 overflow-hidden border border-neutral-200 rounded-lg bg-neutral-100 dark:border-neutral-700/80 dark:bg-neutral-800"
     >
       <template v-if="publication.art">
         <img :src="publication.art.light" alt="" class="object-cover size-full dark:hidden">
@@ -45,14 +45,9 @@ const PUB_IMAGE = {
         </template>
       </span>
       <span class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-        <span class="whitespace-nowrap border border-neutral-300 px-1.5 py-0.5 text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">{{ publication.venue }}</span>
-        <span v-if="publication.award" class="text-amber-700 font-medium dark:text-amber-400">{{ publication.award }}</span>
+        <span class="whitespace-nowrap border border-neutral-300 rounded-full px-2 py-0.5 text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">{{ publication.venue }}</span>
+        <span v-if="publication.award" class="text-amber-800/80 dark:text-amber-300/70">{{ publication.award }}</span>
       </span>
     </span>
-
-    <LinkArrow
-      v-if="publication.url"
-      class="ml-auto mt-1.5 h-2.5 w-2.5 shrink-0 opacity-30 transition-[opacity,transform] duration-150 ease-out group-hover:translate-x-0.5 group-hover:opacity-100 group-hover:-translate-y-0.5"
-    />
   </component>
 </template>

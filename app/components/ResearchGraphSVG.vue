@@ -28,6 +28,7 @@ defineEmits<{
       :y="region.rect.y"
       :width="region.rect.width"
       :height="region.rect.height"
+      rx="12"
       class="rl-region touch-none cursor-grab active:cursor-grabbing"
       :class="[`rl-${region.id}`, { 'rl-region-dimmed': focusedClusters && !focusedClusters.has(region.id) }]"
     />

@@ -56,14 +56,6 @@ const activeDefinitions = computed(() => props.definitions.filter(definition => 
 const panelKey = ref(props.definitions[0]?.key)
 const panelDefinition = computed(() => props.definitions.find(definition => definition.key === panelKey.value) ?? props.definitions[0]!)
 
-// Both boxes share the same padding and row height, so shifting the values box down by one
-// row per filter puts its first row level with the hovered filter.
-const PANEL_ROW_HEIGHT = 28
-const panelOffset = computed(() => {
-  const index = props.definitions.findIndex(definition => definition.key === panelDefinition.value.key)
-  return `${Math.max(index, 0) * PANEL_ROW_HEIGHT}px`
-})
-
 function operator(definition: FilterDefinition) {
   const entry = entryFor(definition.key)
   return modeLabel(effectiveMode(entry), entry.values.length)
@@ -91,17 +83,18 @@ const iconOptions = (definition: FilterDefinition) => selectedOptions(definition
 const chipIcons = (definition: FilterDefinition) => iconOptions(definition).slice(0, CHIP_ICON_LIMIT)
 const hasMoreIcons = (definition: FilterDefinition) => iconOptions(definition).length > CHIP_ICON_LIMIT
 
-const PANEL_BOX = 'bg-white shadow-lg ring-1 ring-neutral-200 dark:bg-neutral-900 dark:ring-neutral-800'
-// Square corners, like the rest of the site.
-const POPOVER_UI = { content: `rounded-none overflow-hidden ${PANEL_BOX}` }
-// The "Filter" panel is two cascading boxes, so the popover itself is only a transparent wrapper.
-const PANEL_POPOVER_UI = { content: 'rounded-none bg-transparent shadow-none ring-0' }
+// Same sheet as the bento tiles, raised a little more. Rows inside sit 4px in, so their 8px corners stay concentric.
+const PANEL_BOX = 'sheet rounded-xl shadow-lg'
+const POPOVER_UI = { content: `rounded-xl overflow-hidden ring-0 ${PANEL_BOX}` }
 const POPOVER_CONTENT = { align: 'start', sideOffset: 6, collisionPadding: 16 } as const
 
 const CHIP_TRANSITION = { type: 'spring', duration: 0.3, bounce: 0 } as const
 const chipTransition = computed(() => prefersReducedMotion.value ? { duration: 0 } : CHIP_TRANSITION)
 const CHIP_HIDDEN = { opacity: 0, scale: 0.96, filter: 'blur(4px)' }
 const CHIP_SHOWN = { opacity: 1, scale: 1, filter: 'blur(0px)' }
+// "Clear filters" sits after the chips, so any slide or slow fade would run under a chip that is
+// entering or leaving. It snaps to its place and leaves at once instead of overlapping them.
+const CLEAR_EXIT = { opacity: 0, transition: { duration: 0 } }
 // "is" to "is any of" resizes the chip instantly (layout="position": animating the size would
 // scale the text), so the new operator blurs in to hide the snap.
 const OPERATOR_HIDDEN = { opacity: 0, filter: 'blur(2px)' }
@@ -111,29 +104,27 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
 <template>
   <div class="relative flex flex-wrap items-center gap-1.5">
     <!-- First in the row, so adding a chip never moves the button its panel is anchored to -->
-    <UPopover :content="POPOVER_CONTENT" :ui="PANEL_POPOVER_UI">
+    <UPopover :content="POPOVER_CONTENT" :ui="POPOVER_UI">
       <button
         type="button"
-        class="h-8 inline-flex pressable cursor-pointer items-center gap-1.5 border border-neutral-200 bg-white px-2.5 text-xs text-neutral-600 transition-colors duration-150 ease-out dark:border-neutral-700 hover:border-neutral-300 dark:bg-neutral-900 hover:bg-neutral-50 dark:text-neutral-300 hover:text-neutral-900 dark:hover:border-neutral-600 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
+        class="filter-trigger sheet h-8 inline-flex pressable cursor-pointer items-center gap-1.5 rounded-[10px] px-2.5 text-xs text-neutral-600 dark:text-neutral-300"
       >
         <Icon name="lucide:list-filter" class="size-3.5" aria-hidden="true" />
         Filter
       </button>
 
       <template #content>
-        <!-- Two boxes glued side by side, each with its own height: the filters fit their
-             content, the values grow up to their max. The ring is drawn outside each box, so a 1px
-             gap puts both rings on the same pixel column and they read as one border. -->
-        <div class="flex items-start">
-          <div role="group" aria-label="Filters" class="relative z-1 w-32 flex shrink-0 flex-col p-1" :class="PANEL_BOX">
+        <!-- One sheet, two columns: the filters on the left, the values of the hovered one on the right -->
+        <div class="flex items-stretch">
+          <div role="group" aria-label="Filters" class="w-32 flex shrink-0 flex-col border-r border-neutral-200 p-1 dark:border-neutral-700/80">
             <button
               v-for="definition in props.definitions"
               :key="definition.key"
               type="button"
               :aria-current="panelDefinition.key === definition.key || undefined"
-              class="h-7 flex cursor-pointer items-center gap-2 px-1.5 text-left text-xs focus-visible:[outline-offset:-2px] focus-visible:bg-neutral-100 dark:focus-visible:bg-neutral-800"
+              class="h-7 flex cursor-pointer items-center gap-2 rounded-lg px-1.5 text-left text-xs focus-visible:[outline-offset:-2px] focus-visible:bg-neutral-100 dark:focus-visible:bg-neutral-700/60"
               :class="panelDefinition.key === definition.key
-                ? 'bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100'
+                ? 'bg-neutral-100 text-neutral-900 dark:bg-neutral-700/60 dark:text-neutral-100'
                 : 'text-neutral-600 dark:text-neutral-400'"
               @pointerenter="panelKey = definition.key"
               @focus="panelKey = definition.key"
@@ -146,9 +137,7 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
           </div>
           <FilterOptionList
             :key="panelDefinition.key"
-            class="ml-px w-44"
-            :class="PANEL_BOX"
-            :style="{ marginTop: panelOffset }"
+            class="w-44"
             :label="panelDefinition.label"
             :options="panelDefinition.options"
             :selected="selectedFor(panelDefinition.key)"
@@ -169,7 +158,7 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
         :animate="CHIP_SHOWN"
         :exit="CHIP_HIDDEN"
         :transition="chipTransition"
-        class="h-8 inline-flex shrink-0 items-stretch whitespace-nowrap bg-neutral-100 p-1 text-xs dark:bg-neutral-800"
+        class="h-8 inline-flex shrink-0 items-stretch whitespace-nowrap rounded-[10px] bg-neutral-100 p-1 text-xs dark:bg-neutral-800"
       >
         <!-- Segment 1: what is filtered, and how -->
         <span class="inline-flex items-center gap-1.5 pl-1.5 text-neutral-500 dark:text-neutral-400">
@@ -179,7 +168,7 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
         <UPopover v-if="modeOptions(definition).length > 1" :content="POPOVER_CONTENT" :ui="POPOVER_UI">
           <button
             type="button"
-            class="mx-1 inline-flex cursor-pointer items-center gap-1 px-1.5 text-neutral-500 font-semibold transition-colors duration-150 ease-out data-[state=open]:bg-neutral-200/70 hover:bg-neutral-200/70 dark:text-neutral-400 data-[state=open]:text-neutral-900 hover:text-neutral-900 dark:data-[state=open]:bg-neutral-700/70 dark:hover:bg-neutral-700/70 dark:data-[state=open]:text-neutral-100 dark:hover:text-neutral-100"
+            class="mx-1 inline-flex cursor-pointer items-center gap-1 rounded-md px-1.5 text-neutral-500 font-semibold transition-colors duration-150 ease-out data-[state=open]:bg-neutral-200/70 hover:bg-neutral-200/70 dark:text-neutral-400 data-[state=open]:text-neutral-900 hover:text-neutral-900 dark:data-[state=open]:bg-neutral-700/70 dark:hover:bg-neutral-700/70 dark:data-[state=open]:text-neutral-100 dark:hover:text-neutral-100"
             :aria-label="`Change ${definition.label} operator`"
           >
             <motion.span
@@ -210,7 +199,7 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
         <UPopover :content="POPOVER_CONTENT" :ui="POPOVER_UI">
           <button
             type="button"
-            class="mx-1 inline-flex cursor-pointer items-center gap-1.5 px-1.5 text-neutral-900 font-medium transition-colors duration-150 ease-out data-[state=open]:bg-neutral-200/70 hover:bg-neutral-200/70 dark:text-neutral-100 dark:data-[state=open]:bg-neutral-700/70 dark:hover:bg-neutral-700/70"
+            class="mx-1 inline-flex cursor-pointer items-center gap-1.5 rounded-md px-1.5 text-neutral-900 font-medium transition-colors duration-150 ease-out data-[state=open]:bg-neutral-200/70 hover:bg-neutral-200/70 dark:text-neutral-100 dark:data-[state=open]:bg-neutral-700/70 dark:hover:bg-neutral-700/70"
             :aria-label="`Change ${definition.label} filter`"
           >
             <!-- Each icon sits on top of the one to its left (plain DOM order) -->
@@ -218,13 +207,13 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
               <span
                 v-for="option in chipIcons(definition)"
                 :key="String(option.value)"
-                class="relative size-4 inline-flex items-center justify-center border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900"
+                class="relative size-4 inline-flex items-center justify-center border border-neutral-200 rounded-full bg-white dark:border-neutral-700 dark:bg-neutral-900"
               >
                 <Icon :name="option.icon!" class="size-2.5" :style="option.iconColor ? { color: option.iconColor } : undefined" aria-hidden="true" />
               </span>
               <span
                 v-if="hasMoreIcons(definition)"
-                class="relative size-4 inline-flex items-center justify-center border border-neutral-200 bg-white text-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-400"
+                class="relative size-4 inline-flex items-center justify-center border border-neutral-200 rounded-full bg-white text-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-400"
                 aria-hidden="true"
               >
                 <Icon name="lucide:ellipsis" class="size-2.5" />
@@ -253,7 +242,7 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
         <span class="my-1 w-px bg-neutral-300 dark:bg-neutral-700" aria-hidden="true" />
         <button
           type="button"
-          class="ml-1 inline-flex cursor-pointer items-center px-1.5 text-neutral-500 transition-colors duration-150 ease-out hover:bg-neutral-200/70 dark:text-neutral-400 hover:text-neutral-900 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-100"
+          class="ml-1 inline-flex cursor-pointer items-center rounded-md px-1.5 text-neutral-500 transition-colors duration-150 ease-out hover:bg-neutral-200/70 dark:text-neutral-400 hover:text-neutral-900 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-100"
           :aria-label="`Remove ${definition.label} filter`"
           @click="remove(definition)"
         >
@@ -264,12 +253,11 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
         v-if="activeDefinitions.length"
         key="clear-all"
         type="button"
-        layout="position"
         :initial="CHIP_HIDDEN"
         :animate="CHIP_SHOWN"
-        :exit="CHIP_HIDDEN"
+        :exit="CLEAR_EXIT"
         :transition="chipTransition"
-        class="h-8 inline-flex shrink-0 pressable cursor-pointer items-center px-2 text-xs text-neutral-500 transition-colors duration-150 ease-out dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+        class="h-8 inline-flex shrink-0 pressable cursor-pointer items-center rounded-[10px] px-2 text-xs text-neutral-500 transition-colors duration-150 ease-out dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
         @click="clearAll()"
       >
         Clear filters
@@ -277,3 +265,35 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
     </AnimatePresence>
   </div>
 </template>
+
+<style scoped>
+.filter-trigger {
+  transition:
+    transform 160ms var(--ease-out),
+    border-color 150ms var(--ease-out),
+    color 150ms var(--ease-out);
+}
+
+/* Same hover as the bento links, kept while its panel is open */
+.filter-trigger[data-state='open'] {
+  border-color: rgb(163 163 163);
+  color: rgb(23 23 23);
+}
+
+.dark .filter-trigger[data-state='open'] {
+  border-color: rgb(115 115 115);
+  color: rgb(245 245 245);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .filter-trigger:hover {
+    border-color: rgb(163 163 163);
+    color: rgb(23 23 23);
+  }
+
+  .dark .filter-trigger:hover {
+    border-color: rgb(115 115 115);
+    color: rgb(245 245 245);
+  }
+}
+</style>

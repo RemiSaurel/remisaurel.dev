@@ -14,8 +14,6 @@ onMounted(() => {
   }, 2000)
 })
 
-const { setCursorLogo, clearCursorLogo } = useCursorLogo()
-
 const POST_LIMIT = 3
 const EXPLORATION_LIMIT = 3
 
@@ -25,7 +23,7 @@ const { data: posts } = await useAsyncData('home-posts', async () => {
     .filter(post => !post.disabled)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, POST_LIMIT)
-    .map(({ path, title, description }) => ({ path, title, description }))
+    .map(({ path, title, description, date }) => ({ path, title, description, date }))
 }, { default: () => [] })
 
 const { data: allExplorations } = await useExplorations()
@@ -43,42 +41,30 @@ const sortedPublications = [...publications]
       <div class="[--enter-blur:8px] [--enter-delay:0.4s]" :class="{ enter: animate }">
         <p class="intro-text m-0">
           French PhD student at the
-          <a
-            href="https://www.irit.fr/" target="_blank" class="intro-link"
-            @mouseenter="setCursorLogo(ENTITY_LOGOS.irit)"
-            @mouseleave="clearCursorLogo"
-          >IRIT</a> lab in Toulouse, working in the
-          <a
-            href="https://www.irit.fr/TALENT/site/" target="_blank" class="intro-link"
-            @mouseenter="setCursorLogo(ENTITY_LOGOS.talent)"
-            @mouseleave="clearCursorLogo"
-          >TALENT</a> team, in collaboration with
-          <a
-            href="https://www.kosmos-education.com/" target="_blank" class="intro-link"
-            @mouseenter="setCursorLogo(ENTITY_LOGOS.kosmos)"
-            @mouseleave="clearCursorLogo"
-          >Kosmos Education</a>.
+          <a href="https://www.irit.fr/" target="_blank" class="font-medium"><img :src="ENTITY_LOGOS.irit.src" alt="" class="object-contain mr-1.5 inline-block h-5.5 w-5.5 align-text-bottom"><span class="underline decoration-neutral-400 underline-offset-2 dark:decoration-neutral-500">IRIT</span></a> lab in Toulouse, working in the
+          <a href="https://www.irit.fr/TALENT/site/" target="_blank" class="font-medium"><img :src="ENTITY_LOGOS.talent.src" alt="" class="object-contain dark:invert dark:hue-rotate-180 dark:mix-blend-screen mr-1.5 inline-block h-5.5 w-5.5 align-text-bottom"><span class="underline decoration-neutral-400 underline-offset-2 dark:decoration-neutral-500">TALENT</span></a> team, in collaboration with
+          <a href="https://www.kosmos-education.com/" target="_blank" class="font-medium"><img :src="ENTITY_LOGOS.kosmos.src" alt="" class="object-contain mr-1.5 inline-block h-5.5 w-5.5 align-text-bottom"><span class="underline decoration-neutral-400 underline-offset-2 dark:decoration-neutral-500">Kosmos Education</span></a>.
         </p>
         <p class="mb-0 mt-4 text-neutral-500 dark:text-neutral-400">
           I build dashboards powered by AI and learning analytics to help teachers
           support students’ <span class="whitespace-nowrap">out-of-class</span> activities in K-12 education.
-          This is where I write about it, build things around it, and share the <NuxtLink to="/research" class="intro-link">
-            research
+          This is where I write about it, build things around it, and share the <NuxtLink to="/research" class="font-medium">
+            <span class="underline decoration-neutral-400 underline-offset-2 dark:decoration-neutral-500">research</span>
           </NuxtLink> behind it.
         </p>
       </div>
     </div>
 
     <ContentSection id="publications" title="Publications" :animate="animate" :delay="0.5" class="scroll-mt-8">
-      <ul class="list-none m-0 flex flex-col gap-1 p-0">
+      <HoverList tag="ul" class="list-none m-0 flex flex-col gap-1 p-0">
         <li v-for="publication in sortedPublications" :key="publication.id">
           <PublicationLine :publication="publication" />
         </li>
-      </ul>
+      </HoverList>
     </ContentSection>
 
     <ContentSection v-if="explorations.length" title="Explorations" link="/explorations" :animate="animate" :delay="0.6">
-      <ul class="list-none m-0 flex flex-col gap-1 p-0">
+      <HoverList tag="ul" class="list-none m-0 flex flex-col gap-1 p-0">
         <li v-for="exploration in explorations" :key="exploration.path">
           <ExplorationRow
             :to="exploration.path"
@@ -86,17 +72,18 @@ const sortedPublications = [...publications]
             :description="exploration.description"
             :status="exploration.status"
             :icon="exploration.icon"
+            :date="exploration.date"
           />
         </li>
-      </ul>
+      </HoverList>
     </ContentSection>
 
     <ContentSection v-if="posts.length" title="Posts" link="/posts" :animate="animate" :delay="0.7">
-      <ul class="list-none m-0 flex flex-col gap-3 p-0">
+      <HoverList tag="ul" class="list-none m-0 flex flex-col gap-1 p-0">
         <li v-for="post in posts" :key="post.path">
-          <PostLine :to="post.path" :title="post.title" :description="post.description" />
+          <PostLine :to="post.path" :title="post.title" :description="post.description" :date="post.date" />
         </li>
-      </ul>
+      </HoverList>
     </ContentSection>
 
     <ContentSection title="News" :animate="animate" :delay="0.8">

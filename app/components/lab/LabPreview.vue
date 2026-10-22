@@ -53,7 +53,7 @@ defineExpose({ svgMarkup })
         <!-- Publications card, scaled down -->
         <figure class="m-0 w-36 flex flex-col gap-2">
           <div class="lab-thumb" data-export>
-            <PubArt :composition="composition" :theme="theme" class="aspect-[2/1] w-full" />
+            <PubArt :composition="composition" :theme="theme" class="aspect-[5/4] w-full" />
           </div>
           <div class="flex flex-col gap-1.5" aria-hidden="true">
             <span class="lab-bar is-strong w-11/12" />

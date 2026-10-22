@@ -4,7 +4,7 @@ import type { TechKey } from '~/projects/techs'
 export interface Project {
   title: string
   description: string
-  icon?: string
+  icon?: string // Iconify name (lucide)
   links?: {
     github?: string
     demo?: string
@@ -20,7 +20,7 @@ const PROJECTS: Project[] = [
     title: 'lab',
     description:
       'A workbench for composing the generative illustrations used across this site: layers, shaders and colors, all tweakable live.',
-    icon: '🧪',
+    icon: 'lucide:flask-conical',
     links: {
       github: 'https://github.com/RemiSaurel/blog',
       demo: '/lab',
@@ -32,7 +32,7 @@ const PROJECTS: Project[] = [
     title: 'lycees-france',
     description:
       'A dataset of all the high schools in France, with their location and some other information. The data is collected from the official website of the Ministry of Education.',
-    icon: '🗺️',
+    icon: 'lucide:map',
     links: {
       github: 'https://github.com/RemiSaurel/french-schools-map',
       demo: 'https://remisaurel.github.io/lycees-france/',
@@ -44,7 +44,7 @@ const PROJECTS: Project[] = [
     title: 'colleges-france',
     description:
       'A dataset of all the middle schools in France, with their location and some other information. The data is collected from the official website of the Ministry of Education.',
-    icon: '🏫',
+    icon: 'lucide:school',
     links: {
       github: 'https://github.com/RemiSaurel/french-schools-map',
       demo: 'https://remisaurel.github.io/colleges-france/',
@@ -56,7 +56,7 @@ const PROJECTS: Project[] = [
     title: 'paper-web',
     description:
       'A template to publish scientific papers on the web. Built with Nuxt Content.',
-    icon: '📃',
+    icon: 'lucide:file-text',
     links: {
       github: 'https://github.com/RemiSaurel/paper-web',
       demo: 'https://remisaurel.github.io/paper-web/',
@@ -68,7 +68,7 @@ const PROJECTS: Project[] = [
     title: 'evalbuddy',
     description:
       'A tool to easily evaluate answers.',
-    icon: '🧑‍🏫',
+    icon: 'lucide:presentation',
     links: {
       github: 'https://github.com/RemiSaurel/evalbuddy',
       demo: 'https://evalbuddy.remisaurel.dev/',
@@ -80,7 +80,7 @@ const PROJECTS: Project[] = [
     title: 'littleman',
     description:
       'A simple Discord bot to fetch papers from arXiv.',
-    icon: '🤖',
+    icon: 'lucide:bot',
     links: {
       github: 'https://github.com/RemiSaurel/littleman',
     },
@@ -90,7 +90,7 @@ const PROJECTS: Project[] = [
   {
     title: 'memoire',
     description: 'A flashcards app based on research recommendations.',
-    icon: '🧠',
+    icon: 'lucide:brain',
     links: {
       github: 'https://github.com/memoire-app',
     },
@@ -100,7 +100,7 @@ const PROJECTS: Project[] = [
   {
     title: 'elaasticatalog',
     description: 'A tool to reference elaastic subjects.',
-    icon: '📚',
+    icon: 'lucide:library',
     links: {
       github: 'https://github.com/elaastic/elaasticatalog',
     },
@@ -111,7 +111,7 @@ const PROJECTS: Project[] = [
     title: 'Golden Legends',
     description:
       '1st place on CGI Games on Web 2024 Challenge. BabylonJS olympic game.',
-    icon: '🥇',
+    icon: 'lucide:medal',
     links: {
       github: 'https://github.com/Golden-Legends/golden-legends',
       demo: 'https://golden-legends.github.io/golden-legends/',
@@ -123,7 +123,7 @@ const PROJECTS: Project[] = [
     title: 'MIAGE typst template',
     description:
       'Template for MIAGE students to create Practical Work reports easily.',
-    icon: '📝',
+    icon: 'lucide:file-pen',
     links: {
       github: 'https://github.com/RemiSaurel?page=1&tab=repositories',
       demo: 'https://www.youtube.com/watch?v=RQGjWUptxXM',
@@ -135,7 +135,7 @@ const PROJECTS: Project[] = [
     title: 'Datastrike',
     description:
       'Esport and data. Feel free to check it out to discover the different analysis features.',
-    icon: '🎮',
+    icon: 'lucide:gamepad-2',
     links: {
       github: 'https://github.com/datastrike',
     },
@@ -146,7 +146,7 @@ const PROJECTS: Project[] = [
     title: 'Wasabi',
     description:
       'Data visualization university project based on a music API. Python data processing and Vue front-end with D3.',
-    icon: '🎹',
+    icon: 'lucide:piano',
     links: {
       github: 'https://github.com/wasabi-project',
       demo: 'https://wasabi-project.github.io/wasabi-dataviz/#/dataviz/',
@@ -158,7 +158,7 @@ const PROJECTS: Project[] = [
     title: 'Blockus',
     description:
       'Blockus is a game based on nodes and links. The goal is to reach 25 points. This is a multiplayer game, feel free to try it out!',
-    icon: '🔫',
+    icon: 'lucide:crosshair',
     links: {
       demo: 'https://blockus-prod-d75bc.web.app/',
     },
@@ -169,7 +169,7 @@ const PROJECTS: Project[] = [
     title: 'Sorting Visualizer',
     description:
       'Web app to visualize sorting algorithms. Built with React to learn the basics of the library.',
-    icon: '📊',
+    icon: 'lucide:chart-no-axes-column',
     links: {
       github: 'https://github.com/RemiSaurel/sorting-algorithms',
       demo: 'https://remisaurel.github.io/sorting-algorithms/',
@@ -181,7 +181,7 @@ const PROJECTS: Project[] = [
     title: 'Lockio',
     description:
       'M1 project. This PoC was designed to demonstrate our idea about an innovative solution to store your stuff…',
-    icon: '📦',
+    icon: 'lucide:package',
     links: {
       github: 'https://github.com/Lockiio',
     },
@@ -192,7 +192,7 @@ const PROJECTS: Project[] = [
     title: 'Spotidrone',
     description:
       'Python script that allows you to discover new artists based on your recommendations. I\'m using the Spotify API to get the recommendations and create the playlist.',
-    icon: '🎧',
+    icon: 'lucide:headphones',
     links: {
       github: 'https://github.com/RemiSaurel/SpotiDrone',
     },

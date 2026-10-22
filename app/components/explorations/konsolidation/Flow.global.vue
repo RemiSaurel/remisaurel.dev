@@ -45,18 +45,21 @@ const ROWS: Row[] = [
 ]
 
 const player = useFlowPlayer()
-const { row, completed } = useFlowDemo(graph, player, { rows: ROWS.length })
+const { row, completed } = useFlowDemo(graph, player, { rows: ROWS.length, continuous: true })
 const selected = ref<string | null>(null)
 
 const current = computed(() => ROWS[Math.min(row.value, ROWS.length - 1)]!)
 
+// The demo never stops: `completed` is a running total, the marks show the position in the cycle
+const cycle = computed(() => completed.value % ROWS.length)
+
+const seen = computed(() => ROWS.slice(0, cycle.value))
+
 function dotState(index: number) {
-  if (index < completed.value)
+  if (index < cycle.value)
     return 'done'
   return index === row.value && Object.values(player.status.value).includes('running') ? 'running' : 'pending'
 }
-
-const seen = computed(() => ROWS.slice(0, completed.value))
 </script>
 
 <template>
@@ -66,7 +69,7 @@ const seen = computed(() => ROWS.slice(0, completed.value))
         <span class="flex items-center gap-1.5">
           <span v-for="(_, index) in ROWS" :key="index" class="mark" :data-state="dotState(index)" />
         </span>
-        <span class="tabular-nums ml-auto">{{ completed }}/{{ ROWS.length }} responses</span>
+        <span class="tabular-nums ml-auto">{{ completed }} {{ completed === 1 ? 'response' : 'responses' }}</span>
       </template>
       <template v-else-if="node.id === 'mcq'">
         <span class="font-mono">auto</span>

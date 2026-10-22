@@ -75,6 +75,14 @@ defineProps<{ state: MascotState }>()
       </g>
     </g>
 
+    <!-- Coding: a cursor blinking on the laptop, code tokens drifting out -->
+    <g v-if="state === 'code'" fill="currentColor" stroke="none" font-size="5" font-weight="600" font-family="ui-monospace, monospace">
+      <rect class="mascot-cursor" x="19.2" y="25.4" width="0.9" height="1.4" />
+      <text class="mascot-token" x="25.5" y="23">{}</text>
+      <text class="mascot-token mascot-token-2" x="1.5" y="22">&lt;/&gt;</text>
+      <text class="mascot-token mascot-token-3" x="27" y="19">;</text>
+    </g>
+
     <!-- Zzz -->
     <g v-if="state === 'sleep'" fill="currentColor" stroke="none" font-size="6" font-weight="600">
       <text class="mascot-z" x="27.5" y="6.5">z</text>
@@ -137,13 +145,43 @@ defineProps<{ state: MascotState }>()
   100% { opacity: 0; transform: translateY(-4px); }
 }
 
+/* Coding: the cursor blinks, tokens float up and fade, staggered */
+.mascot-cursor {
+  animation: mascot-cursor 1s steps(1) infinite;
+}
+
+@keyframes mascot-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.mascot-token {
+  opacity: 0;
+  animation: mascot-token 4.5s ease-in-out infinite;
+}
+
+.mascot-token-2 {
+  animation-delay: 1.5s;
+}
+
+.mascot-token-3 {
+  animation-delay: 3s;
+}
+
+@keyframes mascot-token {
+  0% { opacity: 0; transform: translateY(2px); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-5px); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .mascot,
   .mascot * {
     animation: none !important;
   }
 
-  .mascot-note {
+  .mascot-note,
+  .mascot-token {
     opacity: 1;
   }
 }

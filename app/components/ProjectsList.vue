@@ -80,29 +80,36 @@ const REVEALED = { opacity: 1, y: 0, filter: 'blur(0px)' }
       :while-in-view="itemMotion(index, 1).whileInView"
       :viewport="{ once: true, margin: '0px 0px 80px 0px' }"
       :transition="itemMotion(index, 1).transition"
-      class="project-row px-3 py-2.5 transition-colors duration-150 ease-out hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60"
-      :class="{ 'border-t border-neutral-200/70 dark:border-neutral-800': index > 0 && isFirstOfYear(index) }"
+      class="project-row group rounded-xl px-3 py-2.5 transition-colors duration-150 ease-out hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60"
+      :class="{ 'year-start': index > 0 && isFirstOfYear(index) }"
     >
       <span
-        class="tabular-nums [grid-area:date] text-xs text-neutral-500 md:pt-0.5 dark:text-neutral-400"
+        class="tabular-nums [grid-area:date] text-xs text-neutral-500 dark:text-neutral-400"
         :class="{ 'hidden md:block md:invisible': !isFirstOfYear(index) }"
       >
         {{ project.date }}
       </span>
 
-      <div class="[grid-area:body] min-w-0 flex items-baseline gap-2">
-        <span v-if="project.icon" class="shrink-0 text-sm leading-none opacity-70" aria-hidden="true">{{ project.icon }}</span>
+      <div class="[grid-area:body] min-w-0 flex items-center gap-3">
+        <!-- Same sheet tile as the posts and explorations lists, holding the project's icon -->
+        <span
+          v-if="project.icon"
+          class="project-tile sheet grid size-9 shrink-0 place-items-center rounded-[10px] text-neutral-600 dark:text-neutral-300"
+          aria-hidden="true"
+        >
+          <Icon :name="project.icon" class="size-4.5" />
+        </span>
         <div class="min-w-0 flex flex-col gap-0.5">
           <h2 class="m-0 text-sm text-neutral-900 font-medium dark:text-neutral-100">
             {{ project.title }}
           </h2>
-          <span class="text-sm text-neutral-500 leading-snug dark:text-neutral-400">{{ project.description }}</span>
+          <span class="line-clamp-2 md:line-clamp-none text-sm text-neutral-500 leading-snug dark:text-neutral-400">{{ project.description }}</span>
         </div>
       </div>
 
-      <div class="[grid-area:meta] flex items-center justify-end gap-3">
+      <div class="[grid-area:meta] flex items-center self-center justify-between gap-3 pl-12 md:justify-end md:pl-0">
         <TechStack v-if="project.stack?.length" :stack="project.stack" />
-        <div class="w-11 flex justify-end gap-3">
+        <div class="order-first w-11 flex justify-start gap-3 md:order-none md:justify-end">
           <a
             v-for="(link, key) in project.links"
             :key="key"
@@ -110,7 +117,7 @@ const REVEALED = { opacity: 1, y: 0, filter: 'blur(0px)' }
             target="_blank"
             rel="noopener noreferrer"
             :aria-label="`${project.title} ${key}`"
-            class="flex pressable p-1.5 text-neutral-500 transition-colors duration-200 -m-1.5 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+            class="flex pressable rounded-md p-1.5 text-neutral-500 transition-colors duration-200 -m-1.5 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
           >
             <Icon :name="LINK_ICONS[key] ?? ''" class="size-4" />
           </a>
@@ -138,19 +145,62 @@ const REVEALED = { opacity: 1, y: 0, filter: 'blur(0px)' }
 <style scoped>
 /* Mobile: the year heads its group, one project per row below. Desktop: one line per project. */
 .project-row {
+  position: relative;
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
-    'date date'
-    'body meta';
-  gap: 0.25rem 1rem;
+    'date'
+    'body'
+    'meta';
+  gap: 0.5rem 1rem;
   align-items: start;
 }
 
 @media (min-width: 768px) {
   .project-row {
-    grid-template-columns: 44px 1fr auto;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
     grid-template-areas: 'date body meta';
+    align-items: center;
+  }
+}
+
+/* A new year starts after a hairline, kept off the row so its rounded hover never touches it */
+.project-row.year-start {
+  margin-top: 0.75rem;
+}
+
+.project-row.year-start::before {
+  content: '';
+  position: absolute;
+  top: -0.375rem;
+  left: 0.75rem;
+  right: 0.75rem;
+  height: 1px;
+  background-color: rgb(229 229 229 / 0.7);
+}
+
+.dark .project-row.year-start::before {
+  background-color: rgb(38 38 38);
+}
+
+.dark .project-tile,
+.dark .project-row :deep(.tech-stack-item) {
+  background-color: rgb(10 10 10);
+}
+
+.project-tile {
+  transition: transform var(--duration-short) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .group:hover .project-tile {
+    transform: translateY(-1px) rotate(-3deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .group:hover .project-tile {
+    transform: none;
   }
 }
 </style>

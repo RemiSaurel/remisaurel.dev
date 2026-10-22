@@ -9,7 +9,7 @@ const { data: explorations } = await useExplorations()
 </script>
 
 <template>
-  <div class="max-w-2xl">
+  <div class="mx-auto max-w-2xl">
     <div class="mb-12">
       <h1 class="m-0 text-2xl font-semibold">
         Explorations
@@ -20,7 +20,7 @@ const { data: explorations } = await useExplorations()
       </p>
     </div>
 
-    <ul v-if="explorations.length" class="list-none m-0 flex flex-col gap-1 p-0">
+    <HoverList v-if="explorations.length" tag="ul" class="list-none m-0 flex flex-col gap-1 p-0">
       <motion.li
         v-for="(exploration, index) in explorations"
         :key="exploration.path"
@@ -34,9 +34,10 @@ const { data: explorations } = await useExplorations()
           :description="exploration.description"
           :status="exploration.status"
           :icon="exploration.icon"
+          :date="exploration.date"
         />
       </motion.li>
-    </ul>
+    </HoverList>
 
     <p v-else class="text-sm text-neutral-500 dark:text-neutral-400">
       The first one is on its way.

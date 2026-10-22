@@ -96,6 +96,7 @@ const placement = computed(() => {
 
 <style scoped>
 .rl-popover {
+  border-radius: 0.75rem;
   background-color: var(--rl-surface);
   box-shadow: inset 0 0 0 1px var(--rl-hairline), var(--rl-shadow-pop);
 }

@@ -680,7 +680,7 @@ const CORNER_HANDLES = ['nw', 'ne', 'se', 'sw'] as const
       @pointerleave="onPointerLeave"
       @dblclick="onDoubleClick"
     >
-      <PubArt :composition="composition" :theme="canvasTheme" class="aspect-[2/1] w-full overflow-visible">
+      <PubArt :composition="composition" :theme="canvasTheme" class="aspect-[5/4] w-full overflow-visible">
         <!-- Editor chrome: drawn in frame units, sized in screen pixels -->
         <g class="pointer-events-none" fill="none">
           <!-- Smart guides: one line per alignment, a cross on everything it lines up -->

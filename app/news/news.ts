@@ -13,6 +13,30 @@ interface News {
 
 export const news: News[] = [
   {
+    date: new Date('2026-10-22'),
+    title: 'Added Explorations to the website!',
+    content: 'A new space for interactive, in-progress experiments around my research, starting with automatic short answer grading on Konsolidation.',
+    categories: ['misc'],
+    links: [
+      {
+        text: 'Explorations',
+        url: '/explorations',
+      },
+    ],
+  },
+  {
+    date: new Date('2026-09-24'),
+    title: 'Added the Lab to the website!',
+    content: 'A playground to experiment with the generative art layers used across the site.',
+    categories: ['misc'],
+    links: [
+      {
+        text: 'Lab',
+        url: '/lab',
+      },
+    ],
+  },
+  {
     date: new Date('2026-07-05'),
     title: 'Submitted my first journal article!',
     content: 'Main contribution is about a mixed-methods study on Learning Analytics Dashboards.',

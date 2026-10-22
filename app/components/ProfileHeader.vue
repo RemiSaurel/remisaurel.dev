@@ -2,6 +2,7 @@
 import type { MascotState } from '~/utils/mascot'
 import { animate, motion } from 'motion-v'
 import { MASCOT_LABELS, mascotStateAt, minutesOfDay } from '~/utils/mascot'
+import { BAND_LABELS, temperatureBand, WEATHER_LABELS } from '~/utils/weather'
 
 interface Props {
   animate?: boolean
@@ -132,6 +133,22 @@ function cycleMascot() {
   play('tap', { emphasis: 'subtle' })
 }
 
+// Weather in Toulouse: the glyph says the sky, the colour says cold, mild or hot
+const { weather, settled: weatherSettled } = useToulouseWeather()
+// The weather and the mascot appear together, once both are known, so nothing pops in after the rest
+const tileReady = computed(() => mascotState.value !== null && weatherSettled.value)
+const BAND_COLORS = {
+  cold: 'text-sky-600 dark:text-sky-400',
+  mild: 'text-neutral-500 dark:text-neutral-400',
+  hot: 'text-orange-600 dark:text-orange-400',
+} as const
+const weatherBand = computed(() => weather.value ? temperatureBand(weather.value.temperature) : null)
+const weatherLabel = computed(() => {
+  if (!weather.value || !weatherBand.value)
+    return ''
+  return `${WEATHER_LABELS[weather.value.kind]}, ${Math.round(weather.value.temperature)}°C, ${BAND_LABELS[weatherBand.value]}`
+})
+
 onMounted(() => {
   const tick = () => {
     const now = new Date()
@@ -233,18 +250,29 @@ const PHOTO = {
         </div>
       </div>
 
-      <!-- Bento: the clock and the CV take two cells, each link takes one -->
-      <div class="bento grid grid-rows-[1fr_auto] grid-cols-4 gap-2 sm:w-[12rem]">
-        <div class="bento-tile col-span-2 flex items-center justify-between gap-1 pl-2.5 pr-2">
-          <div class="flex flex-col items-start">
-            <span class="text-[10px] text-neutral-500 leading-tight dark:text-neutral-400">Toulouse</span>
-            <time class="tabular-nums text-sm text-neutral-700 font-medium leading-tight dark:text-neutral-300">{{ localTime }}</time>
-          </div>
+      <!-- Bento: the clock takes three cells, the CV one, each link takes one -->
+      <div class="bento grid grid-cols-5 gap-1.5 sm:grid-rows-[1fr_auto] sm:grid-cols-4 sm:w-[12rem]">
+        <!-- Two rows share a centre line: the place with the weather, the time with the mascot -->
+        <div class="bento-tile grid col-span-5 grid-cols-[auto_1fr_auto_auto] content-center items-center gap-x-2.5 px-3 py-1.5 sm:col-span-3 sm:grid-cols-[1fr_auto] sm:gap-x-3 sm:gap-y-2 sm:py-2 sm:pl-3 sm:pr-3.5">
+          <span class="col-start-1 row-start-1 h-4 flex items-center text-[11px] text-neutral-500 leading-none dark:text-neutral-400">Toulouse</span>
+          <!-- Only after the fetch: the static page has no weather -->
+          <span
+            v-if="tileReady && weather && weatherBand"
+            class="mascot-in col-start-3 row-start-1 h-4 flex items-center justify-self-end gap-1 sm:col-start-2"
+            :class="BAND_COLORS[weatherBand]"
+            :title="weatherLabel"
+            role="img"
+            :aria-label="weatherLabel"
+          >
+            <WeatherGlyph :kind="weather.kind" :night="!weather.isDay" class="size-4" />
+            <span class="tabular-nums text-[11px] leading-none">{{ Math.round(weather.temperature) }}°</span>
+          </span>
+          <time class="tabular-nums col-start-2 row-start-1 h-6 flex items-center text-sm text-neutral-700 font-normal leading-none tracking-tight sm:col-start-1 sm:row-start-2 sm:text-base dark:text-neutral-300">{{ localTime }}</time>
           <!-- Only after mount: the hour decides what it does, and the static page has no hour -->
           <button
-            v-if="mascotState"
+            v-if="tileReady && mascotState"
             type="button"
-            class="shrink-0 pressable rounded-md"
+            class="col-start-4 row-start-1 flex pressable justify-self-end rounded-md sm:col-start-2 sm:row-start-2"
             :title="`${MASCOT_LABELS[mascotState]}. Click to change`"
             :aria-label="`${MASCOT_LABELS[mascotState]}. Click to change`"
             @click="cycleMascot"
@@ -252,17 +280,17 @@ const PHOTO = {
             <HomeMascot
               :key="mascotState"
               :state="mascotState"
-              class="mascot-in size-7 text-neutral-400 dark:text-neutral-500"
+              class="mascot-in size-5 text-neutral-400 sm:size-6 dark:text-neutral-500"
             />
           </button>
         </div>
 
-        <div class="relative col-span-2">
+        <div class="relative col-span-1 h-9 sm:h-auto">
           <button
             type="button"
             title="CV — coming soon"
             aria-label="CV — coming soon"
-            class="bento-tile [-webkit-touch-callout:none] relative size-full flex select-none items-center overflow-hidden border-dashed text-left text-neutral-400 dark:text-neutral-500"
+            class="bento-tile [-webkit-touch-callout:none] relative size-full flex select-none items-center justify-center overflow-hidden border-dashed text-left text-neutral-400 dark:text-neutral-500"
             @pointerdown="startCvHold"
             @pointerup="cancelCvHold"
             @pointerleave="cancelCvHold"
@@ -276,13 +304,13 @@ const PHOTO = {
               class="pointer-events-none absolute inset-0 z-2 bg-[rgb(var(--annotation))]"
               :class="isHoldingCv ? '[clip-path:inset(0_0_0_0)] [transition:clip-path_900ms_linear]' : '[clip-path:inset(0_100%_0_0)] [transition:clip-path_200ms_var(--ease-out)]'"
             />
-            <span class="pointer-events-none relative z-1 flex items-center gap-1.5 px-2.5">
+            <span class="pointer-events-none relative z-1 size-full flex flex-col items-center justify-center gap-0.5 px-1">
               <Icon name="uil:padlock" class="size-3.5" />
-              <span class="text-sm font-medium tracking-tight">CV</span>
+              <span class="text-xs font-medium tracking-tight sm:text-sm">CV</span>
             </span>
             <!-- White copy of the label, revealed by the same sweep as the fill, so the text turns white only once the fill reaches it -->
             <span
-              class="pointer-events-none absolute inset-0 z-3 flex items-center gap-2 px-2.5 text-white"
+              class="pointer-events-none absolute inset-0 z-3 flex flex-col items-center justify-center gap-0.5 px-1 text-white"
               :class="isHoldingCv ? '[clip-path:inset(0_0_0_0)] [transition:clip-path_900ms_linear]' : '[clip-path:inset(0_100%_0_0)] [transition:clip-path_200ms_var(--ease-out)]'"
               aria-hidden="true"
             >
@@ -306,9 +334,9 @@ const PHOTO = {
           rel="noopener noreferrer"
           :aria-label="link.label"
           :title="link.label"
-          class="bento-tile bento-link aspect-square flex pressable items-center justify-center text-neutral-500 dark:text-neutral-400"
+          class="bento-tile bento-link h-9 flex pressable items-center justify-center text-neutral-500 sm:aspect-square sm:h-auto dark:text-neutral-400"
         >
-          <Icon :name="link.icon" class="size-4" />
+          <Icon :name="link.icon" class="size-3.5 sm:size-4" />
         </a>
       </div>
     </div>
@@ -322,9 +350,6 @@ const PHOTO = {
   border: 1px solid rgb(229 229 229);
   border-radius: 0.75rem;
   background: white;
-  box-shadow:
-    0 1px 2px rgb(0 0 0 / 0.04),
-    0 2px 6px -2px rgb(0 0 0 / 0.06);
   transition:
     transform 160ms var(--ease-out),
     border-color 150ms var(--ease-out),
@@ -336,6 +361,9 @@ const PHOTO = {
   --mascot-bg: rgb(38 38 38);
   border-color: rgb(64 64 64 / 0.8);
   background: rgb(38 38 38);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.04),
+    0 2px 6px -2px rgb(0 0 0 / 0.06);
 }
 
 .mascot-in {
@@ -360,14 +388,14 @@ button.bento-tile {
   .bento-link:hover {
     border-color: rgb(163 163 163);
     color: rgb(23 23 23);
-    box-shadow:
-      0 1px 2px rgb(0 0 0 / 0.06),
-      0 3px 8px -3px rgb(0 0 0 / 0.1);
   }
 
   .dark .bento-link:hover {
     border-color: rgb(115 115 115);
     color: rgb(245 245 245);
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.06),
+      0 3px 8px -3px rgb(0 0 0 / 0.1);
   }
 }
 </style>

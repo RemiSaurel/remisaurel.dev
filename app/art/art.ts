@@ -1,5 +1,5 @@
 /**
- * Generative illustrations: a composition is a stack of layers drawn on a shared 2:1 frame.
+ * Generative illustrations: a composition is a stack of layers drawn on a shared 5:4 frame.
  * The frame and grid are fixed, strokes stay within a small range of screen widths, and colors
  * come from a curated palette (that is what keeps every image coherent);
  * everything a layer draws is a pure function of its params, so a composition copied from
@@ -10,7 +10,7 @@ import { isHex, normalizeHex } from './color'
 import { GLOW_LAYER } from './glow'
 
 export const ART_WIDTH = 400
-export const ART_HEIGHT = 200
+export const ART_HEIGHT = 320
 export const GRID_STEP = 20
 
 export const ART_PALETTES = {
@@ -146,7 +146,7 @@ interface ArtNodeBase {
   id: string
   name: string
   visible: boolean
-  /** Center of the node in its parent's space (the frame, 0..400 × 0..200, at the root). */
+  /** Center of the node in its parent's space (the frame, 0..400 × 0..320, at the root). */
   x: number
   y: number
   rotation: number

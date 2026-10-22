@@ -37,8 +37,7 @@ usePageSeo({
         Posts
       </NuxtLink>
       <h1 class="font-display mb-4 text-4xl font-medium">
-        {{ page.title }}
-      </h1>
+        {{ page.title }}      </h1>
       <div ref="body">
         <ContentRenderer :value="page" />
       </div>

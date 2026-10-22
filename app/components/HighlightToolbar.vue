@@ -25,7 +25,7 @@ const measured = useElementSize(useTemplateRef<HTMLElement>('measure'))
 
 // An even whole number of pixels: the pill is centred with translate(-50%), and an odd or
 // fractional width lands it on a half pixel, which blurs everything inside
-const pillWidth = computed(() => measured.width.value ? Math.ceil((measured.width.value + 8) / 2) * 2 : undefined)
+const pillWidth = computed(() => measured.width.value ? Math.ceil((measured.width.value + 6) / 2) * 2 : undefined)
 
 const mode = ref<Mode>('main')
 const hue = ref(50)
@@ -105,7 +105,7 @@ function pickSwatch(color: string) {
                 <button
                   v-if="existing"
                   type="button"
-                  class="h-8 flex pressable items-center gap-1.5 rounded-full px-3 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
+                  class="h-8 flex pressable items-center gap-1.5 rounded-full px-2.5 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
                   @pointerdown.prevent
                   @click="emit('remove')"
                 >
@@ -115,7 +115,7 @@ function pickSwatch(color: string) {
                 <button
                   v-else
                   type="button"
-                  class="h-8 flex pressable items-center gap-1.5 rounded-full px-3 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
+                  class="h-8 flex pressable items-center gap-1.5 rounded-full px-2.5 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
                   @pointerdown.prevent
                   @click="emit('apply')"
                 >
@@ -204,7 +204,7 @@ function pickSwatch(color: string) {
 .pill {
   display: flex;
   overflow: hidden;
-  padding: 4px;
+  padding: 3px;
   box-sizing: border-box;
   border-radius: 9999px;
   background: white;
@@ -213,7 +213,7 @@ function pickSwatch(color: string) {
   animation: pill-in 160ms var(--ease-out);
 }
 
-:global(.dark) .pill {
+.dark .pill {
   background: rgb(38 38 38);
   box-shadow: 0 6px 24px -6px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.08);
 }

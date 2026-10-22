@@ -37,7 +37,7 @@ const isSelected = (option: FilterOption) => props.selected.includes(option.valu
       type="text"
       :placeholder="props.searchPlaceholder"
       :aria-label="props.searchPlaceholder"
-      class="h-8 w-full shrink-0 border-0 border-b border-neutral-200 bg-transparent px-2.5 text-xs text-neutral-900 focus-visible:[outline-offset:-2px] dark:border-neutral-800 dark:text-neutral-100 placeholder:text-neutral-500 dark:placeholder:text-neutral-400"
+      class="h-8 w-full shrink-0 border-0 border-b border-neutral-200 bg-transparent px-2.5 text-xs text-neutral-900 focus-visible:[outline-offset:-2px] dark:border-neutral-700/80 dark:text-neutral-100 placeholder:text-neutral-500 dark:placeholder:text-neutral-400"
     >
     <div
       :role="props.multiple ? 'group' : 'radiogroup'"
@@ -50,12 +50,12 @@ const isSelected = (option: FilterOption) => props.selected.includes(option.valu
         type="button"
         :role="props.multiple ? 'checkbox' : 'radio'"
         :aria-checked="isSelected(option)"
-        class="h-7 w-full flex shrink-0 cursor-pointer items-center gap-2 px-1.5 text-left text-xs text-neutral-700 focus-visible:[outline-offset:-2px] focus-visible:bg-neutral-100 hover:bg-neutral-100 dark:text-neutral-300 dark:focus-visible:bg-neutral-800 dark:hover:bg-neutral-800"
+        class="h-7 w-full flex shrink-0 cursor-pointer items-center gap-2 rounded-lg px-1.5 text-left text-xs text-neutral-700 focus-visible:[outline-offset:-2px] focus-visible:bg-neutral-100 hover:bg-neutral-100 dark:text-neutral-300 dark:focus-visible:bg-neutral-700/60 dark:hover:bg-neutral-700/60"
         @click="emit('toggle', option.value)"
       >
         <span
           v-if="props.multiple"
-          class="size-3.5 flex shrink-0 items-center justify-center border"
+          class="size-3.5 flex shrink-0 items-center justify-center border rounded-[4px] transition-colors duration-150 ease-out"
           :class="isSelected(option)
             ? 'border-neutral-900 bg-neutral-900 text-white dark:border-neutral-100 dark:bg-neutral-100 dark:text-neutral-900'
             : 'border-neutral-300 dark:border-neutral-600'"

@@ -11,7 +11,7 @@ function toggleSound() {
 <template>
   <button
     type="button"
-    class="relative h-8 w-8 flex pressable items-center justify-center bg-neutral-100 transition-colors duration-200 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+    class="relative h-8 w-8 flex pressable items-center justify-center rounded-lg bg-neutral-100 transition-colors duration-200 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700"
     :aria-label="isEnabled ? 'Mute sounds' : 'Unmute sounds'"
     :aria-pressed="isEnabled"
     @click="toggleSound"

@@ -12,6 +12,11 @@ export interface FlowDemoOptions {
   thinkSeconds?: number
   /** Seconds of rest once every row is through */
   restSeconds?: number
+  /**
+   * Never rests: the loop brings the ball back after the last row too, and `completed` keeps
+   * counting instead of starting over, like a stream of responses that never ends
+   */
+  continuous?: boolean
 }
 
 /**
@@ -20,9 +25,9 @@ export interface FlowDemoOptions {
  * next row. It drives the player like any exploration would, so pause and speed just work.
  */
 export function useFlowDemo(graph: MaybeRefOrGetter<FlowGraph>, player: FlowPlayer, options: FlowDemoOptions = {}) {
-  const { rows = 5, edgeSeconds = 0.9, thinkSeconds = 0.8, restSeconds = 1.2 } = options
+  const { rows = 5, edgeSeconds = 0.9, thinkSeconds = 0.8, restSeconds = 1.2, continuous = false } = options
 
-  /** Row being processed, and rows done: what a dataset footer shows */
+  /** Row being processed, and rows done (a running total when `continuous`): what a dataset footer shows */
   const row = ref(0)
   const completed = ref(0)
 
@@ -45,13 +50,15 @@ export function useFlowDemo(graph: MaybeRefOrGetter<FlowGraph>, player: FlowPlay
         }
         if (!alive())
           return
-        completed.value = r + 1
+        completed.value = continuous ? completed.value + 1 : r + 1
         // The ball goes back to the start for the next row; the last one rests where it ended
-        if (loop && r < rows - 1) {
+        if (loop && (continuous || r < rows - 1)) {
           player.status.value = {}
           await player.send(LOOP_EDGE, edgeSeconds * 1.6)
         }
       }
+      if (continuous)
+        continue
       await player.wait(restSeconds)
       if (!alive())
         return

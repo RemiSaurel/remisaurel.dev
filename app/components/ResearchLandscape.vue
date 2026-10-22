@@ -446,6 +446,7 @@ const enter = computed(() =>
 
 <style scoped>
 .rl-frame {
+  border-radius: 1.25rem;
   background-color: var(--rl-canvas);
   box-shadow: inset 0 0 0 1px var(--rl-hairline);
   /* Faint dot grid: gives the free-floating nodes a surface to sit on */

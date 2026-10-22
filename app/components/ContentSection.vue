@@ -36,14 +36,13 @@ const layoutTransition = computed(() => prefersReducedMotion.value ? { duration:
       :href="link"
       class="group mb-3 mt-2 flex items-center justify-between"
     >
-      <h2 class="m-0 text-xl text-neutral-700 font-medium tracking-tight dark:text-neutral-300">
-        {{ title }}
-      </h2>
+      <div class="flex items-center gap-2.5">
+        <h2 class="m-0 text-xl text-neutral-700 font-medium tracking-tight dark:text-neutral-300">
+          {{ title }}
+        </h2>
+        <LinkArrow v-if="link" class="section-arrow ml-1 h-2.5 w-2.5" />
+      </div>
       <slot name="actions" />
-      <LinkArrow
-        v-if="link"
-        class="h-2.5 w-2.5 transition-transform duration-150 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-      />
     </component>
 
     <!-- Content slot -->
@@ -52,3 +51,32 @@ const layoutTransition = computed(() => prefersReducedMotion.value ? { duration:
     </div>
   </motion.section>
 </template>
+
+<style scoped>
+/* Hidden until the header is hovered or focused; slides out from behind the label. */
+@media (hover: hover) and (pointer: fine) {
+  .section-arrow {
+    opacity: 0;
+    transform: translate(-12px, 6px) scale(0.9);
+    filter: blur(2px);
+    transition:
+      transform 220ms cubic-bezier(0.23, 1, 0.32, 1),
+      opacity 160ms ease-out,
+      filter 160ms ease-out;
+  }
+
+  .group:hover .section-arrow,
+  .group:focus-visible .section-arrow {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-arrow {
+    transform: none !important;
+    filter: none !important;
+  }
+}
+</style>

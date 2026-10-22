@@ -33,7 +33,7 @@ function select(value: string) {
   <div
     role="group"
     aria-label="Display mode"
-    class="inline-flex items-center gap-0.5 bg-neutral-100 p-0.5 dark:bg-neutral-800"
+    class="inline-flex items-center gap-0.5 rounded-[10px] bg-neutral-100 p-0.5 dark:bg-neutral-800"
   >
     <button
       v-for="option in props.options"
@@ -41,7 +41,7 @@ function select(value: string) {
       type="button"
       :aria-pressed="model === option.value"
       :aria-label="option.label"
-      class="relative h-7 inline-flex pressable cursor-pointer items-center gap-1.5 px-2 text-xs transition-colors duration-200 ease-out"
+      class="relative h-7 inline-flex pressable cursor-pointer items-center gap-1.5 rounded-lg px-2 text-xs transition-colors duration-200 ease-out"
       :class="model === option.value
         ? 'text-neutral-900 dark:text-neutral-100'
         : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200'"
@@ -50,7 +50,7 @@ function select(value: string) {
       <motion.span
         v-if="model === option.value"
         :layout-id="`view-switcher-pill-${props.id}`"
-        class="absolute inset-0 bg-white shadow-[0_1px_2px_rgb(0_0_0/0.06)] dark:bg-neutral-700"
+        class="sheet absolute inset-0 rounded-lg dark:!bg-neutral-700"
         :transition="prefersReducedMotion ? { duration: 0 } : PILL_TRANSITION"
       />
       <span class="relative inline-flex items-center gap-1.5">

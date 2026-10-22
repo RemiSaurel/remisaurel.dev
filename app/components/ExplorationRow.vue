@@ -5,6 +5,7 @@ interface ExplorationRowProps {
   description: string
   status?: 'draft' | 'wip' | 'published'
   icon?: string
+  date?: Date | string
 }
 
 defineProps<ExplorationRowProps>()
@@ -24,11 +25,11 @@ const { play } = useSound()
       aria-hidden="true"
     >
       <Icon v-if="icon" :name="icon" class="size-[18px]" />
-      <span v-else class="w-[18px] flex flex-col gap-[3px]">
-        <span class="h-[1.5px] w-full rounded-full bg-current" />
-        <span class="h-[1.5px] w-full rounded-full bg-current" />
-        <span class="h-[1.5px] w-full rounded-full bg-current" />
-        <span class="h-[1.5px] w-3/5 rounded-full bg-current" />
+      <span v-else class="w-[20px] flex flex-col gap-[4px]">
+        <span class="h-[2px] w-full rounded-full bg-current" />
+        <span class="h-[2px] w-full rounded-full bg-current" />
+        <span class="h-[2px] w-full rounded-full bg-current" />
+        <span class="h-[2px] w-3/5 rounded-full bg-current" />
       </span>
     </span>
 
@@ -43,6 +44,7 @@ const { play } = useSound()
         >
           {{ status === 'draft' ? 'Draft' : 'WIP' }}
         </span>
+        <NewTag v-if="isNew(date)" />
       </span>
       <span class="truncate text-[13px] text-neutral-500 dark:text-neutral-400">
         {{ description }}

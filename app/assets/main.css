@@ -258,6 +258,18 @@ a {
   }
 }
 
+/* The small white sheet of the bento and the posts/explorations tiles, for controls and cards.
+   The radius is left to each use, so nested corners can stay concentric. */
+.sheet {
+  border: 1px solid rgb(229 229 229);
+  background-color: white;
+}
+
+.dark .sheet {
+  border-color: rgb(64 64 64 / 0.8);
+  background-color: rgb(38 38 38);
+}
+
 /* Divider line */
 .divider {
   width: 100%;

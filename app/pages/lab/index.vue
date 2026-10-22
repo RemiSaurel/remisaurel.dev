@@ -132,7 +132,7 @@ function exportSvg(theme: ArtTheme) {
   exportOpen.value = false
 }
 
-/** 1600x800: sharp as a card on a 2x screen, and a fine Open Graph image. */
+/** 1600x1280: sharp as a card on a 2x screen, and a fine Open Graph image. */
 function exportPng(theme: ArtTheme) {
   const markup = svgMarkup(theme)
   exportOpen.value = false
@@ -143,7 +143,7 @@ function exportPng(theme: ArtTheme) {
   image.onload = () => {
     const canvas = document.createElement('canvas')
     canvas.width = 1600
-    canvas.height = 800
+    canvas.height = 1280
     canvas.getContext('2d')!.drawImage(image, 0, 0, canvas.width, canvas.height)
     URL.revokeObjectURL(url)
     canvas.toBlob(blob => blob && download(blob, exportName('png', theme)))
@@ -482,7 +482,7 @@ const GESTURES = [
               </button>
               <div class="mx-2 my-1 h-px bg-neutral-200 dark:bg-neutral-800" />
               <button v-for="theme in (['dark', 'light'] as const)" :key="`png-${theme}`" type="button" class="lab-menu-item" @click="exportPng(theme)">
-                PNG <span class="text-neutral-400 dark:text-neutral-500">{{ theme }} · 1600×800</span>
+                PNG <span class="text-neutral-400 dark:text-neutral-500">{{ theme }} · 1600×1280</span>
               </button>
             </div>
           </template>

@@ -108,7 +108,7 @@ onBeforeUnmount(() => clearTimeout(showTimer))
       <li
         v-for="(tech, index) in techs"
         :key="tech.key"
-        class="tech-stack-item relative size-[22px] flex shrink-0 items-center justify-center border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900"
+        class="tech-stack-item relative size-[22px] flex shrink-0 items-center justify-center border border-neutral-200 rounded-md bg-white dark:border-neutral-700 dark:bg-neutral-800"
         :style="{ '--i': index }"
         @pointerenter="onItemEnter($event, index)"
       >
@@ -123,7 +123,7 @@ onBeforeUnmount(() => clearTimeout(showTimer))
     </ul>
 
     <div
-      class="tech-tooltip pointer-events-none absolute bottom-full left-0 mb-1.5 h-6 overflow-hidden rounded-sm bg-white text-xs text-neutral-900 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-900 dark:text-white dark:ring-neutral-800"
+      class="tech-tooltip pointer-events-none absolute bottom-full left-0 mb-1.5 h-6 overflow-hidden rounded-md bg-white text-xs text-neutral-900 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-900 dark:text-white dark:ring-neutral-800"
       :data-visible="tooltipVisible || undefined"
       :style="{ '--active': activeIndex, 'width': tooltipWidth ? `${tooltipWidth}px` : undefined }"
       aria-hidden="true"

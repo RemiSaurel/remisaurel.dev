@@ -101,6 +101,7 @@ function pct(value: number, total: number) {
 /* Hub: the single filled anchor */
 .rl-node-hub {
   padding: 0.5rem 0.8rem;
+  border-radius: 0.75rem;
   justify-content: center;
   text-align: center;
   font-weight: 600;
@@ -114,6 +115,7 @@ function pct(value: number, total: number) {
 .rl-node-theme {
   gap: 0.45rem;
   padding: 0.36rem 0.7rem 0.36rem 0.6rem;
+  border-radius: 0.625rem;
   font-weight: 600;
   letter-spacing: -0.005em;
   color: rgb(var(--c-ink));
@@ -125,6 +127,7 @@ function pct(value: number, total: number) {
 .rl-node-topic {
   gap: 0.45rem;
   padding: 0.3rem 0.62rem 0.3rem 0.52rem;
+  border-radius: 0.625rem;
   background-color: var(--rl-surface);
   box-shadow: inset 0 0 0 1px var(--rl-hairline);
 }
@@ -134,6 +137,7 @@ function pct(value: number, total: number) {
   flex-direction: column;
   gap: 0.2rem;
   padding: 0.45rem 0.7rem 0.5rem;
+  border-radius: 0.75rem;
   font-weight: 500;
   line-height: 1.3;
   background-color: var(--rl-surface);

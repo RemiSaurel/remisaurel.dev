@@ -37,7 +37,7 @@ const postGroups = computed(() => {
 </script>
 
 <template>
-  <div>
+  <div class="mx-auto max-w-2xl">
     <div class="mb-16">
       <h1 class="m-0 text-2xl font-semibold">
         Posts
@@ -62,16 +62,17 @@ const postGroups = computed(() => {
         >
           {{ group.monthYear }}
         </h2>
-        <div class="flex flex-col gap-2">
+        <HoverList class="flex flex-col gap-1">
           <div v-for="p in group.posts" :key="p.path">
             <PostLine
               :to="p.path"
               :title="p.title"
               :description="p.description"
               :disabled="p.disabled"
+              :date="p.date"
             />
           </div>
-        </div>
+        </HoverList>
       </motion.div>
     </div>
   </div>

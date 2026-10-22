@@ -68,7 +68,7 @@ const isDark = computed(() => colorMode.value === 'dark')
 
 <template>
   <button
-    class="relative h-8 w-8 flex pressable items-center justify-center bg-neutral-100 transition-colors duration-200 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+    class="relative h-8 w-8 flex pressable items-center justify-center rounded-lg bg-neutral-100 transition-colors duration-200 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700"
     type="button"
     :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
     @click="toggleColorMode"

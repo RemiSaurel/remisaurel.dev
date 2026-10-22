@@ -46,7 +46,7 @@ const verdict = computed(() => (props.verdict ? COMPARE_VERDICTS[props.verdict] 
 
     <footer
       v-if="$slots.note || note"
-      class="compare-note border-t border-neutral-200/70 bg-neutral-50 px-3 py-2.5 text-[12.5px] text-neutral-600 leading-normal dark:border-neutral-700/70 dark:bg-neutral-900/40 dark:text-neutral-400"
+      class="compare-note border-t border-neutral-200/70 bg-neutral-100 px-3 py-2.5 text-[12.5px] text-neutral-700 leading-normal dark:border-neutral-700/70 dark:bg-neutral-800/70 dark:text-neutral-300"
     >
       <slot name="note">
         {{ note }}
