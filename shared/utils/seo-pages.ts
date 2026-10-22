@@ -16,6 +16,11 @@ export const SEO_PAGES: Record<string, SeoPage> = {
     label: 'Research',
     description: 'Research landscape: learning analytics dashboards, generative AI in education, human-AI interaction and responsible AI.',
   },
+  '/explorations': {
+    title: 'Explorations',
+    label: 'Explorations',
+    description: 'Interactive explorations of AI in education: workflows, models and interfaces you can run and take apart.',
+  },
   '/posts': {
     title: 'Posts',
     label: 'Blog',

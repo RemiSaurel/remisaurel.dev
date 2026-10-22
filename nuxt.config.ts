@@ -1,12 +1,16 @@
-import { readdirSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { ogImagePath, SEO_PAGES } from './shared/utils/seo-pages'
 
-// OG images are drawn by server/routes/og: one per page, one per post. Nothing links to them
-// (they only appear in <meta> tags), so the crawler needs the list.
-const postPaths = readdirSync('content/posts')
-  .filter(file => file.endsWith('.md'))
-  .map(file => `/posts/${file.replace(/\.md$/, '')}`)
-const ogImageRoutes = [...Object.keys(SEO_PAGES), ...postPaths].map(ogImagePath)
+// OG images are drawn by server/routes/og: one per page, post and exploration. Nothing links to them
+// (they only appear in <meta> tags), so the crawler needs the list. Draft explorations are never generated.
+// An exploration with no status is a draft, like the content schema says.
+function contentPaths(dir: string) {
+  return readdirSync(`content/${dir}`)
+    .filter(file => file.endsWith('.md'))
+    .filter(file => dir !== 'explorations' || /^status:\s*(?:wip|published)\s*$/m.test(readFileSync(`content/${dir}/${file}`, 'utf8')))
+    .map(file => `/${dir}/${file.replace(/\.md$/, '')}`)
+}
+const ogImageRoutes = [...Object.keys(SEO_PAGES), ...contentPaths('posts'), ...contentPaths('explorations')].map(ogImagePath)
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
