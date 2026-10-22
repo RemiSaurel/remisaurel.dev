@@ -34,8 +34,8 @@ const verdict = computed(() => (props.verdict ? COMPARE_VERDICTS[props.verdict] 
       <h4 :id="`${id}-label`" class="m-0 truncate text-[13px] text-neutral-900 font-medium dark:text-neutral-100">
         {{ label }}
       </h4>
-      <span v-if="verdict" class="badge flex shrink-0 items-center gap-1 rounded-full px-1.5 py-px text-[11px] font-medium">
-        <Icon :name="verdict.icon" class="size-3" />
+      <span v-if="verdict" class="badge flex shrink-0 items-center gap-1.5 rounded-lg py-0.5 pl-1.5 pr-2 text-[13px] font-medium leading-snug">
+        <Icon :name="verdict.icon" class="icon size-3.5" />
         {{ verdict.label }}
       </span>
     </header>
@@ -89,9 +89,17 @@ const verdict = computed(() => (props.verdict ? COMPARE_VERDICTS[props.verdict] 
   --verdict-ink: rgb(251 113 133);
 }
 
+/* Bordered tag: a tinted outline and fill, a soft shadow, the ink of the verdict */
 .badge {
+  border: 1px solid color-mix(in srgb, var(--verdict-ink) 30%, transparent);
   background: var(--verdict-bg);
+  box-shadow: 0 1px 1px color-mix(in srgb, var(--verdict-ink) 14%, transparent);
   color: var(--verdict-ink);
+}
+
+/* The glyphs sit a little high in their box: nudge them to the optical middle of the text */
+.icon {
+  transform: translateY(0.5px);
 }
 
 /* Three rows shared with the other takes (label, content, note), so they line up across columns */

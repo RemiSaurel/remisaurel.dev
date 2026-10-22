@@ -33,6 +33,8 @@ export function useFlowDemo(graph: MaybeRefOrGetter<FlowGraph>, player: FlowPlay
 
   async function run(generation: number) {
     const alive = () => player.generation.value === generation
+    // Paused, the clock holds here: the flow stays idle until it is played, instead of showing its first node done
+    await player.wait(0.05)
     while (alive()) {
       const { nodes, edges, loop } = toValue(graph)
       const byId = new Map(nodes.map(node => [node.id, node]))
