@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import type { MascotState } from '~/utils/mascot'
 import { animate, motion } from 'motion-v'
+import { MASCOT_LABELS, mascotStateAt, minutesOfDay } from '~/utils/mascot'
 
 interface Props {
   animate?: boolean
@@ -94,14 +96,53 @@ function handlePhotoClick(event: MouseEvent) {
     setTimeout(openTetris, prefersReducedMotion.value ? 0 : 180)
 }
 
-const socialLinksBeforeCv = [
+const socialLinks = [
   { icon: 'academicons:google-scholar', url: 'https://scholar.google.com/citations?hl=fr&user=r8AM0OIAAAAJ', label: 'Google Scholar' },
-]
-const socialLinksAfterCv = [
   { icon: 'uil:github-alt', url: 'https://github.com/remisaurel', label: 'GitHub' },
   { icon: 'uil:linkedin', url: 'https://www.linkedin.com/in/r%C3%A9mi-saurel/', label: 'LinkedIn' },
   { icon: 'i-simple-icons-x', url: 'https://twitter.com/remisaurel', label: 'X' },
 ]
+
+// Local time in Toulouse; set after mount so the static HTML never carries a stale time
+const TIMEZONE = 'Europe/Paris'
+const TIME_FORMAT = new Intl.DateTimeFormat('en-GB', { timeZone: TIMEZONE, hour: '2-digit', minute: '2-digit' })
+const localTime = ref('--:--')
+const minutesNow = ref<number | null>(null)
+let clockTimer: ReturnType<typeof setInterval> | undefined
+
+// The mascot follows the hour in Toulouse. `?mascot=sleep|code|music` forces it while developing.
+const route = useRoute()
+const manualMascotState = ref<MascotState | null>(null)
+const mascotState = computed<MascotState | null>(() => {
+  if (manualMascotState.value)
+    return manualMascotState.value
+  const forced = import.meta.dev ? route.query.mascot : undefined
+  if (forced === 'sleep' || forced === 'code' || forced === 'music')
+    return forced
+  return minutesNow.value === null ? null : mascotStateAt(minutesNow.value)
+})
+
+// A click moves on to the next state, looping, until the page is reloaded
+const MASCOT_ORDER: MascotState[] = ['sleep', 'code', 'music']
+
+function cycleMascot() {
+  if (!mascotState.value)
+    return
+  manualMascotState.value = MASCOT_ORDER[(MASCOT_ORDER.indexOf(mascotState.value) + 1) % MASCOT_ORDER.length]!
+  play('tap', { emphasis: 'subtle' })
+}
+
+onMounted(() => {
+  const tick = () => {
+    const now = new Date()
+    localTime.value = TIME_FORMAT.format(now)
+    minutesNow.value = minutesOfDay(now, TIMEZONE)
+  }
+  tick()
+  clockTimer = setInterval(tick, 10_000)
+})
+
+onBeforeUnmount(() => clearInterval(clockTimer))
 
 const photoHover = useMotionHover({ scale: 1.02, rotate: -0.75 })
 
@@ -152,11 +193,9 @@ const PHOTO = {
 </script>
 
 <template>
-  <aside class="relative lg:sticky lg:top-8">
-    <!-- Mobile: Horizontal layout with large photo -->
-    <div v-bind="enter(0.1)" class="lg:hidden">
-      <div class="flex items-start gap-4">
-        <!-- Photo same size as desktop -->
+  <header class="relative">
+    <div v-bind="enter(0.1)" class="flex flex-col gap-6 sm:flex-row sm:items-stretch sm:justify-between sm:gap-8">
+      <div class="flex items-center gap-4 sm:items-stretch sm:gap-5">
         <motion.div
           class="relative shrink-0 cursor-pointer"
           :while-hover="photoHover"
@@ -167,7 +206,7 @@ const PHOTO = {
             v-bind="PHOTO"
             :preload="{ fetchPriority: 'high' }"
             fetchpriority="high"
-            class="h-auto w-32"
+            class="object-cover h-auto w-20 sm:h-full sm:w-24"
           />
           <span
             v-for="p in particles"
@@ -178,9 +217,8 @@ const PHOTO = {
           />
         </motion.div>
 
-        <!-- Info on right -->
-        <div class="min-w-0 flex flex-col gap-1 pt-1">
-          <h1 class="m-0 text-lg font-medium tracking-tight">
+        <div class="min-w-0 flex flex-col gap-1">
+          <h1 class="m-0 text-lg font-medium tracking-tight sm:text-xl">
             Rémi Saurel
           </h1>
           <p class="m-0 text-sm text-neutral-500 dark:text-neutral-400">
@@ -195,26 +233,36 @@ const PHOTO = {
         </div>
       </div>
 
-      <!-- Social links below -->
-      <div class="mt-4 flex items-center gap-2">
-        <a
-          v-for="link in socialLinksBeforeCv"
-          :key="link.url"
-          :href="link.url"
-          target="_blank"
-          rel="noopener noreferrer"
-          :aria-label="link.label"
-          class="social-link size-8 inline-flex pressable items-center justify-center bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
-        >
-          <Icon :name="link.icon" class="size-4" />
-        </a>
+      <!-- Bento: the clock and the CV take two cells, each link takes one -->
+      <div class="bento grid grid-rows-[1fr_auto] grid-cols-4 gap-2 sm:w-[12rem]">
+        <div class="bento-tile col-span-2 flex items-center justify-between gap-1 pl-2.5 pr-2">
+          <div class="flex flex-col items-start">
+            <span class="text-[10px] text-neutral-500 leading-tight dark:text-neutral-400">Toulouse</span>
+            <time class="tabular-nums text-sm text-neutral-700 font-medium leading-tight dark:text-neutral-300">{{ localTime }}</time>
+          </div>
+          <!-- Only after mount: the hour decides what it does, and the static page has no hour -->
+          <button
+            v-if="mascotState"
+            type="button"
+            class="shrink-0 pressable rounded-md"
+            :title="`${MASCOT_LABELS[mascotState]}. Click to change`"
+            :aria-label="`${MASCOT_LABELS[mascotState]}. Click to change`"
+            @click="cycleMascot"
+          >
+            <HomeMascot
+              :key="mascotState"
+              :state="mascotState"
+              class="mascot-in size-7 text-neutral-400 dark:text-neutral-500"
+            />
+          </button>
+        </div>
 
-        <div class="relative size-8 shrink-0">
+        <div class="relative col-span-2">
           <button
             type="button"
             title="CV — coming soon"
             aria-label="CV — coming soon"
-            class="[-webkit-touch-callout:none] relative size-8 inline-flex pressable select-none items-center justify-center overflow-hidden border border-neutral-300 border-dashed text-neutral-400 dark:border-neutral-700 dark:text-neutral-500"
+            class="bento-tile [-webkit-touch-callout:none] relative size-full flex select-none items-center overflow-hidden border-dashed text-left text-neutral-400 dark:text-neutral-500"
             @pointerdown="startCvHold"
             @pointerup="cancelCvHold"
             @pointerleave="cancelCvHold"
@@ -224,18 +272,25 @@ const PHOTO = {
             @blur="cancelCvHold"
             @contextmenu.prevent
           >
-            <Icon name="uil:padlock" class="pointer-events-none absolute inset-0 z-1 m-auto size-4" />
             <span
               class="pointer-events-none absolute inset-0 z-2 bg-[rgb(var(--annotation))]"
               :class="isHoldingCv ? '[clip-path:inset(0_0_0_0)] [transition:clip-path_900ms_linear]' : '[clip-path:inset(0_100%_0_0)] [transition:clip-path_200ms_var(--ease-out)]'"
             />
-            <Icon
-              name="uil:padlock"
-              class="pointer-events-none absolute inset-0 z-3 m-auto size-4 text-white"
+            <span class="pointer-events-none relative z-1 flex items-center gap-1.5 px-2.5">
+              <Icon name="uil:padlock" class="size-3.5" />
+              <span class="text-sm font-medium tracking-tight">CV</span>
+            </span>
+            <!-- White copy of the label, revealed by the same sweep as the fill, so the text turns white only once the fill reaches it -->
+            <span
+              class="pointer-events-none absolute inset-0 z-3 flex items-center gap-2 px-2.5 text-white"
               :class="isHoldingCv ? '[clip-path:inset(0_0_0_0)] [transition:clip-path_900ms_linear]' : '[clip-path:inset(0_100%_0_0)] [transition:clip-path_200ms_var(--ease-out)]'"
-            />
+              aria-hidden="true"
+            >
+              <Icon name="uil:padlock" class="size-3.5" />
+              <span class="text-sm font-medium tracking-tight">CV</span>
+            </span>
           </button>
-          <span class="font-hand pointer-events-none absolute flex flex-col rotate-[-9deg] select-none items-center whitespace-nowrap text-[0.95rem] text-[rgb(var(--annotation))] font-700 leading-none -right-[0.65rem] -top-[0.85rem]" aria-hidden="true">
+          <span class="font-hand pointer-events-none absolute z-4 flex flex-col rotate-[-9deg] select-none items-center whitespace-nowrap text-[0.95rem] text-[rgb(var(--annotation))] font-700 leading-none -right-[0.35rem] -top-[0.85rem]" aria-hidden="true">
             Soon
             <svg class="mt-[-1px] h-[8px] w-[28px]" viewBox="0 0 44 12" aria-hidden="true">
               <path d="M2 6c6-4 10-4 15-1.5s9 3 14-1 8-2 11 1" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
@@ -244,139 +299,75 @@ const PHOTO = {
         </div>
 
         <a
-          v-for="link in socialLinksAfterCv"
+          v-for="link in socialLinks"
           :key="link.url"
           :href="link.url"
           target="_blank"
           rel="noopener noreferrer"
           :aria-label="link.label"
-          class="social-link size-8 inline-flex pressable items-center justify-center bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
+          :title="link.label"
+          class="bento-tile bento-link aspect-square flex pressable items-center justify-center text-neutral-500 dark:text-neutral-400"
         >
           <Icon :name="link.icon" class="size-4" />
         </a>
       </div>
     </div>
-
-    <!-- Desktop: Original vertical layout -->
-    <div class="hidden flex-col gap-3 lg:flex">
-      <!-- Photo -->
-      <div v-bind="enter(0.1)">
-        <motion.div
-          class="relative cursor-pointer"
-          :while-hover="photoHover"
-          :transition="{ type: 'spring', stiffness: 300, damping: 20 }"
-          @click="handlePhotoClick"
-        >
-          <NuxtImg
-            v-bind="PHOTO"
-            fetchpriority="high"
-            class="h-auto max-w-48 w-full"
-          />
-          <span
-            v-for="p in particles"
-            :key="p.id"
-            class="[animation:photo-particle_650ms_var(--ease-out)_forwards] absolute left-1/2 top-1/2 rounded-full"
-            :class="p.accent ? 'bg-amber-500' : 'bg-neutral-700 dark:bg-neutral-200'"
-            :style="{ 'width': `${p.size}px`, 'height': `${p.size}px`, '--sx': `${p.sx}px`, '--sy': `${p.sy}px`, '--tx': `${p.tx}px`, '--ty': `${p.ty}px` }"
-          />
-        </motion.div>
-      </div>
-
-      <!-- Name & Title -->
-      <div v-bind="enter(0.2)" class="flex flex-col gap-0.5">
-        <h1 class="m-0 text-lg font-medium tracking-tight">
-          Rémi Saurel
-        </h1>
-        <p class="m-0 text-sm text-neutral-500 dark:text-neutral-400">
-          PhD Student at IRIT Lab, Toulouse
-        </p>
-      </div>
-
-      <!-- Contact -->
-      <div v-bind="enter(0.25)" class="flex flex-col gap-1">
-        <span class="text-sm text-neutral-500 dark:text-neutral-400">
-          remi.saurel [at] irit.fr
-        </span>
-      </div>
-
-      <!-- Social Links -->
-      <div v-bind="enter(0.3)" class="flex gap-2">
-        <a
-          v-for="link in socialLinksBeforeCv"
-          :key="link.url"
-          :href="link.url"
-          target="_blank"
-          rel="noopener noreferrer"
-          :aria-label="link.label"
-          class="social-link size-8 inline-flex pressable items-center justify-center bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
-        >
-          <Icon :name="link.icon" class="size-4" />
-        </a>
-
-        <div class="relative size-8 shrink-0">
-          <button
-            type="button"
-            title="CV — coming soon"
-            aria-label="CV — coming soon"
-            class="[-webkit-touch-callout:none] relative size-8 inline-flex pressable select-none items-center justify-center overflow-hidden border border-neutral-300 border-dashed text-neutral-400 dark:border-neutral-700 dark:text-neutral-500"
-            @pointerdown="startCvHold"
-            @pointerup="cancelCvHold"
-            @pointerleave="cancelCvHold"
-            @pointercancel="cancelCvHold"
-            @keydown.enter.space.prevent="startCvHold"
-            @keyup.enter.space="cancelCvHold"
-            @blur="cancelCvHold"
-            @contextmenu.prevent
-          >
-            <Icon name="uil:padlock" class="pointer-events-none absolute inset-0 z-1 m-auto size-4" />
-            <span
-              class="pointer-events-none absolute inset-0 z-2 bg-[rgb(var(--annotation))]"
-              :class="isHoldingCv ? '[clip-path:inset(0_0_0_0)] [transition:clip-path_900ms_linear]' : '[clip-path:inset(0_100%_0_0)] [transition:clip-path_200ms_var(--ease-out)]'"
-            />
-            <Icon
-              name="uil:padlock"
-              class="pointer-events-none absolute inset-0 z-3 m-auto size-4 text-white"
-              :class="isHoldingCv ? '[clip-path:inset(0_0_0_0)] [transition:clip-path_900ms_linear]' : '[clip-path:inset(0_100%_0_0)] [transition:clip-path_200ms_var(--ease-out)]'"
-            />
-          </button>
-          <span class="font-hand pointer-events-none absolute flex flex-col rotate-[-9deg] select-none items-center whitespace-nowrap text-[0.95rem] text-[rgb(var(--annotation))] font-700 leading-none -right-[0.65rem] -top-[0.85rem]" aria-hidden="true">
-            Soon
-            <svg class="mt-[-1px] h-[8px] w-[28px]" viewBox="0 0 44 12" aria-hidden="true">
-              <path d="M2 6c6-4 10-4 15-1.5s9 3 14-1 8-2 11 1" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
-            </svg>
-          </span>
-        </div>
-
-        <a
-          v-for="link in socialLinksAfterCv"
-          :key="link.url"
-          :href="link.url"
-          target="_blank"
-          rel="noopener noreferrer"
-          :aria-label="link.label"
-          class="social-link size-8 inline-flex pressable items-center justify-center bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
-        >
-          <Icon :name="link.icon" class="size-4" />
-        </a>
-      </div>
-    </div>
-  </aside>
+  </header>
 </template>
 
 <style scoped>
-/* Hover lift as a CSS transition: no spring overshoot on utility links, and `translate`
-   composes with the press scale from `.pressable`. */
-.social-link {
+/* The same small sheet as the tiles of the posts and explorations lists */
+.bento-tile {
+  --mascot-bg: white;
+  border: 1px solid rgb(229 229 229);
+  border-radius: 0.75rem;
+  background: white;
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.04),
+    0 2px 6px -2px rgb(0 0 0 / 0.06);
   transition:
     transform 160ms var(--ease-out),
-    translate 160ms var(--ease-out),
-    background-color 150ms var(--ease-out),
+    border-color 150ms var(--ease-out),
+    box-shadow 160ms var(--ease-out),
     color 150ms var(--ease-out);
 }
 
+.dark .bento-tile {
+  --mascot-bg: rgb(38 38 38);
+  border-color: rgb(64 64 64 / 0.8);
+  background: rgb(38 38 38);
+}
+
+.mascot-in {
+  animation: mascot-in 0.4s var(--ease-out) both;
+}
+
+@keyframes mascot-in {
+  from { opacity: 0; transform: translateY(3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot-in {
+    animation: none;
+  }
+}
+
+button.bento-tile {
+  border-style: dashed;
+}
+
 @media (hover: hover) and (pointer: fine) {
-  .social-link:hover {
-    translate: 0 -1px;
+  .bento-link:hover {
+    border-color: rgb(163 163 163);
+    color: rgb(23 23 23);
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.06),
+      0 3px 8px -3px rgb(0 0 0 / 0.1);
+  }
+
+  .dark .bento-link:hover {
+    border-color: rgb(115 115 115);
+    color: rgb(245 245 245);
   }
 }
 </style>

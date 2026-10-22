@@ -571,7 +571,7 @@ const STATUS_LABEL: Record<FlowStatus, string> = { idle: 'Waiting', running: 'Ru
 </script>
 
 <template>
-  <figure ref="host" class="flow-host breakout my-8">
+  <figure ref="host" class="flow-host breakout my-8" data-no-highlight>
     <!-- Phones: the graph as a vertical list -->
     <div class="md:hidden">
       <FlowStack v-model:selected="selected" :graph="graph" :player="player">

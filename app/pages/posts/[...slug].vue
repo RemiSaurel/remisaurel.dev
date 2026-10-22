@@ -11,6 +11,8 @@ const { data: page, status } = await useAsyncData(
   () => queryCollection('posts').path(`/posts/${slug.value}`).first(),
 )
 
+const body = useTemplateRef<HTMLElement>('body')
+
 const references = computed<Reference[]>(() => page.value?.references ?? [])
 provide(REFERENCES_KEY, references)
 
@@ -27,10 +29,20 @@ usePageSeo({
 <template>
   <div>
     <article v-if="page" class="leading-6">
-      <h1 class="mb-4 text-4xl">
+      <NuxtLink
+        to="/posts"
+        class="mb-4 w-fit inline-flex items-center gap-1 py-1 text-xs text-neutral-500 transition-colors duration-150 -my-1 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+      >
+        <Icon name="lucide:arrow-left" class="size-3.5" />
+        Posts
+      </NuxtLink>
+      <h1 class="font-display mb-4 text-4xl font-medium">
         {{ page.title }}
       </h1>
-      <ContentRenderer :value="page" />
+      <div ref="body">
+        <ContentRenderer :value="page" />
+      </div>
+      <PostHighlighter :root="body" :storage-key="`/posts/${slug}`" />
       <PostReferences v-if="references.length" :references="references" />
     </article>
 

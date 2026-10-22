@@ -35,7 +35,6 @@ const layoutTransition = computed(() => prefersReducedMotion.value ? { duration:
       v-if="title"
       :href="link"
       class="group mb-3 mt-2 flex items-center justify-between"
-      :class="{ pressable: link }"
     >
       <h2 class="m-0 text-xl text-neutral-700 font-medium tracking-tight dark:text-neutral-300">
         {{ title }}
@@ -43,7 +42,7 @@ const layoutTransition = computed(() => prefersReducedMotion.value ? { duration:
       <slot name="actions" />
       <LinkArrow
         v-if="link"
-        class="h-2.5 w-2.5 group-hover:rotate-45"
+        class="h-2.5 w-2.5 transition-transform duration-150 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
       />
     </component>
 

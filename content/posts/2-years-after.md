@@ -50,7 +50,7 @@ Maybe this is your first time here. Let me quickly introduce myself and my resea
 ::quote
 The collection, analysis, interpretation and communication of data about learners and their learning that provides theoretically relevant and actionable insights to enhance learning and teaching.
 
-#source
+# source
 :citation{id="solar-2026"}
 ::
 
@@ -64,7 +64,7 @@ As I described on the main page:
 ::quote
 I develop dashboards powered by AI and learning analytics to help teachers support students’ out-of-class activities in K-12 education. Interested in Human-AI Interaction and responsible AI integration in education.
 
-#source
+# source
 [remisaurel.dev](/)
 ::
 

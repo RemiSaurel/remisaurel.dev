@@ -64,6 +64,12 @@ body {
   font-weight: 600;
 }
 
+/* Exploration titles: a serif with some character (font swap test) */
+.font-display {
+  font-family: "Fraunces", Georgia, serif;
+  font-variation-settings: "SOFT" 100, "WONK" 1;
+}
+
 /* Editorial pull quotes (Quote component) */
 .font-quote {
   font-family: "Newsreader", Georgia, serif;

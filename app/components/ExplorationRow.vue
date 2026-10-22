@@ -34,7 +34,7 @@ const { play } = useSound()
 
     <span class="min-w-0 flex flex-col">
       <span class="flex items-center gap-2">
-        <span class="truncate text-[15px] text-neutral-800 font-medium transition-colors duration-150 dark:text-neutral-200 group-hover:text-neutral-950 dark:group-hover:text-white">
+        <span class="truncate text-base text-neutral-800 font-medium transition-colors duration-150 dark:text-neutral-200 group-hover:text-neutral-950 dark:group-hover:text-white">
           {{ title }}
         </span>
         <span

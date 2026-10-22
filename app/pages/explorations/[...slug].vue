@@ -13,6 +13,7 @@ const { data: found, status } = await useAsyncData(
 
 // A draft does not exist outside of development
 const page = computed(() => (found.value && (SHOW_DRAFTS || found.value.status !== 'draft') ? found.value : null))
+const body = useTemplateRef<HTMLElement>('body')
 const tags = computed(() => page.value?.tags ?? [])
 
 // "In progress since October 2026, about AI, ASAG and Workflow." Built as parts, so no template
@@ -59,7 +60,7 @@ usePageSeo({
           <Icon name="lucide:arrow-left" class="size-3.5" />
           Explorations
         </NuxtLink>
-        <h1 class="mb-3 text-balance text-4xl tracking-tight">
+        <h1 class="font-display mb-3 text-balance text-4xl font-medium tracking-tight">
           {{ page.title }}
         </h1>
         <p class="m-0 text-pretty text-neutral-600 dark:text-neutral-400">
@@ -76,7 +77,10 @@ usePageSeo({
           </template>
         </p>
       </header>
-      <ContentRenderer :value="page" />
+      <div ref="body">
+        <ContentRenderer :value="page" />
+      </div>
+      <PostHighlighter :root="body" :storage-key="`/explorations/${slug}`" />
     </article>
 
     <div v-else-if="status === 'pending'" class="py-12 text-center text-neutral-500 dark:text-neutral-400">

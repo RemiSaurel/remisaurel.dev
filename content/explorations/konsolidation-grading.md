@@ -3,11 +3,11 @@ title: Grading learner responses on Konsolidation
 description: How Konsolidation grades what learners write. MCQ scores give a trusted binary grade, an AI proposes a score and skills, and a teacher validates them.
 date: 2026-10-22
 tags: [AI, ASAG, Workflow]
-status: wip
+status: published
 icon: lucide:git-merge
 ---
 
-This is the grading workflow running on Konsolidation. A learner answers an exercise, and the response is graded on two tracks: MCQ scores, computed by rule, and an AI that reads the response. The workflow below plays on its own with mocked responses.
+This is the grading workflow running on Konsolidation, the out-of-class study app at the center of my [research](/research). For the bigger picture of where this work comes from, see [2 years after](/posts/2-years-after). A learner answers an exercise, and the response is graded on two tracks: MCQ scores, computed by rule, and an AI that reads the response. The workflow below plays on its own with mocked responses.
 
 Hover a step to see what it depends on, and click it to open its details. Pause the flow or change its speed from the bottom right.
 

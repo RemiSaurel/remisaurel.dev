@@ -113,6 +113,7 @@ export default defineNuxtConfig({
     families: [
       { name: 'Instrument Sans', provider: 'google', weights: [400, 500, 600, 700] },
       { name: 'Caveat', provider: 'google', weights: [600, 700] },
+      { name: 'Fraunces', provider: 'google', weights: [400, 500, 600] },
       { name: 'Newsreader', provider: 'google', weights: [400, 500], styles: ['italic'] },
     ],
   },

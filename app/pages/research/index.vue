@@ -126,7 +126,7 @@ function itemReveal(index: number) {
         out-of-class study app.
       </p>
       <div class="mt-6 flex flex-wrap items-center gap-4 text-sm">
-        <NuxtLink to="/" class="intro-link">
+        <NuxtLink to="/#publications" class="intro-link">
           Publications
         </NuxtLink>
         <a
