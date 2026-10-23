@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useElementSize } from '@vueuse/core'
+import { useDebounceFn, useElementSize, useEventListener } from '@vueuse/core'
 import { HIGHLIGHT_SWATCHES, hueToHex, isHexColor } from '~/utils/highlights'
 
 type Mode = 'main' | 'palette' | 'custom'
@@ -40,15 +40,28 @@ const isTouch = import.meta.client && window.matchMedia('(pointer: coarse)').mat
 
 const visible = computed(() => props.rect.bottom > 0 && props.rect.top < window.innerHeight)
 
+// The toolbar glides to its new spot when the selection changes, but must stay glued to the
+// text while the page scrolls or resizes: a transition there would make it lag behind
+const tracking = ref(false)
+const stopTracking = useDebounceFn(() => tracking.value = false, 120)
+
+function track() {
+  tracking.value = true
+  stopTracking()
+}
+
+useEventListener(() => window, 'scroll', track, { passive: true })
+useEventListener(() => window, 'resize', track, { passive: true })
+
 const placement = computed(() => {
   const below = isTouch || props.rect.top < 64
   const center = props.rect.left + props.rect.width / 2
+  const x = Math.round(Math.min(Math.max(center, 160), window.innerWidth - 160))
+  const y = Math.round(below ? props.rect.bottom + 10 : props.rect.top - 10)
   return {
     below,
     style: {
-      left: `${Math.round(Math.min(Math.max(center, 160), window.innerWidth - 160))}px`,
-      top: `${Math.round(below ? props.rect.bottom + 10 : props.rect.top - 10)}px`,
-      transform: `translate(-50%, ${below ? '0' : '-100%'})`,
+      transform: `translate(${x}px, ${y}px) translate(-50%, ${below ? '0' : '-100%'})`,
     },
   }
 })
@@ -79,7 +92,8 @@ function pickSwatch(color: string) {
     <div
       v-show="visible"
       data-highlight-toolbar
-      class="fixed z-50"
+      class="anchor fixed left-0 top-0 z-50"
+      :class="{ tracking }"
       :style="placement.style"
     >
       <div
@@ -91,7 +105,7 @@ function pickSwatch(color: string) {
       >
         <div ref="measure" class="w-max">
           <Transition name="mode" mode="out-in">
-            <div :key="mode" class="flex items-center gap-1">
+            <div :key="mode" class="flex items-center" :class="{ 'gap-0': mode === 'main', 'gap-1': mode !== 'main', 'pr-2': mode === 'palette' }">
               <template v-if="mode === 'main'">
                 <button
                   type="button"
@@ -105,7 +119,7 @@ function pickSwatch(color: string) {
                 <button
                   v-if="existing"
                   type="button"
-                  class="h-8 flex pressable items-center gap-1.5 rounded-full px-2.5 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
+                  class="h-8 flex pressable items-center gap-1.5 rounded-full pl-2 pr-3 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
                   @pointerdown.prevent
                   @click="emit('remove')"
                 >
@@ -115,7 +129,7 @@ function pickSwatch(color: string) {
                 <button
                   v-else
                   type="button"
-                  class="h-8 flex pressable items-center gap-1.5 rounded-full px-2.5 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
+                  class="h-8 flex pressable items-center gap-1.5 rounded-full pl-2 pr-3 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
                   @pointerdown.prevent
                   @click="emit('apply')"
                 >
@@ -200,6 +214,14 @@ function pickSwatch(color: string) {
 </template>
 
 <style scoped>
+.anchor {
+  transition: transform 260ms var(--ease-out);
+}
+
+.anchor.tracking {
+  transition: none;
+}
+
 /* Enter once, scaling from the edge facing the text; the pill never scales while it morphs */
 .pill {
   display: flex;
@@ -258,7 +280,8 @@ function pickSwatch(color: string) {
     animation: none;
   }
 
-  .pill {
+  .pill,
+  .anchor {
     transition: none;
   }
 

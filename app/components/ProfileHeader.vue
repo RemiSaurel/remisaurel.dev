@@ -280,7 +280,7 @@ const PHOTO = {
             <HomeMascot
               :key="mascotState"
               :state="mascotState"
-              class="mascot-in size-5 text-neutral-400 sm:size-6 dark:text-neutral-500"
+              class="mascot-in h-4.5 w-auto text-neutral-400 sm:h-5 dark:text-neutral-500"
             />
           </button>
         </div>

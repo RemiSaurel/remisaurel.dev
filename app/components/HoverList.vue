@@ -12,16 +12,22 @@ function onOver(event: PointerEvent) {
   const row = (event.target as HTMLElement).closest<HTMLElement>('.group')
   if (!row || !root.value.contains(row))
     return
-  const parent = root.value.getBoundingClientRect()
-  const rect = row.getBoundingClientRect()
+  // Layout offsets, not getBoundingClientRect: rows may still be mid-entrance (translated/scaled),
+  // and the highlight must land where they will settle
+  let x = 0
+  let y = 0
+  for (let el: HTMLElement | null = row; el && el !== root.value; el = el.offsetParent as HTMLElement | null) {
+    x += el.offsetLeft
+    y += el.offsetTop
+  }
   // Coming from outside the list: appear in place, only slide between rows
   box.animate = box.visible
-  box.x = rect.left - parent.left
-  box.y = rect.top - parent.top
+  box.x = x
+  box.y = y
   // Each row sets its own radius (inner radius + padding), the highlight copies it
   box.radius = getComputedStyle(row).borderRadius
-  box.w = rect.width
-  box.h = rect.height
+  box.w = row.offsetWidth
+  box.h = row.offsetHeight
   box.visible = true
 }
 
