@@ -27,12 +27,12 @@ defineProps<FlowIconSwapProps>()
 .swap > * {
   grid-area: 1 / 1;
   opacity: 0;
-  transform: scale(0.4);
-  filter: blur(2px);
+  transform: scale(0.25);
+  filter: blur(4px);
   transition:
-    opacity 180ms var(--ease-out),
-    transform 180ms var(--ease-out),
-    filter 180ms var(--ease-out);
+    opacity 180ms cubic-bezier(0.2, 0, 0, 1),
+    transform 180ms cubic-bezier(0.2, 0, 0, 1),
+    filter 180ms cubic-bezier(0.2, 0, 0, 1);
 }
 
 .swap > .on {

@@ -91,6 +91,20 @@ export function edgePath(from: FlowPoint, to: FlowPoint): { d: string, arrow: st
 }
 
 /**
+ * Edge leaving the bottom of a node and entering the top of another one lower down: a vertical S, for
+ * a flow that wraps onto a new row. The arrowhead stops short of the target, like `edgePath`'s.
+ */
+export function dropPath(from: FlowPoint, to: FlowPoint): { d: string, arrow: string, end: FlowPoint } {
+  const end = { x: to.x, y: to.y - ARROW_GAP }
+  const handle = Math.max(0, end.y - from.y) / 2
+  return {
+    d: `M${from.x} ${from.y}C${from.x} ${from.y + handle} ${end.x} ${end.y - handle} ${end.x} ${end.y}`,
+    arrow: `M${end.x - ARROW * 0.8} ${end.y - ARROW}L${end.x} ${end.y}L${end.x + ARROW * 0.8} ${end.y - ARROW}`,
+    end,
+  }
+}
+
+/**
  * Return path from the bottom of `from` back to the bottom of `to`, running at height `floor`:
  * down, along a rounded U, and up into `to`. `labelAt` is the middle of its long run.
  */

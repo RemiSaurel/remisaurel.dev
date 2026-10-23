@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CompareEntry } from '~/utils/compare'
+import { useMounted } from '@vueuse/core'
 import { COMPARE_KEY } from '~/utils/compare'
 
 // Two or more takes on the same problem, side by side, each with its verdict: what works and what
@@ -22,6 +23,10 @@ const { play } = useSound()
 const { prefersReducedMotion } = usePrefersReducedMotion()
 
 const entries = ref<CompareEntry[]>([])
+
+// The takes register while they set up, after this component has rendered on the client but before
+// it has on the server: the pager waits for the mount so both sides hydrate to the same markup
+const mounted = useMounted()
 
 provide(COMPARE_KEY, {
   register: entry => (entries.value = [...entries.value, entry]),
@@ -73,7 +78,7 @@ function go(index: number) {
     </div>
 
     <!-- Phones: where you are in the carousel, and a way to jump -->
-    <div v-if="entries.length > 1" class="mt-3 flex items-center justify-center gap-2 md:hidden">
+    <div v-if="mounted && entries.length > 1" class="mt-3 flex items-center justify-center gap-2 md:hidden">
       <button
         v-for="(entry, index) in entries"
         :key="entry.id"

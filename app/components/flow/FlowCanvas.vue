@@ -4,7 +4,7 @@ import type { SpringState } from '~/utils/flow/geometry'
 import type { FlowDirection } from '~/utils/flow/graph'
 import type { FlowGraph, FlowNodeSpec, FlowPoint, FlowRect, FlowSize, FlowStatus, FlowViewport } from '~/utils/flow/types'
 import { useEventListener, useIntersectionObserver, useMediaQuery, useResizeObserver, useScrollLock } from '@vueuse/core'
-import { boundsOf, easeInOut, edgePath, fitViewport, loopPath, springSettled, springStep, zoomAt } from '~/utils/flow/geometry'
+import { boundsOf, dropPath, easeInOut, edgePath, fitViewport, loopPath, springSettled, springStep, zoomAt } from '~/utils/flow/geometry'
 import { lineageOf, neighbourIn, stagesOf } from '~/utils/flow/graph'
 import { edgeId, LOOP_EDGE } from '~/utils/flow/types'
 
@@ -173,7 +173,9 @@ const edges = computed(() => props.graph.edges.map((edge) => {
   return {
     id: edgeId(edge),
     stage: stages.value.get(edge.from) ?? 0,
-    ...edgePath({ x: a.x + a.width, y: a.y + a.height / 2 }, { x: b.x, y: b.y + b.height / 2 }),
+    ...(edge.vertical
+      ? dropPath({ x: a.x + a.width / 2, y: a.y + a.height }, { x: b.x + b.width / 2, y: b.y })
+      : edgePath({ x: a.x + a.width, y: a.y + a.height / 2 }, { x: b.x, y: b.y + b.height / 2 })),
   }
 }))
 
@@ -433,6 +435,9 @@ function select(id: string | null) {
 // Pinch on a trackpad arrives as ctrl + wheel. A plain wheel is left to the page, unless the canvas
 // is full screen: stealing the page's scroll inline would trap whoever scrolls past it.
 useEventListener(root, 'wheel', (e: WheelEvent) => {
+  // The side panel scrolls on its own, even full screen
+  if ((e.target as Element).closest('[data-flow-ui]') && !e.ctrlKey && !e.metaKey)
+    return
   if (!e.ctrlKey && !e.metaKey) {
     if (!expanded.value)
       return
@@ -452,7 +457,16 @@ const ARROWS: Record<string, FlowDirection> = { ArrowLeft: 'left', ArrowRight: '
 
 function focusNode(id: string) {
   nodeEls.get(id)?.focus({ preventScroll: true })
+  if (selected.value)
+    select(id)
   reveal(id)
+}
+
+// With the side panel open, the keyboard carries it along: it shows the node that has the focus. A press
+// focuses a node too, and then its click decides, so only a focus that came from the keyboard counts.
+function onNodeFocus(e: FocusEvent, id: string) {
+  if (selected.value && selected.value !== id && (e.target as HTMLElement).matches(':focus-visible'))
+    select(id)
 }
 
 function onNodeKeydown(e: KeyboardEvent, id: string) {
@@ -567,6 +581,15 @@ function togglePlay() {
   play('toggle', { direction: props.player.playing.value ? 'forward' : 'back', emphasis: 'subtle' })
 }
 
+// One beat at a time: pauses, then runs to the next thing that resolves
+function stepPlay() {
+  if (!props.player)
+    return
+  props.player.step()
+  hasPlayed.value = true
+  play('tap', { emphasis: 'subtle' })
+}
+
 const STATUS_LABEL: Record<FlowStatus, string> = { idle: 'Waiting', running: 'Running', done: 'Done', error: 'Failed' }
 </script>
 
@@ -675,6 +698,7 @@ const STATUS_LABEL: Record<FlowStatus, string> = { idle: 'Waiting', running: 'Ru
                 }"
                 @pointerenter="hovered = node.id"
                 @pointerleave="hovered === node.id && (hovered = null)"
+                @focus="onNodeFocus($event, node.id)"
                 @keydown="onNodeKeydown($event, node.id)"
               >
                 <FlowNode
@@ -732,10 +756,16 @@ const STATUS_LABEL: Record<FlowStatus, string> = { idle: 'Waiting', running: 'Ru
                 <FlowButton :label="player.playing.value ? 'Pause' : 'Play'" :pressed="player.playing.value" @click="togglePlay">
                   <FlowIconSwap :icons="['lucide:play', 'lucide:pause']" :active="player.playing.value ? 1 : 0" />
                 </FlowButton>
+                <FlowButton label="Next step" icon="lucide:step-forward" @click="stepPlay" />
                 <FlowButton label="Speed" @click="cycleSpeed">
                   <span class="tabular-nums w-7 text-center text-[11px] font-medium">{{ player.speed.value }}×</span>
                 </FlowButton>
               </FlowToolbar>
+            </div>
+
+            <!-- The keyboard changes what the panel shows while focus stays on the node: say it -->
+            <div class="sr-only" role="status">
+              {{ selectedNode ? `${selectedNode.title} details, ${STATUS_LABEL[statusOf(selectedNode.id)]}` : '' }}
             </div>
 
             <Transition name="flow-panel">

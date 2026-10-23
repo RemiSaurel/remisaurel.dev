@@ -1,9 +1,13 @@
 import type { FlowPacket, FlowStatus } from '~/utils/flow/types'
+import { landsAt, nextEventAt } from '~/utils/flow/clock'
 
 export interface FlowPlayerOptions {
   /** Starts playing once mounted. Never under reduced motion: the visitor presses play when they want it */
   autoplay?: boolean
 }
+
+/** Real seconds a step may take at most: a `think` wait of a second must not make the button feel slow */
+const STEP_SECONDS = 0.3
 
 /**
  * What a workflow canvas shows happening: the status of each node and the balls travelling its edges.
@@ -27,6 +31,10 @@ export function useFlowPlayer(options: FlowPlayerOptions = {}) {
   let raf = 0
   let last = 0
   let nextPacket = 0
+  /** Where a `step` stops: the clock runs up to it while paused, then holds again. `null` outside a step */
+  let stepTarget: number | null = null
+  /** Clock seconds per real second during a step: fast enough that a long beat still takes `STEP_SECONDS` */
+  let stepRate = 1
   let timers: { due: number, done: () => void }[] = []
   let flights: { packet: FlowPacket, start: number, duration: number, done: () => void }[] = []
 
@@ -35,24 +43,34 @@ export function useFlowPlayer(options: FlowPlayerOptions = {}) {
       playing.value = true
   })
 
-  const running = () => playing.value && visible.value
+  const running = () => (playing.value || stepTarget !== null) && visible.value
+
+  /** Fires whatever the clock has reached: timers coming due, balls landing */
+  function flush() {
+    const due = timers.filter(timer => timer.due <= clock)
+    timers = timers.filter(timer => timer.due > clock)
+    due.forEach(timer => timer.done())
+
+    const landed = flights.filter(flight => clock >= landsAt(flight))
+    flights = flights.filter(flight => clock < landsAt(flight))
+    packets.value = flights.map(flight => ({ ...flight.packet, t: (clock - flight.start) / flight.duration }))
+    landed.forEach(flight => flight.done())
+  }
 
   function tick(now: number) {
     raf = 0
     const dt = last ? Math.min((now - last) / 1000, 0.1) : 0
     last = now
-    if (running())
-      clock += dt * speed.value
+    if (running()) {
+      clock += dt * (stepTarget === null ? speed.value : stepRate)
+      // A step never runs past its event: it lands on it exactly, then the clock holds
+      if (stepTarget !== null && clock >= stepTarget) {
+        clock = stepTarget
+        stepTarget = null
+      }
+    }
 
-    const due = timers.filter(timer => timer.due <= clock)
-    timers = timers.filter(timer => timer.due > clock)
-    due.forEach(timer => timer.done())
-
-    const landed = flights.filter(flight => clock - flight.start >= flight.duration)
-    flights = flights.filter(flight => clock - flight.start < flight.duration)
-    packets.value = flights.map(flight => ({ ...flight.packet, t: (clock - flight.start) / flight.duration }))
-    landed.forEach(flight => flight.done())
-
+    flush()
     schedule()
   }
 
@@ -105,6 +123,24 @@ export function useFlowPlayer(options: FlowPlayerOptions = {}) {
       play()
   }
 
+  /**
+   * Pauses, then runs the clock up to the next thing that resolves (a `wait` ending, a ball landing),
+   * so each press moves the flow one beat. Pressed again mid-beat, it finishes that beat at once
+   */
+  function step() {
+    pause()
+    if (stepTarget !== null) {
+      clock = stepTarget
+      stepTarget = null
+      flush()
+      return
+    }
+    stepTarget = nextEventAt(timers, flights)
+    if (stepTarget !== null)
+      stepRate = Math.max(speed.value, (stepTarget - clock) / STEP_SECONDS)
+    schedule()
+  }
+
   function setSpeed(next: number) {
     speed.value = next
   }
@@ -123,6 +159,7 @@ export function useFlowPlayer(options: FlowPlayerOptions = {}) {
     packets.value = []
     timers = []
     flights = []
+    stepTarget = null
     generation.value++
   }
 
@@ -141,6 +178,7 @@ export function useFlowPlayer(options: FlowPlayerOptions = {}) {
     play,
     pause,
     toggle,
+    step,
     reset,
     setSpeed,
     setVisible,

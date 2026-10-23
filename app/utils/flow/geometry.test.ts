@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { boundsOf, clampZoom, easeInOut, edgePath, fitViewport, FLOW_MAX_ZOOM, FLOW_MIN_ZOOM, loopPath, springSettled, springStep, zoomAt } from './geometry'
+import { boundsOf, clampZoom, dropPath, easeInOut, edgePath, fitViewport, FLOW_MAX_ZOOM, FLOW_MIN_ZOOM, loopPath, springSettled, springStep, zoomAt } from './geometry'
 
 describe('zoomAt', () => {
   it('keeps the world point under the anchor in place', () => {
@@ -69,6 +69,22 @@ describe('edgePath', () => {
     const { d } = edgePath({ x: 300, y: 0 }, { x: 100, y: 80 })
     const handle = Number(d.split('C')[1]!.split(' ')[0]) - 300
     expect(handle).toBeGreaterThanOrEqual(60)
+  })
+})
+
+describe('dropPath', () => {
+  it('leaves the source going down and stops short of the target', () => {
+    const { d, end } = dropPath({ x: 100, y: 80 }, { x: 100, y: 200 })
+    expect(d.startsWith('M100 80C100 ')).toBe(true)
+    expect(end).toEqual({ x: 100, y: 196 })
+    expect(d.endsWith(`${end.x} ${end.y}`)).toBe(true)
+  })
+
+  it('swings sideways between two columns without leaving the gap', () => {
+    const { d, end } = dropPath({ x: 500, y: 80 }, { x: 100, y: 200 })
+    const [, c1y, , c2y] = d.split('C')[1]!.split(' ').map(Number) as [number, number, number, number]
+    expect(c1y).toBeGreaterThanOrEqual(80)
+    expect(c2y).toBeLessThanOrEqual(end.y)
   })
 })
 

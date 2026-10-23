@@ -33,6 +33,8 @@ export interface FlowNodeSpec {
 export interface FlowEdgeSpec {
   from: string
   to: string
+  /** Leaves the bottom of `from` and enters the top of `to`, which sits on a lower row: for a flow that wraps */
+  vertical?: boolean
 }
 
 /** Return path under the nodes, from the end of a stage back to its start: "for each row of the dataset" */
