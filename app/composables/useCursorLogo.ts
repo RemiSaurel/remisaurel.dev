@@ -9,6 +9,7 @@ export const ENTITY_LOGOS = {
   irit: { src: '/logos/irit.svg', alt: 'IRIT' },
   talent: { src: '/logos/talent.png', alt: 'TALENT' },
   kosmos: { src: '/logos/kosmos.svg', alt: 'Kosmos Education' },
+  ut: { src: '/logos/ut.png', alt: 'Université de Toulouse' },
 } satisfies Record<string, CursorLogo>
 
 const activeLogo = ref<CursorLogo | null>(null)

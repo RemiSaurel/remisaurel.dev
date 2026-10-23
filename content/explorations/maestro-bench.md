@@ -83,3 +83,7 @@ The frozen execution is what makes a result checkable. In reproducibility work, 
 MB is now one interface for the whole loop, instead of scripts to copy. Everything is configurable (prompt, model, temperature, sampling, even several agents in a row) and nothing ties it to one provider: Mistral, Claude and GPT run side by side. Every launch is recorded answer by answer, and every score comes with its interval against a baseline.
 
 It is used by teams: each project has its own workspace, with roles and its own API keys, so the models, prompts, datasets and experiments of a team stay theirs.
+
+## Open source, shared ownership
+
+The code is open source: it can be inspected, reused and adapted. MB is jointly owned by the :entity-link{entity='ut' href='https://www.univ-toulouse.fr/'}[Université de Toulouse] and :entity-link{entity='kosmos' href='https://www.kosmos-education.com/'}[Kosmos Education]. It is being deployed on the infrastructure of the :entity-link{entity='irit' href='https://www.irit.fr/'}[IRIT], which will host it.
