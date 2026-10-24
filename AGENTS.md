@@ -190,6 +190,8 @@ import { motion } from 'motion-v'
 - Markdown files in `content/posts/` with YAML frontmatter
 - Required frontmatter: `title`, `description`, `date`
 - Custom components available: `:tag{color="green"}[text]`, `::blockquote{type="info"}`
+- `::annotation{note="best-shotting?"}` around a block: a handwritten note in the margin with a bracket beside the block (`mark="arrow"` for a small arrow that ends on the last word instead, `side="left"` for the left margin). Below 1080px there is no margin: the bracket stays against the text and the note goes under it
+- `:annotate[few words]{note="strokes are data"}` inside a sentence: the same handwritten note for a few words, which are underlined by hand. The arrow runs in the space under the line to the end of the underline (`side="left"` for the left margin, like `::annotation`). Below 1080px the note follows the words
 - `::compare` with `:::compare-item{label="…" verdict="works|partial|fails" note="…"}` children: takes side by side (one frame of columns on desktop, a snapping carousel with a pager on phones). Use the `note` prop, not a `#note` slot: MDC drops the following items after a slot in a nested block
 - Code blocks use catppuccin themes (latte for light, mocha for dark)
 
