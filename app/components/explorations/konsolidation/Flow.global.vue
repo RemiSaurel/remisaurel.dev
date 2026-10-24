@@ -67,7 +67,17 @@ function dotState(index: number) {
     <template #footer="{ node }">
       <template v-if="node.id === 'response'">
         <span class="flex items-center gap-1.5">
-          <span v-for="(_, index) in ROWS" :key="index" class="mark" :data-state="dotState(index)" />
+          <span
+            v-for="(_, index) in ROWS"
+            :key="index"
+            class="size-2 border rounded-full border-solid transition-[background-color,border-color,transform] duration-300 ease-[var(--ease-out)]"
+            :class="dotState(index) === 'running'
+              ? 'scale-125 border-blue-500 bg-blue-400'
+              : dotState(index) === 'done'
+                ? 'border-neutral-900 bg-neutral-900 dark:border-neutral-100 dark:bg-neutral-100'
+                : 'border-neutral-300 bg-neutral-50 dark:border-neutral-600 dark:bg-neutral-800'"
+            :data-state="dotState(index)"
+          />
         </span>
         <span class="tabular-nums ml-auto">{{ completed }} {{ completed === 1 ? 'response' : 'responses' }}</span>
       </template>
@@ -96,7 +106,7 @@ function dotState(index: number) {
         <div
           v-for="(r, index) in ROWS"
           :key="r.id"
-          class="row flex items-baseline gap-2 rounded-md px-2 py-1.5"
+          class="flex items-baseline gap-2 rounded-md px-2 py-1.5 transition-[background-color] duration-200 ease-[var(--ease-out)] data-[state=running]:bg-blue-500/8 data-[state=done]:opacity-55"
           :data-state="dotState(index)"
         >
           <span class="text-[11px] text-neutral-400 font-mono">{{ r.id }}</span>
@@ -150,50 +160,3 @@ function dotState(index: number) {
     </template>
   </FlowCanvas>
 </template>
-
-<style scoped>
-.mark {
-  width: 8px;
-  height: 8px;
-  border-radius: 9999px;
-  border: 1px solid rgb(212 212 212);
-  background: rgb(250 250 250);
-  transition:
-    background-color 300ms var(--ease-out),
-    border-color 300ms var(--ease-out),
-    transform 300ms var(--ease-out);
-}
-
-.dark .mark {
-  border-color: rgb(82 82 82);
-  background: rgb(38 38 38);
-}
-
-.mark[data-state='running'] {
-  background: rgb(96 165 250);
-  border-color: rgb(59 130 246);
-  transform: scale(1.25);
-}
-
-.mark[data-state='done'] {
-  background: rgb(23 23 23);
-  border-color: rgb(23 23 23);
-}
-
-.dark .mark[data-state='done'] {
-  background: rgb(245 245 245);
-  border-color: rgb(245 245 245);
-}
-
-.row {
-  transition: background-color 200ms var(--ease-out);
-}
-
-.row[data-state='running'] {
-  background: rgb(59 130 246 / 0.08);
-}
-
-.row[data-state='done'] {
-  opacity: 0.55;
-}
-</style>

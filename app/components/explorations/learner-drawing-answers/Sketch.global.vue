@@ -63,10 +63,10 @@ const trace = computed(() => {
   <figure class="sketch my-8 flex flex-col gap-3">
     <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
       <SegmentedControl v-model="view" label="Whose side" :options="VIEWS" />
-      <figcaption class="m-0 flex items-start gap-2 text-[15px] not-italic">
+      <p class="m-0 flex items-start gap-2 text-[15px] not-italic">
         <Icon name="lucide:microscope" class="mt-0.5 size-4 shrink-0 text-neutral-400" aria-hidden="true" />
         <span>{{ CELL_PROMPT }}</span>
-      </figcaption>
+      </p>
     </div>
 
     <ExplorationsLearnerDrawingAnswersTeacher v-if="view === 'teacher'" :drawing="drawing" />
@@ -85,16 +85,26 @@ const trace = computed(() => {
     </DrawingBoard>
 
     <!-- The counter: both rows are there before the first check, so asking changes their words and nothing else -->
-    <div v-if="view === 'learner'" class="counter">
+    <div v-if="view === 'learner'" class="flex flex-col gap-2 border border-neutral-200 rounded-xl p-3 dark:border-neutral-700/80 dark:bg-neutral-800/40">
       <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <button type="button" class="check" :disabled="!drawing.labels.value.length" @click="check">
+        <button
+          type="button"
+          class="[transition-property:scale,background-color] h-8 inline-flex items-center gap-1.5 rounded-lg bg-neutral-400/16 px-3 text-[13px] text-neutral-800 font-medium duration-[160ms] ease-[var(--ease-out)] disabled:cursor-not-allowed dark:text-neutral-200 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:outline-solid [@media(prefers-reduced-motion:reduce)]:transition-none active:enabled:[scale:0.96] hover:enabled:bg-neutral-400/26 dark:focus-visible:outline-neutral-100"
+          :disabled="!drawing.labels.value.length"
+          @click="check"
+        >
           <Icon name="lucide:list-checks" class="size-4" aria-hidden="true" />
           Check my labels
         </button>
 
-        <div class="min-w-0 flex flex-wrap items-center gap-x-3 gap-y-1" :data-stale="stale" aria-live="polite">
-          <div class="segments" aria-hidden="true">
-            <span v-for="(part, index) in CELL_PARTS" :key="part.id" class="segment" :data-on="!!count && index < count.named" />
+        <div class="min-w-0 flex flex-wrap items-center gap-x-3 gap-y-1 data-[stale=true]:opacity-50" :data-stale="stale" aria-live="polite">
+          <div class="flex gap-[3px]" aria-hidden="true">
+            <span
+              v-for="(part, index) in CELL_PARTS"
+              :key="part.id"
+              class="h-2 w-5 rounded-full bg-neutral-400/25 transition-[background-color] duration-[240ms] ease-[var(--ease-out)] data-[on=true]:bg-emerald-500 [@media(prefers-reduced-motion:reduce)]:transition-none"
+              :data-on="!!count && index < count.named"
+            />
           </div>
           <span class="tabular-nums text-[14px] font-medium">
             <template v-if="count">
@@ -128,93 +138,3 @@ const trace = computed(() => {
     </div>
   </figure>
 </template>
-
-<style scoped>
-.counter {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  border: 1px solid rgb(229 229 229);
-  border-radius: 12px;
-}
-
-.dark .counter {
-  border-color: rgb(64 64 64 / 0.8);
-  background: rgb(38 38 38 / 0.4);
-}
-
-.check {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 32px;
-  padding: 0 12px;
-  border-radius: 8px;
-  background: rgb(163 163 163 / 0.16);
-  color: rgb(38 38 38);
-  font-size: 13px;
-  font-weight: 500;
-  transition:
-    scale 160ms var(--ease-out),
-    background-color 160ms var(--ease-out);
-}
-
-.dark .check {
-  color: rgb(229 229 229);
-}
-
-.check:active:not(:disabled) {
-  scale: 0.96;
-}
-
-.check:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.check:focus-visible {
-  outline: 2px solid rgb(23 23 23);
-  outline-offset: 2px;
-}
-
-.dark .check:focus-visible {
-  outline-color: rgb(245 245 245);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .check:hover:not(:disabled) {
-    background: rgb(163 163 163 / 0.26);
-  }
-}
-
-/* One segment per expected part, with no name on it: it only shows how far along the labels are */
-.segments {
-  display: flex;
-  gap: 3px;
-}
-
-.segment {
-  width: 20px;
-  height: 8px;
-  border-radius: 9999px;
-  background: rgb(163 163 163 / 0.25);
-  transition: background-color 240ms var(--ease-out);
-}
-
-.segment[data-on='true'] {
-  background: rgb(16 185 129);
-}
-
-/* An answer about a drawing that has changed since: still there, but faded */
-[data-stale='true'] {
-  opacity: 0.5;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .check,
-  .segment {
-    transition: none;
-  }
-}
-</style>

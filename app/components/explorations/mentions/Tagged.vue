@@ -12,9 +12,13 @@ defineProps<{
 <template>
   <span class="tagged">
     <template v-for="(part, index) in parsePrompt(text)" :key="index">
-      <span v-if="part.kind" class="tag" :data-kind="part.kind">
+      <span
+        v-if="part.kind"
+        class="[box-decoration-break:clone] rounded-[4px] px-0.5 py-px transition-[background-color] duration-200 ease-[var(--ease-out)] data-[kind=learner]:bg-[rgb(var(--learner)/0.14)] data-[kind=subject]:bg-[rgb(var(--subject)/0.18)] [@media(prefers-reduced-motion:reduce)]:transition-none"
+        :data-kind="part.kind"
+      >
         <template v-if="triggers">{{ MENTION_TRIGGERS[part.kind] }}{{ part.text }}</template>
-        <template v-else><span class="angle">&lt;{{ part.kind }} id="{{ part.id }}"&gt;</span>{{ part.text }}<span class="angle">&lt;/{{ part.kind }}&gt;</span></template>
+        <template v-else><span class="text-[#5a5a5a] dark:text-neutral-400">&lt;{{ part.kind }} id="{{ part.id }}"&gt;</span>{{ part.text }}<span class="text-[#5a5a5a] dark:text-neutral-400">&lt;/{{ part.kind }}&gt;</span></template>
       </span>
       <template v-else>{{ part.text }}</template>
     </template>
@@ -25,34 +29,5 @@ defineProps<{
 .tagged {
   --learner: 59 130 246;
   --subject: 245 158 11;
-}
-
-.angle {
-  color: rgb(90 90 90);
-}
-
-.dark .angle {
-  color: rgb(163 163 163);
-}
-
-.tag {
-  padding: 1px 2px;
-  border-radius: 4px;
-  box-decoration-break: clone;
-  transition: background-color 200ms var(--ease-out);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tag {
-    transition: none;
-  }
-}
-
-.tag[data-kind='learner'] {
-  background: rgb(var(--learner) / 0.14);
-}
-
-.tag[data-kind='subject'] {
-  background: rgb(var(--subject) / 0.18);
 }
 </style>

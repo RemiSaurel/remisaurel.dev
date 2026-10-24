@@ -95,11 +95,11 @@ const barWidth = (rmse: number) => `${Math.round((rmse / BASELINE) * 100)}%`
         </p>
         <div class="tabular-nums grid grid-cols-[auto_1fr_auto] items-center gap-x-3 gap-y-1.5 text-xs">
           <span class="text-neutral-400">baseline</span>
-          <span class="bar" style="width: 100%" />
+          <span class="h-[6px] rounded-full bg-neutral-400/45" style="width: 100%" />
           <span class="font-mono">{{ BASELINE.toFixed(2) }}</span>
           <template v-for="(it, index) in seen" :key="index">
             <span class="truncate">{{ it.change }}</span>
-            <span class="bar" :data-best="it.rmse === best" :style="{ width: barWidth(it.rmse) }" />
+            <span class="h-[6px] rounded-full bg-neutral-400/45 data-[best=true]:bg-blue-500" :data-best="it.rmse === best" :style="{ width: barWidth(it.rmse) }" />
             <span class="font-medium font-mono">{{ it.rmse.toFixed(2) }}</span>
           </template>
         </div>
@@ -107,15 +107,3 @@ const barWidth = (rmse: number) => `${Math.round((rmse / BASELINE) * 100)}%`
     </template>
   </FlowCanvas>
 </template>
-
-<style scoped>
-.bar {
-  height: 6px;
-  border-radius: 9999px;
-  background: rgb(163 163 163 / 0.45);
-}
-
-.bar[data-best='true'] {
-  background: rgb(59 130 246);
-}
-</style>

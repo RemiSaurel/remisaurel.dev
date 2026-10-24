@@ -103,13 +103,17 @@ watch(lit, (cell) => {
   <figure class="my-8 flex flex-col gap-3">
     <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
       <SegmentedControl v-model="current" label="Which line" :options="CASES" />
-      <p class="hint" :data-gone="touched" aria-hidden="true">
+      <p
+        class="hint m-0 flex items-center gap-[5px] text-[12px] text-neutral-500 transition-[opacity] duration-200 ease-[var(--ease-out)] dark:text-neutral-400 data-[gone=true]:opacity-0 [@media(prefers-reduced-motion:reduce)]:transition-none"
+        :data-gone="touched"
+        aria-hidden="true"
+      >
         <Icon name="lucide:mouse-pointer-click" class="hint-icon size-3.5" />
         Point at a cell
       </p>
     </div>
 
-    <div class="stage" @pointerover="onOver" @pointerleave="hovered = null">
+    <div class="[zoom:1.15] border border-neutral-200 rounded-xl bg-neutral-50 px-2.5 py-3.5 dark:border-neutral-700/80 dark:bg-neutral-800/40" @pointerover="onOver" @pointerleave="hovered = null">
       <ExplorationsLearnerDrawingAnswersLogEntry :line="line" plain :lit="lit" />
     </div>
 
@@ -118,7 +122,7 @@ watch(lit, (cell) => {
         v-for="cell in cells"
         :key="cell"
         type="button"
-        class="note"
+        class="flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13px] leading-[1.4] transition-[background-color] duration-[140ms] ease-[var(--ease-out)] data-[on=true]:bg-neutral-400/18 focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:outline-solid [@media(prefers-reduced-motion:reduce)]:transition-none dark:focus-visible:outline-neutral-100"
         :data-on="lit === cell"
         :aria-pressed="pinned === cell"
         @pointerenter="hovered = cell"
@@ -127,10 +131,15 @@ watch(lit, (cell) => {
         @blur="hovered = null"
         @click="pin(cell)"
       >
-        <Icon :name="NOTES[cell]!.icon" class="note-icon size-4" aria-hidden="true" />
-        <span class="note-body">
-          <span class="note-title">{{ NOTES[cell]!.title }}</span>
-          <span class="note-text">{{ NOTES[cell]!.text }}</span>
+        <Icon
+          :name="NOTES[cell]!.icon"
+          class="mt-0.5 size-4 shrink-0 transition-[color] duration-[140ms] ease-[var(--ease-out)] [@media(prefers-reduced-motion:reduce)]:transition-none"
+          :class="lit === cell ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-500 dark:text-neutral-400'"
+          aria-hidden="true"
+        />
+        <span class="flex flex-col gap-px">
+          <span class="font-medium">{{ NOTES[cell]!.title }}</span>
+          <span class="text-neutral-500 dark:text-neutral-400">{{ NOTES[cell]!.text }}</span>
         </span>
       </button>
     </div>
@@ -138,93 +147,6 @@ watch(lit, (cell) => {
 </template>
 
 <style scoped>
-/* The line is shown larger than in the log, to be read cell by cell */
-.stage {
-  zoom: 1.15;
-  padding: 14px 10px;
-  border: 1px solid rgb(229 229 229);
-  border-radius: 12px;
-  background: rgb(250 250 250);
-}
-
-.dark .stage {
-  border-color: rgb(64 64 64 / 0.8);
-  background: rgb(38 38 38 / 0.4);
-}
-
-.note {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 8px 10px;
-  border-radius: 8px;
-  font-size: 13px;
-  line-height: 1.4;
-  text-align: left;
-  transition: background-color 140ms var(--ease-out);
-}
-
-.note-body {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.note-icon {
-  margin-top: 2px;
-  flex-shrink: 0;
-  color: rgb(115 115 115);
-  transition: color 140ms var(--ease-out);
-}
-
-.dark .note-icon {
-  color: rgb(163 163 163);
-}
-
-.note[data-on='true'] .note-icon,
-.dark .note[data-on='true'] .note-icon {
-  color: rgb(23 23 23);
-}
-
-.dark .note[data-on='true'] .note-icon {
-  color: rgb(245 245 245);
-}
-
-.note-title {
-  font-weight: 500;
-}
-
-.note-text {
-  color: rgb(115 115 115);
-}
-
-.dark .note-text {
-  color: rgb(163 163 163);
-}
-
-.note[data-on='true'] {
-  background: rgb(163 163 163 / 0.18);
-}
-
-/* An invitation beside the choice of line, until the first cell is pointed at */
-.hint {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin: 0;
-  font-size: 12px;
-  color: rgb(115 115 115);
-  transition: opacity 200ms var(--ease-out);
-}
-
-.dark .hint {
-  color: rgb(163 163 163);
-}
-
-.hint[data-gone='true'] {
-  opacity: 0;
-}
-
 .hint-icon {
   animation: nudge 1.8s var(--ease-out) infinite;
 }
@@ -241,22 +163,7 @@ watch(lit, (cell) => {
   }
 }
 
-.note:focus-visible {
-  outline: 2px solid rgb(23 23 23);
-  outline-offset: 2px;
-}
-
-.dark .note:focus-visible {
-  outline-color: rgb(245 245 245);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .note,
-  .note-icon,
-  .hint {
-    transition: none;
-  }
-
   .hint-icon {
     animation: none;
   }

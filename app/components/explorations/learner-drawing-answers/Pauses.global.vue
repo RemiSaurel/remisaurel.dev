@@ -112,98 +112,55 @@ const seconds = (ms: number) => `${Math.round(ms / 1000)} s`
 </script>
 
 <template>
-  <figure class="panel my-8">
+  <figure class="my-8 flex flex-col gap-2 border border-neutral-200 rounded-xl p-3 dark:border-neutral-700/80 dark:bg-neutral-800/40">
     <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-      <button type="button" class="play" :aria-label="playing ? 'Pause' : 'Play the session'" @click="playing ? stop() : play()">
+      <button type="button" class="[transition-property:scale,background-color] grid size-8 shrink-0 place-items-center rounded-lg bg-neutral-400/18 text-neutral-600 duration-[160ms] ease-[var(--ease-out)] [@media(prefers-reduced-motion:reduce)]:[transition-property:background-color] active:[scale:0.94] dark:bg-neutral-400/20 hover:bg-neutral-400/30 dark:text-neutral-300 focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:outline-solid dark:focus-visible:outline-neutral-100" :aria-label="playing ? 'Pause' : 'Play the session'" @click="playing ? stop() : play()">
         <Icon :name="playing ? 'lucide:pause' : 'lucide:play'" class="size-4" aria-hidden="true" />
       </button>
-      <label class="cap">
+      <label class="min-w-0 flex flex-1 flex-wrap items-center gap-x-[10px] gap-y-1 text-[13px]">
         <span>A pause lasts at most</span>
-        <input v-model.number="cap" type="range" min="0.2" max="10" step="0.2" :aria-valuetext="`${cap.toFixed(1)} seconds`">
-        <output class="tabular-nums">{{ cap.toFixed(1) }} s</output>
+        <input v-model.number="cap" type="range" class="[accent-color:rgb(115_115_115)] max-w-56 min-w-20 flex-[1_1_6rem] focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:outline-solid dark:focus-visible:outline-neutral-100" min="0.2" max="10" step="0.2" :aria-valuetext="`${cap.toFixed(1)} seconds`">
+        <output class="tabular-nums min-w-[2.2rem] font-medium">{{ cap.toFixed(1) }} s</output>
       </label>
-      <SegmentedControl v-model="speed" label="Speed of the recording" :options="SPEEDS" class="speed" />
+      <SegmentedControl v-model="speed" label="Speed of the recording" :options="SPEEDS" class="shrink-0" />
     </div>
 
-    <div class="row">
-      <p class="caption">
+    <div class="flex flex-col gap-[6px]">
+      <p class="m-0 flex items-baseline justify-between gap-2 text-[13px] font-medium">
         <span>The learner's time</span>
-        <span class="tabular-nums">{{ mmss(real) }}</span>
+        <span class="tabular-nums text-neutral-500 font-normal dark:text-neutral-400">{{ mmss(real) }}</span>
       </p>
-      <div class="bar" aria-hidden="true">
-        <span v-for="item in upper" :key="item.key" class="block" :style="{ left: `${item.left}%`, width: `max(${item.width}%, 3px)`, background: item.color }" />
+      <!-- The head follows the clock 1:1: no easing -->
+      <div class="bar relative h-7" aria-hidden="true">
+        <span v-for="item in upper" :key="item.key" class="absolute inset-y-[5px] rounded-[2px]" :style="{ left: `${item.left}%`, width: `max(${item.width}%, 3px)`, background: item.color }" />
         <span
           v-for="item in pauses"
           :key="item.from"
-          class="pause"
+          class="pause absolute inset-y-0 grid place-items-center overflow-hidden whitespace-nowrap text-[12px] text-neutral-500 dark:text-neutral-400"
           :style="{ left: `${pct(item.from)}%`, width: `${pct(item.to - item.from)}%` }"
         >{{ seconds(item.to - item.from) }}</span>
-        <span class="head" :style="{ left: `${headUpper}%` }" />
+        <span class="pointer-events-none absolute inset-y-0 w-0.5 rounded-[1px] bg-neutral-900 -ml-px dark:bg-neutral-100" :style="{ left: `${headUpper}%` }" />
       </div>
     </div>
 
-    <svg class="links" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-      <polygon v-for="link in links" :key="link.key" :points="link.points" class="link" />
+    <svg class="block h-9 w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <polygon v-for="link in links" :key="link.key" :points="link.points" class="fill-neutral-400/20" />
     </svg>
 
-    <div class="row">
-      <div class="bar" aria-hidden="true">
-        <span v-for="item in lower" :key="item.key" class="block" :style="{ left: `${item.left}%`, width: `max(${item.width}%, 3px)`, background: item.color }" />
-        <span class="head" :style="{ left: `${headLower}%` }" />
+    <div class="flex flex-col gap-[6px]">
+      <div class="bar relative h-7" aria-hidden="true">
+        <span v-for="item in lower" :key="item.key" class="absolute inset-y-[5px] rounded-[2px]" :style="{ left: `${item.left}%`, width: `max(${item.width}%, 3px)`, background: item.color }" />
+        <span class="pointer-events-none absolute inset-y-0 w-0.5 rounded-[1px] bg-neutral-900 -ml-px dark:bg-neutral-100" :style="{ left: `${headLower}%` }" />
       </div>
-      <p class="caption">
+      <p class="m-0 flex items-baseline justify-between gap-2 text-[13px] font-medium">
         <span>The recording's clock</span>
-        <span class="tabular-nums">{{ mmss(played) }}</span>
+        <span class="tabular-nums text-neutral-500 font-normal dark:text-neutral-400">{{ mmss(played) }}</span>
       </p>
     </div>
   </figure>
 </template>
 
 <style scoped>
-.panel {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  border: 1px solid rgb(229 229 229);
-  border-radius: 12px;
-}
-
-.dark .panel {
-  border-color: rgb(64 64 64 / 0.8);
-  background: rgb(38 38 38 / 0.4);
-}
-
-.row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.caption {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  margin: 0;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.caption > :last-child {
-  color: rgb(115 115 115);
-  font-weight: 400;
-}
-
-.dark .caption > :last-child {
-  color: rgb(163 163 163);
-}
-
-.bar {
-  position: relative;
-  height: 28px;
-}
-
 .bar::before {
   content: '';
   position: absolute;
@@ -212,130 +169,11 @@ const seconds = (ms: number) => `${Math.round(ms / 1000)} s`
   background: rgb(163 163 163 / 0.4);
 }
 
-.block {
-  position: absolute;
-  top: 5px;
-  bottom: 5px;
-  border-radius: 2px;
-}
-
 /* How long a pause was, where it was */
-.pause {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  font-size: 12px;
-  color: rgb(115 115 115);
-  white-space: nowrap;
-}
-
-.dark .pause {
-  color: rgb(163 163 163);
-}
-
 .pause::before {
   content: '';
   position: absolute;
   inset: 4px 0;
   border-inline: 1px dashed rgb(163 163 163 / 0.6);
-}
-
-/* Follows the clock 1:1: no easing */
-.head {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  margin-left: -1px;
-  border-radius: 1px;
-  background: rgb(23 23 23);
-  pointer-events: none;
-}
-
-.dark .head {
-  background: rgb(245 245 245);
-}
-
-.link {
-  fill: rgb(163 163 163 / 0.2);
-}
-
-.links {
-  display: block;
-  width: 100%;
-  height: 36px;
-}
-
-.play {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  border-radius: 8px;
-  background: rgb(163 163 163 / 0.18);
-  color: rgb(82 82 82);
-  transition: scale 160ms var(--ease-out), background-color 160ms var(--ease-out);
-}
-
-.dark .play {
-  background: rgb(163 163 163 / 0.2);
-  color: rgb(212 212 212);
-}
-
-@media (hover: hover) {
-  .play:hover {
-    background: rgb(163 163 163 / 0.3);
-  }
-}
-
-.play:active {
-  scale: 0.94;
-}
-
-.cap {
-  display: flex;
-  flex: 1;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 10px;
-  min-width: 0;
-  font-size: 13px;
-}
-
-.cap input {
-  flex: 1 1 6rem;
-  min-width: 5rem;
-  max-width: 14rem;
-  accent-color: rgb(115 115 115);
-}
-
-.cap output {
-  min-width: 2.2rem;
-  font-weight: 500;
-}
-
-.speed {
-  flex-shrink: 0;
-}
-
-.play:focus-visible,
-.cap input:focus-visible {
-  outline: 2px solid rgb(23 23 23);
-  outline-offset: 2px;
-}
-
-.dark .play:focus-visible,
-.dark .cap input:focus-visible {
-  outline-color: rgb(245 245 245);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .play {
-    transition: background-color 160ms var(--ease-out);
-  }
 }
 </style>

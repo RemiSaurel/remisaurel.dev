@@ -66,18 +66,18 @@ const owner = computed(() => new Map(steps.value.flatMap(step => Array.from({ le
 
 <template>
   <figure class="my-8 flex flex-col gap-3">
-    <div class="panel">
-      <p class="caption">
+    <div class="min-w-0 flex flex-col gap-2.5 border border-neutral-200 rounded-xl px-3 py-2.5 dark:border-neutral-700/80 dark:bg-neutral-800/40">
+      <p class="m-0 flex items-baseline justify-between gap-2 text-[13px] font-medium">
         <span>The acts, on time</span>
-        <span class="tabular-nums">{{ events.length }} acts in {{ mmss(end) }}</span>
+        <span class="tabular-nums text-neutral-500 font-normal dark:text-neutral-400">{{ events.length }} acts in {{ mmss(end) }}</span>
       </p>
 
-      <div class="axis" aria-hidden="true">
-        <TransitionGroup name="bracket" tag="div" class="brackets">
+      <div class="relative mx-1 h-10" aria-hidden="true">
+        <TransitionGroup name="bracket" tag="div" class="absolute inset-0">
           <span
             v-for="item in lines"
             :key="item.step.first"
-            class="bracket"
+            class="bracket absolute bottom-1.5 top-1.5 box-content border-[1.5px] border-transparent rounded-md px-[5px] -mx-[5px] data-[group=true]:border-neutral-400/55 data-[on=true]:border-neutral-900 data-[on=true]:bg-neutral-400/18 dark:data-[on=true]:border-neutral-100"
             :data-on="lit === item.step.first"
             :data-group="item.step.last > item.step.first"
             :style="{ left: `${item.from}%`, width: `${item.to - item.from}%` }"
@@ -86,26 +86,33 @@ const owner = computed(() => new Map(steps.value.flatMap(step => Array.from({ le
         <span
           v-for="tick in ticks"
           :key="tick.key"
-          class="tick"
+          class="absolute top-3 h-4 rounded-[1.5px] transition-[opacity] duration-[140ms] ease-[var(--ease-out)] data-[dim=true]:opacity-25 [@media(prefers-reduced-motion:reduce)]:transition-none"
           :data-dim="lit !== null && owner.get(tick.key) !== lit"
           :style="{ left: `${tick.left}%`, width: `max(${tick.width}%, 3px)`, background: tick.color }"
         />
       </div>
 
-      <label class="window">
+      <label class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[13px]">
         <span>Acts closer than</span>
-        <input v-model.number="gap" type="range" min="0" max="4" step="0.5" :aria-valuetext="`${gap.toFixed(1)} seconds`">
-        <output class="tabular-nums">{{ gap.toFixed(1) }} s</output>
+        <input
+          v-model.number="gap"
+          class="[accent-color:rgb(115_115_115)] max-w-56 min-w-24 flex-[1_1_8rem] focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:outline-solid dark:focus-visible:outline-neutral-100"
+          type="range" min="0"
+          max="4"
+          step="0.5"
+          :aria-valuetext="`${gap.toFixed(1)} seconds`"
+        >
+        <output class="tabular-nums min-w-[2.2rem] font-medium">{{ gap.toFixed(1) }} s</output>
         <span>are one line</span>
       </label>
     </div>
 
-    <div class="panel">
-      <p class="caption">
+    <div class="min-w-0 flex flex-col gap-2.5 border border-neutral-200 rounded-xl px-3 py-2.5 dark:border-neutral-700/80 dark:bg-neutral-800/40">
+      <p class="m-0 flex items-baseline justify-between gap-2 text-[13px] font-medium">
         <span>The log</span>
-        <span class="tabular-nums">{{ lines.length }} lines</span>
+        <span class="tabular-nums text-neutral-500 font-normal dark:text-neutral-400">{{ lines.length }} lines</span>
       </p>
-      <TransitionGroup tag="div" name="line" class="lines">
+      <TransitionGroup tag="div" name="line" class="relative [&>*]:mb-0.5 [&>*]:w-full">
         <ExplorationsLearnerDrawingAnswersLogEntry
           v-for="item in lines"
           :key="`${item.step.first}:${item.step.last}`"
@@ -122,74 +129,8 @@ const owner = computed(() => new Map(steps.value.flatMap(step => Array.from({ le
 </template>
 
 <style scoped>
-.panel {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 0;
-  padding: 10px 12px;
-  border: 1px solid rgb(229 229 229);
-  border-radius: 12px;
-}
-
-.dark .panel {
-  border-color: rgb(64 64 64 / 0.8);
-  background: rgb(38 38 38 / 0.4);
-}
-
-.caption {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  margin: 0;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.caption > :last-child {
-  color: rgb(115 115 115);
-  font-weight: 400;
-}
-
-.dark .caption > :last-child {
-  color: rgb(163 163 163);
-}
-
-.axis {
-  position: relative;
-  height: 40px;
-  margin-inline: 4px;
-}
-
-/* A tick is an act, as long as the act took. A bracket gathers the ticks that make one line */
-.tick {
-  position: absolute;
-  top: 12px;
-  height: 16px;
-  border-radius: 1.5px;
-  transition: opacity 140ms var(--ease-out);
-}
-
-.tick[data-dim='true'] {
-  opacity: 0.25;
-}
-
-.brackets {
-  position: absolute;
-  inset: 0;
-}
-
 /* A bracket stretches over the acts it gathers, and shrinks back when the gap is cut */
 .bracket {
-  position: absolute;
-  top: 6px;
-  bottom: 6px;
-  margin-inline: -5px;
-  padding-inline: 5px;
-  box-sizing: content-box;
-  border: 1.5px solid transparent;
-  border-radius: 6px;
   transition:
     left 260ms var(--ease-out),
     width 260ms var(--ease-out),
@@ -203,58 +144,6 @@ const owner = computed(() => new Map(steps.value.flatMap(step => Array.from({ le
 .bracket-leave-to {
   opacity: 0;
   scale: 0.9 1;
-}
-
-.bracket[data-group='true'] {
-  border-color: rgb(163 163 163 / 0.55);
-}
-
-.bracket[data-on='true'] {
-  border-color: rgb(23 23 23);
-  background: rgb(163 163 163 / 0.18);
-}
-
-.dark .bracket[data-on='true'] {
-  border-color: rgb(245 245 245);
-}
-
-.window {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 10px;
-  font-size: 13px;
-}
-
-.window input {
-  flex: 1 1 8rem;
-  min-width: 6rem;
-  max-width: 14rem;
-  accent-color: rgb(115 115 115);
-}
-
-.window output {
-  min-width: 2.2rem;
-  font-weight: 500;
-}
-
-.window input:focus-visible {
-  outline: 2px solid rgb(23 23 23);
-  outline-offset: 2px;
-}
-
-.dark .window input:focus-visible {
-  outline-color: rgb(245 245 245);
-}
-
-/* As tall as its lines: a gap that gathers acts leaves no empty space */
-.lines {
-  position: relative;
-}
-
-.lines > * {
-  width: 100%;
-  margin-bottom: 2px;
 }
 
 .line-enter-active,
@@ -280,7 +169,6 @@ const owner = computed(() => new Map(steps.value.flatMap(step => Array.from({ le
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tick,
   .bracket,
   .line-enter-active,
   .line-leave-active,

@@ -236,14 +236,14 @@ const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`
 
     <template v-else>
       <!-- The recording: play it, or move along the timeline to a moment -->
-      <section class="panel" aria-label="The session">
+      <section class="min-w-0 flex flex-col gap-2 border border-neutral-200 rounded-xl px-3 py-[10px] dark:border-neutral-700/80 dark:bg-neutral-800/40" aria-label="The session">
         <div class="flex items-center gap-x-3">
-          <button type="button" class="play" :aria-label="playing ? 'Pause' : 'Play the session'" @click="playing ? stop() : play()">
+          <button type="button" class="[transition-property:scale] grid size-8 shrink-0 place-items-center rounded-lg bg-neutral-900 text-white duration-[160ms] ease-[var(--ease-out)] active:[scale:0.94] dark:bg-neutral-100 dark:text-neutral-900 focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:outline-solid [@media(prefers-reduced-motion:reduce)]:transition-none dark:focus-visible:outline-neutral-100" :aria-label="playing ? 'Pause' : 'Play the session'" @click="playing ? stop() : play()">
             <Icon :name="playing ? 'lucide:pause' : 'lucide:play'" class="size-4" aria-hidden="true" />
           </button>
 
           <div
-            class="scrub"
+            class="[touch-action:none] min-w-0 flex-[1_1_180px] cursor-pointer select-none rounded-lg px-[7px] py-1 focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:outline-solid dark:focus-visible:outline-neutral-100"
             role="slider"
             tabindex="0"
             aria-label="Position in the session"
@@ -258,11 +258,11 @@ const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`
             @pointercancel="onScrubUp"
             @keydown="onScrubKey"
           >
-            <div ref="track" class="track">
-              <span class="line" />
-              <span class="line played" :style="{ width: `${at(time)}%` }" />
-              <span v-for="tick in ticks" :key="tick.key" class="tick" :data-kind="tick.kind" :data-past="tick.past" :style="{ left: `${tick.at}%` }" />
-              <span class="head" :style="{ left: `${at(time)}%` }" />
+            <div ref="track" class="relative h-6">
+              <span class="absolute inset-x-0 top-1/2 h-px bg-neutral-400/40" />
+              <span class="absolute inset-x-0 top-1/2 mt-[-0.5px] h-0.5 bg-neutral-500/70" :style="{ width: `${at(time)}%` }" />
+              <span v-for="tick in ticks" :key="tick.key" class="tick [transition-property:opacity] [translate:0_-50%] absolute top-1/2 rounded-[1px] duration-[120ms] ease-[var(--ease-out)] -ml-px [@media(prefers-reduced-motion:reduce)]:transition-none" :class="[tick.kind === 'check' ? 'z-[1] h-5 w-[3px]' : 'h-3 w-0.5', tick.past ? 'opacity-100' : 'opacity-35']" :data-kind="tick.kind" :data-past="tick.past" :style="{ left: `${tick.at}%` }" />
+              <span class="head pointer-events-none absolute inset-y-0 z-[2] w-0.5 rounded-[1px] bg-neutral-900 -ml-px dark:bg-neutral-100" :style="{ left: `${at(time)}%` }" />
             </div>
           </div>
 
@@ -271,13 +271,13 @@ const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`
 
         <!-- What is happening where the timeline is, and what the marks mean -->
         <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-          <p class="now" aria-hidden="true">
+          <p class="m-0 flex items-baseline gap-[10px] text-[14px]" aria-hidden="true">
             <span class="tabular-nums text-neutral-500 dark:text-neutral-400">{{ mmss(now.time) }}</span>
             <span>{{ now.text }}</span>
           </p>
           <div class="flex flex-wrap gap-x-3 gap-y-0.5 text-[12px] text-neutral-500 dark:text-neutral-400">
             <span v-for="item in LEGEND" :key="item.kind" class="flex items-center gap-1.5">
-              <span class="key" :data-kind="item.kind" />
+              <span class="key h-3 w-[3px] shrink-0 rounded-[1px]" :data-kind="item.kind" />
               {{ item.label }}
             </span>
           </div>
@@ -285,17 +285,17 @@ const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`
       </section>
 
       <div class="grid items-start gap-3 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-        <section class="panel" aria-label="Parts named">
-          <p class="caption">
+        <section class="min-w-0 flex flex-col gap-2 border border-neutral-200 rounded-xl px-3 py-[10px] dark:border-neutral-700/80 dark:bg-neutral-800/40" aria-label="Parts named">
+          <p class="m-0 flex items-baseline justify-between gap-2 text-[13px] font-medium">
             <span>Parts named</span>
-            <span class="tabular-nums">{{ namedCount }} of {{ parts.length }}</span>
+            <span class="tabular-nums text-neutral-500 font-normal dark:text-neutral-400">{{ namedCount }} of {{ parts.length }}</span>
           </p>
           <ul class="list-none m-0 flex flex-col gap-0.5 p-0">
             <li v-for="part in parts" :key="part.id">
               <!-- A named part can be pointed at: its labels light up on the sheet -->
               <button
                 type="button"
-                class="part"
+                class="[transition-property:background-color] min-w-0 w-full flex items-center gap-2 rounded-[6px] px-[6px] py-[3px] text-left text-[13px] duration-[120ms] ease-[var(--ease-out)] disabled:cursor-default aria-[pressed=true]:bg-neutral-400/18 focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:outline-solid [@media(prefers-reduced-motion:reduce)]:transition-none hover:enabled:bg-neutral-400/14 dark:focus-visible:outline-neutral-100"
                 :data-named="part.named.length > 0"
                 :aria-pressed="part.named.length ? picked === part.id : undefined"
                 :disabled="!part.named.length"
@@ -303,9 +303,9 @@ const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`
                 @pointerleave="hovered = null"
                 @click="pick(part.id)"
               >
-                <Icon :name="part.named.length ? 'lucide:circle-check' : 'lucide:circle'" class="part-icon size-4 shrink-0" aria-hidden="true" />
-                <span class="part-name">{{ part.name }}</span>
-                <span v-if="part.named.length" class="part-label">{{ part.named.map(label => label.text).join(', ') }}</span>
+                <Icon :name="part.named.length ? 'lucide:circle-check' : 'lucide:circle'" class="size-4 shrink-0" :class="part.named.length ? 'text-emerald-500' : 'text-neutral-400/70'" aria-hidden="true" />
+                <span :class="!part.named.length && 'text-neutral-500 dark:text-neutral-400'">{{ part.name }}</span>
+                <span v-if="part.named.length" class="ml-auto min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[12px] text-neutral-500 dark:text-neutral-400">{{ part.named.map(label => label.text).join(', ') }}</span>
                 <span v-else class="sr-only">not named</span>
               </button>
             </li>
@@ -316,24 +316,31 @@ const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`
         </section>
 
         <!-- Every act, and each ask for help with what led to it -->
-        <section class="panel" aria-label="The log">
-          <p class="caption">
+        <section class="min-w-0 flex flex-col gap-2 border border-neutral-200 rounded-xl px-3 py-[10px] dark:border-neutral-700/80 dark:bg-neutral-800/40" aria-label="The log">
+          <p class="m-0 flex items-baseline justify-between gap-2 text-[13px] font-medium">
             <span>The log</span>
-            <span class="tabular-nums">{{ plural(events.length, 'act') }}<template v-if="summary.checks.length">, {{ plural(summary.checks.length, 'check') }}</template></span>
+            <span class="tabular-nums text-neutral-500 font-normal dark:text-neutral-400">{{ plural(events.length, 'act') }}<template v-if="summary.checks.length">, {{ plural(summary.checks.length, 'check') }}</template></span>
           </p>
-          <ol ref="log" class="log list-none m-0 p-0">
-            <li v-for="row in rows" :key="row.key" class="row" :data-child="row.child">
+          <ol ref="log" class="list-none [overscroll-behavior:contain] relative m-0 max-h-56 min-h-40 flex-[1_1_0] overflow-y-auto p-0">
+            <!-- The article styles every li (size, line height, a margin below): a row is its own -->
+            <li
+              v-for="row in rows"
+              :key="row.key"
+              class="row [font-size:inherit] [line-height:inherit] flex items-start"
+              :class="row.child ? 'ml-[11px] mb-0 gap-0 border-l border-neutral-400/45 pl-[22px]' : 'mb-[2px] gap-1'"
+              :data-child="row.child"
+            >
               <button
                 v-if="row.group"
                 type="button"
-                class="fold"
+                class="grid h-[30px] w-[22px] shrink-0 place-items-center rounded-[6px] text-neutral-500 hover:bg-neutral-400/18 dark:text-neutral-400 focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-solid dark:focus-visible:outline-neutral-100 focus-visible:-outline-offset-2"
                 :aria-expanded="row.open"
                 :aria-label="row.open ? 'Fold the acts' : 'Unfold the acts'"
                 @click="toggle(row.step.first)"
               >
-                <Icon name="lucide:chevron-right" class="fold-icon size-3.5" aria-hidden="true" />
+                <Icon name="lucide:chevron-right" class="[transition-property:rotate] size-3.5 duration-[160ms] ease-[var(--ease-out)] [@media(prefers-reduced-motion:reduce)]:transition-none" :class="row.open && '[rotate:90deg]'" aria-hidden="true" />
               </button>
-              <span v-else-if="foldable && !row.child" class="fold" aria-hidden="true" />
+              <span v-else-if="foldable && !row.child" class="grid h-[30px] w-[22px] shrink-0 place-items-center rounded-[6px] text-neutral-500 dark:text-neutral-400" aria-hidden="true" />
               <ExplorationsLearnerDrawingAnswersLogEntry :line="row.line" :state="stateOf(row.step)" :open="row.open" :compact="row.child" @click="seek(row.step.t)" />
             </li>
           </ol>
@@ -347,221 +354,7 @@ const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`
 </template>
 
 <style scoped>
-.panel {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-  padding: 10px 12px;
-  border: 1px solid rgb(229 229 229);
-  border-radius: 12px;
-}
-
-.dark .panel {
-  border-color: rgb(64 64 64 / 0.8);
-  background: rgb(38 38 38 / 0.4);
-}
-
-.caption {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  margin: 0;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.caption > :last-child:not(:first-child) {
-  color: rgb(115 115 115);
-  font-weight: 400;
-}
-
-.dark .caption > :last-child:not(:first-child) {
-  color: rgb(163 163 163);
-}
-
-/* A part: what the teacher expected, and which label of the learner named it. A named one can be pointed at */
-.part {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  min-width: 0;
-  padding: 3px 6px;
-  border-radius: 6px;
-  font-size: 13px;
-  text-align: left;
-  transition: background-color 120ms var(--ease-out);
-}
-
-.part:disabled {
-  cursor: default;
-}
-
-.part[aria-pressed='true'] {
-  background: rgb(163 163 163 / 0.18);
-}
-
-.part:focus-visible {
-  outline: 2px solid rgb(23 23 23);
-  outline-offset: 2px;
-}
-
-.dark .part:focus-visible {
-  outline-color: rgb(245 245 245);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .part:hover:not(:disabled) {
-    background: rgb(163 163 163 / 0.14);
-  }
-}
-
-.part-icon {
-  color: rgb(163 163 163 / 0.7);
-}
-
-.part[data-named='true'] .part-icon {
-  color: rgb(16 185 129);
-}
-
-.part[data-named='false'] .part-name {
-  color: rgb(115 115 115);
-}
-
-.dark .part[data-named='false'] .part-name {
-  color: rgb(163 163 163);
-}
-
-.part-label {
-  min-width: 0;
-  margin-left: auto;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 12px;
-  color: rgb(115 115 115);
-}
-
-.dark .part-label {
-  color: rgb(163 163 163);
-}
-
-/* The player */
-.play {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  border-radius: 8px;
-  background: rgb(23 23 23);
-  color: white;
-  transition: scale 160ms var(--ease-out);
-}
-
-.dark .play {
-  background: rgb(245 245 245);
-  color: rgb(23 23 23);
-}
-
-.play:active {
-  scale: 0.94;
-}
-
-.play:focus-visible,
-.scrub:focus-visible {
-  outline: 2px solid rgb(23 23 23);
-  outline-offset: 2px;
-}
-
-.dark .play:focus-visible,
-.dark .scrub:focus-visible {
-  outline-color: rgb(245 245 245);
-}
-
-/* The whole strip takes the pointer, a taller target than the line it draws */
-.scrub {
-  flex: 1 1 180px;
-  min-width: 0;
-  padding: 4px 7px;
-  border-radius: 8px;
-  cursor: pointer;
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.track {
-  position: relative;
-  height: 24px;
-}
-
-.line {
-  position: absolute;
-  inset: 50% 0 auto;
-  height: 1px;
-  background: rgb(163 163 163 / 0.4);
-}
-
-.line.played {
-  height: 2px;
-  margin-top: -0.5px;
-  background: rgb(115 115 115 / 0.7);
-}
-
-.tick {
-  position: absolute;
-  top: 50%;
-  width: 2px;
-  height: 12px;
-  margin-left: -1px;
-  border-radius: 1px;
-  translate: 0 -50%;
-  opacity: 0.35;
-  transition: opacity 120ms var(--ease-out);
-}
-
-.tick[data-past='true'] {
-  opacity: 1;
-}
-
-.tick[data-kind='check'] {
-  z-index: 1;
-  width: 3px;
-  height: 20px;
-}
-
-/* Follows the pointer 1:1 while it is dragged: no easing */
-.head {
-  position: absolute;
-  z-index: 2;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  margin-left: -1px;
-  border-radius: 1px;
-  background: rgb(23 23 23);
-  pointer-events: none;
-}
-
-.dark .head {
-  background: rgb(245 245 245);
-}
-
-.head::before {
-  content: '';
-  position: absolute;
-  top: -3px;
-  left: 50%;
-  width: 8px;
-  height: 8px;
-  border-radius: 9999px;
-  background: inherit;
-  translate: -50% 0;
-}
-
+/* The kind of an act, on the timeline and in its legend */
 .tick[data-kind='draw'],
 .key[data-kind='draw'] {
   background: rgb(115 115 115);
@@ -582,102 +375,21 @@ const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`
   background: rgb(16 185 129);
 }
 
-.key {
-  width: 3px;
-  height: 12px;
-  flex-shrink: 0;
-  border-radius: 1px;
-}
-
-.now {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin: 0;
-  font-size: 14px;
-}
-
-/* The log: a check has a second line, with what the learner did before asking */
-.log {
-  position: relative;
-  flex: 1 1 0;
-  min-height: 10rem;
-  max-height: 14rem;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-/* A line that gathers acts has a chevron; the others keep its place, so the columns line up (unless no line has one) */
-/* The article styles every li (size, line height, a margin below): a row is its own */
-.row {
-  display: flex;
-  align-items: flex-start;
-  gap: 4px;
-  margin-bottom: 2px;
-  font-size: inherit;
-  line-height: inherit;
-}
-
-.fold {
-  display: grid;
-  flex-shrink: 0;
-  place-items: center;
-  width: 22px;
-  height: 30px;
-  border-radius: 6px;
-  color: rgb(115 115 115);
-}
-
-.dark .fold {
-  color: rgb(163 163 163);
-}
-
-button.fold:focus-visible {
-  outline: 2px solid rgb(23 23 23);
-  outline-offset: -2px;
-}
-
-.dark button.fold:focus-visible {
-  outline-color: rgb(245 245 245);
-}
-
-.fold-icon {
-  transition: rotate 160ms var(--ease-out);
-}
-
-.fold[aria-expanded='true'] .fold-icon {
-  rotate: 90deg;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  button.fold:hover {
-    background: rgb(163 163 163 / 0.18);
-  }
-}
-
-/*
- * The acts of an unfolded line hang on one branch under its chevron, indented and a little tighter than
- * the lines. Rows touch, so the branch is a single line
- */
-.row[data-child='true'] {
-  gap: 0;
-  margin-bottom: 0;
-  margin-left: 11px;
-  padding-left: 22px;
-  border-left: 1px solid rgb(163 163 163 / 0.45);
+/* The dot on the head */
+.head::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: inherit;
+  translate: -50% 0;
 }
 
 /* The last act leaves some air before the next line */
 .row[data-child='true']:has(+ .row:not([data-child='true'])) {
   margin-bottom: 4px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .play,
-  .tick,
-  .part,
-  .fold-icon {
-    transition: none;
-  }
 }
 </style>
