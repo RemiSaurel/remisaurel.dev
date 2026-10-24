@@ -89,11 +89,10 @@ const verdict = computed(() => (props.verdict ? COMPARE_VERDICTS[props.verdict] 
   --verdict-ink: rgb(251 113 133);
 }
 
-/* Bordered tag: a tinted outline and fill, a soft shadow, the ink of the verdict */
+/* Bordered tag: a tinted outline and fill, the ink of the verdict */
 .badge {
   border: 1px solid color-mix(in srgb, var(--verdict-ink) 30%, transparent);
   background: var(--verdict-bg);
-  box-shadow: 0 1px 1px color-mix(in srgb, var(--verdict-ink) 14%, transparent);
   color: var(--verdict-ink);
 }
 
