@@ -1,9 +1,9 @@
 ---
 title: Mentions in the teachers' chatbot
 description: Teachers pick learners and subjects from a list while they type, like @file in a coding assistant. What that gives the agents behind the chatbot, and what it does not.
-date: 2026-10-23
+date: 2026-06-15
 tags: [AI, Chatbot, UX]
-status: wip
+status: published
 icon: lucide:at-sign
 references:
   - id: saurel2026rjc

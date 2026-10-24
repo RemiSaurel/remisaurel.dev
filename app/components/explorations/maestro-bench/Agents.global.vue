@@ -83,7 +83,7 @@ const MAX_RMSE = Math.max(...Object.values(RMSES))
           <span
             v-for="(_, index) in ROWS"
             :key="index"
-            class="dot"
+            class="size-[6px] rounded-full bg-neutral-400/45 data-[state=done]:bg-blue-500 data-[state=running]:bg-blue-500/60"
             :data-state="index < completed ? 'done' : index === row && status !== 'idle' ? 'running' : 'pending'"
           />
         </span>
@@ -112,7 +112,7 @@ const MAX_RMSE = Math.max(...Object.values(RMSES))
         <p class="m-0">
           Each row goes through the whole workflow, one after the other. This one is the row being processed.
         </p>
-        <p class="answer m-0">
+        <p class="m-0 rounded-[8px] bg-neutral-400/12 px-[10px] py-[8px] text-[12px] leading-[1.5]">
           “{{ current.answer }}”
         </p>
         <p class="m-0 text-xs text-neutral-400">
@@ -135,15 +135,15 @@ const MAX_RMSE = Math.max(...Object.values(RMSES))
         <p class="m-0">
           A formula turns the grades of the agents into one score. Pick one: the table shows what each row would get.
         </p>
-        <div class="formulas" role="radiogroup" aria-label="Aggregation formula">
-          <span class="thumb" aria-hidden="true" :style="{ transform: `translateX(${formulaIndex * 100}%)` }" />
+        <div class="relative flex rounded-[9px] bg-neutral-400/15 p-[3px]" role="radiogroup" aria-label="Aggregation formula">
+          <span class="absolute inset-y-[3px] left-[3px] w-[calc((100%-6px)/3)] rounded-[6px] bg-white shadow-[0_1px_2px_rgb(0_0_0/0.12)] transition-transform duration-[250ms] ease-[var(--ease-out)] dark:bg-neutral-700 [@media(prefers-reduced-motion:reduce)]:transition-none" aria-hidden="true" :style="{ transform: `translateX(${formulaIndex * 100}%)` }" />
           <button
             v-for="f in FORMULAS"
             :key="f.id"
             type="button"
             role="radio"
             :aria-checked="f.id === formulaId"
-            class="formula"
+            class="relative flex-1 rounded-[6px] px-[8px] py-[4px] text-[12px] text-neutral-500 font-medium transition-colors duration-200 ease-[var(--ease-out)] aria-[checked=true]:text-neutral-900 dark:text-neutral-400 [@media(prefers-reduced-motion:reduce)]:transition-none dark:aria-[checked=true]:text-neutral-100"
             @click="formulaId = f.id"
           >
             {{ f.label }}
@@ -166,7 +166,7 @@ const MAX_RMSE = Math.max(...Object.values(RMSES))
         <div class="tabular-nums grid grid-cols-[auto_1fr_auto] items-center gap-x-3 gap-y-1.5 text-xs">
           <template v-for="f in FORMULAS" :key="f.id">
             <span>{{ f.label }}</span>
-            <span class="bar" :data-best="f.id === bestId" :style="{ width: `${Math.round((RMSES[f.id]! / MAX_RMSE) * 100)}%` }" />
+            <span class="h-[6px] rounded-full bg-neutral-400/45 data-[best=true]:bg-blue-500" :data-best="f.id === bestId" :style="{ width: `${Math.round((RMSES[f.id]! / MAX_RMSE) * 100)}%` }" />
             <span class="font-medium font-mono">{{ RMSES[f.id]!.toFixed(2) }}</span>
           </template>
         </div>
@@ -186,93 +186,3 @@ const MAX_RMSE = Math.max(...Object.values(RMSES))
     </template>
   </FlowCanvas>
 </template>
-
-<style scoped>
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 9999px;
-  background: rgb(163 163 163 / 0.45);
-}
-
-.dot[data-state='running'] {
-  background: rgb(59 130 246 / 0.6);
-}
-
-.dot[data-state='done'] {
-  background: rgb(59 130 246);
-}
-
-.answer {
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: rgb(163 163 163 / 0.12);
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-.formulas {
-  position: relative;
-  display: flex;
-  padding: 3px;
-  border-radius: 9px;
-  background: rgb(163 163 163 / 0.15);
-}
-
-/* One third of the track: slides under the selected formula */
-.thumb {
-  position: absolute;
-  top: 3px;
-  bottom: 3px;
-  left: 3px;
-  width: calc((100% - 6px) / 3);
-  border-radius: 6px;
-  background: rgb(255 255 255);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
-  transition: transform 250ms var(--ease-out);
-}
-
-.dark .thumb {
-  background: rgb(64 64 64);
-}
-
-.formula {
-  position: relative;
-  flex: 1;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: rgb(115 115 115);
-  transition: color 200ms var(--ease-out);
-}
-
-.dark .formula {
-  color: rgb(163 163 163);
-}
-
-.formula[aria-checked='true'] {
-  color: rgb(23 23 23);
-}
-
-.dark .formula[aria-checked='true'] {
-  color: rgb(245 245 245);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .thumb,
-  .formula {
-    transition: none;
-  }
-}
-
-.bar {
-  height: 6px;
-  border-radius: 9999px;
-  background: rgb(163 163 163 / 0.45);
-}
-
-.bar[data-best='true'] {
-  background: rgb(59 130 246);
-}
-</style>

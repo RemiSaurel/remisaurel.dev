@@ -1,13 +1,10 @@
-/** Drafts are benches for components: listed while developing, never in production. */
+/** Drafts are benches for components: openable while developing, a non-clickable teaser in production. */
 export const SHOW_DRAFTS = import.meta.dev
 
-/** The explorations a visitor can open, newest first. Shared by the nav and /explorations. */
+/** Every exploration, drafts included (see `SHOW_DRAFTS`), newest first. Shared by the nav, the home and /explorations. */
 export function useExplorations() {
-  return useAsyncData('explorations', async () => {
-    const all = await queryCollection('explorations')
-      .select('path', 'title', 'description', 'date', 'tags', 'status', 'icon')
-      .order('date', 'DESC')
-      .all()
-    return all.filter(exploration => SHOW_DRAFTS || exploration.status !== 'draft')
-  }, { default: () => [] })
+  return useAsyncData('explorations', () => queryCollection('explorations')
+    .select('path', 'title', 'description', 'date', 'tags', 'status', 'icon')
+    .order('date', 'DESC')
+    .all(), { default: () => [] })
 }

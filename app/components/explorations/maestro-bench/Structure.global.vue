@@ -195,42 +195,43 @@ const percent = (units: number) => `${(units / domain.value) * 100}%`
   <div class="structure my-8 flex flex-col gap-4">
     <div class="flex items-center justify-between gap-3 text-[13px] text-neutral-500 dark:text-neutral-400">
       <span>Click a row to see what it holds</span>
-      <button type="button" class="replay" @click="play">
+      <button type="button" class="inline-flex items-center gap-[5px] rounded-[7px] px-[8px] py-[3px] transition-[background-color] duration-[180ms] ease-[var(--ease-out)] active:scale-[0.97] hover:bg-neutral-400/16 [@media(prefers-reduced-motion:reduce)]:transition-none" @click="play">
         <Icon name="lucide:rotate-ccw" class="size-3.5" aria-hidden="true" />
         Replay
       </button>
     </div>
 
-    <ul ref="trace" class="trace list-none m-0 p-0" :data-settled="settled" :style="{ '--span': `${domain * UNIT}s`, '--unit': `${UNIT}s` }">
+    <ul ref="trace" class="trace list-none relative m-0 overflow-hidden border border-neutral-200 rounded-[12px] border-solid bg-white p-0 dark:border-neutral-700/80 dark:bg-neutral-800/40" :data-settled="settled" :style="{ '--span': `${domain * UNIT}s`, '--unit': `${UNIT}s` }">
       <li v-for="{ row, guides } in guided" :key="row.id" class="m-0 p-0">
         <div
-          class="row"
+          class="row grid grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] h-[40px] cursor-pointer items-center pl-[8px] pr-[12px] text-[14px]"
+          :class="selected === row.id ? 'bg-[rgb(var(--tint)/0.1)]' : 'hover:bg-neutral-400/10'"
           :data-level="row.level"
           :data-active="selected === row.id"
           @click="selected = row.id"
         >
-          <span class="label">
-            <span v-for="(guide, index) in guides" :key="index" class="guide" :data-guide="guide" aria-hidden="true" />
-            <button type="button" class="pick" :aria-pressed="selected === row.id" @click.stop="selected = row.id">
-              <span class="tile"><Icon :name="LEVELS[row.level].icon" class="size-3.5" aria-hidden="true" /></span>
-              <span class="name">{{ row.name }}</span>
+          <span class="h-full min-w-0 flex items-center pr-[16px]">
+            <span v-for="(guide, index) in guides" :key="index" class="guide relative w-[22px] shrink-0 self-stretch" :data-guide="guide" aria-hidden="true" />
+            <button type="button" class="pick min-w-0 flex flex-1 items-center self-stretch text-left" :aria-pressed="selected === row.id" @click.stop="selected = row.id">
+              <span class="grid mr-[8px] size-[22px] shrink-0 place-items-center rounded-[6px] bg-[rgb(var(--tint)/0.16)] text-[rgb(var(--tint))]"><Icon :name="LEVELS[row.level].icon" class="size-3.5" aria-hidden="true" /></span>
+              <span class="truncate" :class="row.level === 'study' || row.level === 'batch' ? 'font-medium' : ''">{{ row.name }}</span>
             </button>
 
             <!-- An experiment is run again from its own row, which adds an execution -->
-            <span v-if="row.level === 'experiment'" class="actions">
+            <span v-if="row.level === 'experiment'" class="ml-[4px] flex shrink-0 items-center gap-[4px]">
               <button
                 type="button"
-                class="mini"
+                class="mini h-[24px] inline-flex items-center gap-[4px] border border-neutral-400/40 rounded-[6px] border-solid bg-white px-[6px] text-[12px] text-neutral-600 disabled:cursor-not-allowed dark:bg-neutral-800 dark:text-neutral-300 disabled:opacity-40 enabled:active:scale-[0.96] enabled:hover:border-[rgb(var(--tint)/0.6)] enabled:hover:text-[rgb(var(--tint))]"
                 :aria-expanded="open === row.experiment!.id"
                 :aria-label="open === row.experiment!.id ? 'Fold the executions' : `Show the ${row.experiment!.executions.length} executions`"
                 @click.stop="toggle(row.experiment!)"
               >
-                <Icon name="lucide:chevron-right" class="chevron size-3.5" :data-open="open === row.experiment!.id" aria-hidden="true" />
+                <Icon name="lucide:chevron-right" class="size-3.5 data-[open=true]:rotate-90" :data-open="open === row.experiment!.id" aria-hidden="true" />
                 {{ row.experiment!.executions.length }}
               </button>
               <button
                 type="button"
-                class="mini"
+                class="mini h-[24px] inline-flex items-center gap-[4px] border border-neutral-400/40 rounded-[6px] border-solid bg-white px-[6px] text-[12px] text-neutral-600 disabled:cursor-not-allowed dark:bg-neutral-800 dark:text-neutral-300 disabled:opacity-40 enabled:active:scale-[0.96] enabled:hover:border-[rgb(var(--tint)/0.6)] enabled:hover:text-[rgb(var(--tint))]"
                 aria-label="Run again"
                 :disabled="row.experiment!.executions.length >= MAX_EXECUTIONS"
                 @click.stop="runAgain(row.experiment!)"
@@ -242,10 +243,11 @@ const percent = (units: number) => `${(units / domain.value) * 100}%`
           </span>
 
           <!-- The bar is replayed by changing the key: it waits dashed, then fills over its own time -->
-          <span v-if="row.level !== 'study'" :key="run" class="lane" aria-hidden="true">
-            <span v-if="row.level === 'experiment' && row.start > 0" class="wait" :style="{ 'width': percent(row.start), '--from': row.start }" />
+          <span v-if="row.level !== 'study'" :key="run" class="relative h-[14px]" aria-hidden="true">
+            <span v-if="row.level === 'experiment' && row.start > 0" class="wait absolute left-0 top-1/2 h-0 border-t border-neutral-400 border-dashed" :style="{ 'width': percent(row.start), '--from': row.start }" />
             <span
-              class="bar"
+              class="bar absolute inset-y-[2px] origin-left rounded-[4px]"
+              :class="row.level === 'batch' ? 'bg-[rgb(var(--tint)/0.6)]' : 'bg-[rgb(var(--tint)/0.75)]'"
               :data-fresh="row.fresh"
               :style="{ 'left': percent(row.start), 'width': percent(row.end - row.start), '--from': row.fresh ? 0 : row.start, '--len': row.end - row.start }"
             />
@@ -260,7 +262,7 @@ const percent = (units: number) => `${(units / domain.value) * 100}%`
     </ul>
 
     <!-- A fixed height: every level fits, so choosing one never moves what is below -->
-    <div :key="selected" class="detail" :data-level="current.level">
+    <div :key="selected" class="detail min-h-[23rem] flex flex-col gap-[10px] p-[2px] text-[15px] sm:min-h-[13rem]" :data-level="current.level">
       <div class="flex items-center gap-2">
         <span class="kind"><Icon :name="info.icon" class="size-3.5" aria-hidden="true" />{{ info.kind }}</span>
         <span class="font-medium">{{ current.name }}</span>
@@ -277,7 +279,7 @@ const percent = (units: number) => `${(units / domain.value) * 100}%`
         <span class="pill"><Icon name="lucide:link" class="size-3.5" aria-hidden="true" />Public link</span>
       </div>
 
-      <dl v-else-if="current.level === 'batch'" class="facts">
+      <dl v-else-if="current.level === 'batch'" class="facts grid grid-cols-[auto_1fr] m-0 gap-x-[16px] gap-y-[6px] text-[14px] sm:grid-cols-[auto_1fr_auto_1fr]">
         <dt>Experiments</dt>
         <dd>4, from 2 models and 2 prompts</dd>
         <dt>In parallel</dt>
@@ -285,7 +287,7 @@ const percent = (units: number) => `${(units / domain.value) * 100}%`
       </dl>
 
       <template v-else-if="current.level === 'experiment'">
-        <dl class="facts">
+        <dl class="facts grid grid-cols-[auto_1fr] m-0 gap-x-[16px] gap-y-[6px] text-[14px] sm:grid-cols-[auto_1fr_auto_1fr]">
           <dt>Dataset</dt>
           <dd><code>responses.csv</code>, 200 rows</dd>
           <dt>Prompt</dt>
@@ -299,7 +301,7 @@ const percent = (units: number) => `${(units / domain.value) * 100}%`
         </dl>
       </template>
 
-      <dl v-else class="facts">
+      <dl v-else class="facts grid grid-cols-[auto_1fr] m-0 gap-x-[16px] gap-y-[6px] text-[14px] sm:grid-cols-[auto_1fr_auto_1fr]">
         <dt>Prompt</dt>
         <dd><code>correcteur@{{ current.experiment!.prompt }}</code></dd>
         <dt>Model</dt>
@@ -324,48 +326,6 @@ const percent = (units: number) => `${(units / domain.value) * 100}%`
   --line: 163 163 163 / 0.5;
 }
 
-.replay {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 8px;
-  border-radius: 7px;
-  transition: background-color 180ms var(--ease-out);
-}
-
-.replay:active {
-  transform: scale(0.97);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .replay:hover {
-    background: rgb(163 163 163 / 0.16);
-  }
-}
-
-.trace {
-  position: relative;
-  border: 1px solid rgb(229 229 229);
-  border-radius: 12px;
-  background: white;
-  overflow: hidden;
-}
-
-.dark .trace {
-  border-color: rgb(64 64 64 / 0.8);
-  background: rgb(38 38 38 / 0.4);
-}
-
-.row {
-  display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-  align-items: center;
-  height: 40px;
-  padding: 0 12px 0 8px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
 .row[data-level='study'],
 .detail[data-level='study'] {
   --tint: 115 115 115;
@@ -386,94 +346,13 @@ const percent = (units: number) => `${(units / domain.value) * 100}%`
   --tint: 16 185 129;
 }
 
-.row[data-active='true'] {
-  background: rgb(var(--tint) / 0.1);
-}
-
-.pick {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  align-self: stretch;
-  min-width: 0;
-  text-align: left;
-}
-
 .pick:focus-visible,
 .mini:focus-visible {
   outline: 2px solid rgb(var(--tint) / 0.7);
   outline-offset: 1px;
 }
 
-.actions {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: 4px;
-  margin-left: 4px;
-}
-
-/* Small buttons on the row of an experiment */
-.mini {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 24px;
-  padding: 0 6px;
-  border: 1px solid rgb(163 163 163 / 0.4);
-  border-radius: 6px;
-  background: white;
-  font-size: 12px;
-  color: rgb(82 82 82);
-}
-
-.dark .mini {
-  background: rgb(38 38 38);
-  color: rgb(212 212 212);
-}
-
-.mini:active:not(:disabled) {
-  transform: scale(0.96);
-}
-
-.mini:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .mini:hover:not(:disabled) {
-    border-color: rgb(var(--tint) / 0.6);
-    color: rgb(var(--tint));
-  }
-}
-
-.chevron[data-open='true'] {
-  transform: rotate(90deg);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .row:not([data-active='true']):hover {
-    background: rgb(163 163 163 / 0.1);
-  }
-}
-
-.label {
-  display: flex;
-  padding-right: 16px;
-  align-items: center;
-  min-width: 0;
-  height: 100%;
-}
-
 /* One cell per level above the row: the lines that join a row to its parent and its siblings */
-.guide {
-  position: relative;
-  flex-shrink: 0;
-  align-self: stretch;
-  width: 22px;
-}
-
 .guide[data-guide='pass']::before,
 .guide[data-guide='tee']::before,
 .guide[data-guide='elbow']::before {
@@ -499,58 +378,15 @@ const percent = (units: number) => `${(units / domain.value) * 100}%`
   border-top: 1px solid rgb(var(--line));
 }
 
-.tile {
-  display: grid;
-  place-items: center;
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
-  margin-right: 8px;
-  border-radius: 6px;
-  background: rgb(var(--tint) / 0.16);
-  color: rgb(var(--tint));
-}
-
-.name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.row[data-level='study'] .name,
-.row[data-level='batch'] .name {
-  font-weight: 500;
-}
-
-.lane {
-  position: relative;
-  height: 14px;
-}
-
 /* Waiting for a free slot */
 .wait {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  height: 0;
-  border-top: 1px dashed rgb(163 163 163);
   /* Grows with the cursor: it is the time spent waiting, up to the start of the bar */
   animation: reveal calc(var(--from) * var(--unit)) linear backwards;
 }
 
 .bar {
-  position: absolute;
-  top: 2px;
-  bottom: 2px;
-  border-radius: 4px;
-  background: rgb(var(--tint) / 0.75);
-  transform-origin: left;
   /* Starts when the cursor reaches it, and takes as long as its width */
   animation: fill calc(var(--len) * var(--unit)) linear calc(var(--from) * var(--unit)) backwards;
-}
-
-.row[data-level='batch'] .bar {
-  background: rgb(var(--tint) / 0.6);
 }
 
 .trace[data-settled='true'] .bar:not([data-fresh='true']),
@@ -607,21 +443,6 @@ const percent = (units: number) => `${(units / domain.value) * 100}%`
   }
 }
 
-.detail {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-height: 23rem;
-  padding: 2px;
-  font-size: 15px;
-}
-
-@media (min-width: 640px) {
-  .detail {
-    min-height: 13rem;
-  }
-}
-
 /* Tags: a tinted border and background, a darker text of the same hue */
 .kind,
 .pill {
@@ -650,20 +471,6 @@ const percent = (units: number) => `${(units / domain.value) * 100}%`
   font-size: 12px;
 }
 
-.facts {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 6px 16px;
-  margin: 0;
-  font-size: 14px;
-}
-
-@media (min-width: 640px) {
-  .facts {
-    grid-template-columns: auto 1fr auto 1fr;
-  }
-}
-
 .facts dt {
   color: rgb(115 115 115);
 }
@@ -689,11 +496,8 @@ const percent = (units: number) => `${(units / domain.value) * 100}%`
   }
 
   .wait,
-  .bar,
-  .row,
-  .replay {
+  .bar {
     animation: none;
-    transition: none;
   }
 }
 </style>

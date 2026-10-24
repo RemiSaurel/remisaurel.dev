@@ -190,14 +190,17 @@ import { motion } from 'motion-v'
 - Markdown files in `content/posts/` with YAML frontmatter
 - Required frontmatter: `title`, `description`, `date`
 - Custom components available: `:tag{color="green"}[text]`, `::blockquote{type="info"}`
+- `::annotation{note="best-shotting?"}` around a block: a handwritten note in the margin with a bracket beside the block (`mark="arrow"` for a small arrow that ends on the last word instead, `side="left"` for the left margin). Below 1080px there is no margin: the bracket stays against the text and the note goes under it
+- `:annotate[few words]{note="strokes are data"}` inside a sentence: the same handwritten note for a few words, which are underlined by hand. The arrow runs in the space under the line to the end of the underline (`side="left"` for the left margin, like `::annotation`). Below 1080px the note follows the words
 - `::compare` with `:::compare-item{label="…" verdict="works|partial|fails" note="…"}` children: takes side by side (one frame of columns on desktop, a snapping carousel with a pager on phones). Use the `note` prop, not a `#note` slot: MDC drops the following items after a slot in a nested block
 - Code blocks use catppuccin themes (latte for light, mocha for dark)
 
 ### Explorations
 
 - One Markdown file per exploration in `content/explorations/` (frontmatter: `title`, `description`, `date`, `tags`, `status`, `icon`)
-- `status`: `draft` (the default) shows it in dev only, never listed, linked nor generated in production; `wip` publishes it with a "Work in progress" mark; `published` publishes it. The nav shows "Explorations" once one is visible
+- `status`: `draft` (the default) is openable in dev only; in production it is listed on /explorations and the home as a non-clickable "Soon" teaser (title and description only), and its page is never generated; `wip` publishes it with a "Work in progress" mark; `published` publishes it. The nav shows "Explorations" once one is listed (a teaser counts)
 - Interactive parts live in `app/components/explorations/<slug>/` as `*.global.vue`, embedded with MDC (`::explorations-<slug>-<name>`)
+- Styling of exploration components: UnoCSS utilities in the template for layout, spacing, sizing, typography, colors, borders, shadows, simple transitions, hover/focus states and `dark:`. `<style scoped>` only for what `presetMini` can't say readably: `@keyframes` and their `animation`, pseudo-elements with `content`, selectors that combine several `data-*` states, and rules on elements you can't put a class on (`v-html`, slots, `:deep`). Write full literal class names (UnoCSS extracts them statically). `main.css` also imports Tailwind v4 (through `@nuxt/ui`), so classes missing from `presetMini` (`tabular-nums`, `sr-only`, `list-none`) may still work; prefer the ones UnoCSS generates, and check with the checker when in doubt
 - Workflows use `FlowCanvas` with a `FlowGraph` (nodes with x/y, edges, optional loop). A player (`useFlowPlayer`) drives what happens: node statuses and balls along edges, all on its own clock (pause, speed, `step`: runs the clock to the next `wait` or ball landing, so a driver's beats are its awaits). `useFlowDemo` plays a graph on its own until there is real logic to drive it
 - An edge with `vertical: true` leaves the bottom of its source and enters the top of its target, so a graph can wrap onto a second row. With the side panel open, the arrow keys carry it from node to node
 - Node footers and the side panel come from the `footer` and `inspector` slots. Below `md`, the same graph renders as a vertical list (`FlowStack`)

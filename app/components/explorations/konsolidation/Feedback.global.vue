@@ -118,42 +118,30 @@ function onKey(event: KeyboardEvent, index: number) {
 <template>
   <div class="feedback my-8 flex flex-col gap-5">
     <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-      <div role="tablist" aria-label="Version of the prompt" class="segmented">
-        <button
-          v-for="v in VERSIONS"
-          :key="v.id"
-          type="button"
-          role="tab"
-          class="segment"
-          :aria-selected="version === v.id"
-          @click="version = v.id"
-        >
-          {{ v.label }}
-        </button>
-      </div>
+      <SegmentedControl v-model="version" label="Version of the prompt" :options="VERSIONS" />
       <span class="text-[13px] text-neutral-500 dark:text-neutral-400">{{ message.caption }}</span>
     </div>
 
     <!-- What the learner gets -->
-    <p :key="version" class="bubble m-0">
+    <p :key="version" class="bubble m-0 rounded-2xl bg-neutral-100 px-4 py-3 leading-[1.7] dark:bg-neutral-800/70">
       <span
         v-for="(parts, index) in parsed"
         :key="index"
         role="button"
         tabindex="0"
-        class="sentence"
+        class="sentence [-webkit-box-decoration-break:clone] [box-decoration-break:clone] mr-[6px] cursor-pointer rounded-[6px] px-[6px] py-[3px]"
         :data-i="index"
         :data-active="active === index"
         @click="active = index"
         @keydown="onKey($event, index)"
       >
         <template v-for="(part, partIndex) in parts" :key="partIndex">
-          <span v-if="part.kind" class="chip" :data-kind="part.kind">
+          <span v-if="part.kind" class="inline-flex items-center gap-1 whitespace-nowrap rounded-[6px] pl-1 pr-[6px] align-[-0.09em] text-[0.9em] font-medium leading-[1.2] data-[kind=question]:bg-blue-500/14 data-[kind=subject]:bg-amber-500/18 data-[kind=question]:text-blue-700 data-[kind=subject]:text-amber-800 dark:data-[kind=question]:text-blue-300 dark:data-[kind=subject]:text-amber-300" :data-kind="part.kind">
             <Icon :name="REFERENCE_ICONS[part.kind]" class="size-3.5 shrink-0" aria-hidden="true" />
             {{ part.text }}
           </span>
           <template v-else>{{ part.text }}</template>
-        </template><sup class="num">{{ index + 1 }}</sup>
+        </template><sup class="[font-variant-numeric:tabular-nums] ml-[2px] text-[10px] text-[rgb(var(--tint))] font-semibold">{{ index + 1 }}</sup>
       </span>
     </p>
 
@@ -162,37 +150,37 @@ function onKey(event: KeyboardEvent, index: number) {
       <li
         v-for="(sentence, index) in message.sentences"
         :key="index"
-        class="step"
+        class="step group border border-neutral-200 rounded-xl border-solid bg-white transition-[border-color] duration-200 ease-[var(--ease-out)] dark:border-neutral-700/80 dark:bg-neutral-800/40"
         :data-i="index"
         :data-active="active === index"
       >
         <button
           type="button"
-          class="step-head"
+          class="w-full flex items-center gap-[10px] px-3 py-[10px] text-left text-[15px]"
           :aria-expanded="active === index"
           @click="active = index"
         >
-          <span class="badge">{{ index + 1 }}</span>
+          <span class="grid size-5 shrink-0 place-items-center rounded-full bg-[rgb(var(--tint)/0.16)] text-[11px] text-[rgb(var(--tint))] font-semibold">{{ index + 1 }}</span>
           <span class="font-medium">{{ sentence.analysis.role }}</span>
-          <Icon name="lucide:chevron-down" class="chevron ml-auto size-4 shrink-0" aria-hidden="true" />
+          <Icon name="lucide:chevron-down" class="chevron ml-auto size-4 shrink-0 text-neutral-400 group-data-[active=true]:rotate-180" aria-hidden="true" />
         </button>
-        <div class="step-body">
+        <div class="step-body grid grid-rows-[0fr] group-data-[active=true]:grid-rows-[1fr]">
           <div class="min-h-0 overflow-hidden">
             <div class="flex flex-col gap-3 px-3 pb-3 pt-1 text-[15px]">
-              <p class="verdict m-0" :data-tone="sentence.analysis.verdict.tone">
-                <span class="tone"><Icon :name="VERDICT_ICONS[sentence.analysis.verdict.tone]" class="size-3" aria-hidden="true" /></span>
+              <p class="m-0 flex items-center gap-2" :data-tone="sentence.analysis.verdict.tone">
+                <span class="grid size-[18px] shrink-0 place-items-center rounded-full text-white" :class="sentence.analysis.verdict.tone === 'works' ? 'bg-emerald-500' : sentence.analysis.verdict.tone === 'partial' ? 'bg-amber-500' : 'bg-rose-500'"><Icon :name="VERDICT_ICONS[sentence.analysis.verdict.tone]" class="size-3" aria-hidden="true" /></span>
                 {{ sentence.analysis.verdict.text }}
               </p>
-              <blockquote class="prompt m-0">
-                <span class="prompt-label">Prompt</span>
+              <blockquote class="m-0 border-l-2 border-l-[rgb(var(--tint)/0.5)] border-l-solid py-[2px] pl-3 text-[13px] text-neutral-600 leading-[1.6] dark:text-neutral-400">
+                <span class="[font-family:ui-monospace,monospace] mr-[6px] text-[11px] text-[rgb(var(--tint))] tracking-[0.04em] case-upper">Prompt</span>
                 {{ sentence.analysis.prompt }}
               </blockquote>
               <div v-if="sentence.analysis.raw" class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-                <code class="code">{{ sentence.analysis.raw[0] }}</code>
+                <code class="rounded-[5px] bg-neutral-400/16 px-[6px] py-[2px] text-[12px]">{{ sentence.analysis.raw[0] }}</code>
                 <Icon name="lucide:arrow-right" class="size-3.5 text-neutral-400" aria-hidden="true" />
-                <code class="code">{{ sentence.analysis.raw[1] }}</code>
+                <code class="rounded-[5px] bg-neutral-400/16 px-[6px] py-[2px] text-[12px]">{{ sentence.analysis.raw[1] }}</code>
                 <Icon name="lucide:arrow-right" class="size-3.5 text-neutral-400" aria-hidden="true" />
-                <span class="chip" :data-kind="parseFeedback(sentence.analysis.raw[1])[0]?.kind">
+                <span class="inline-flex items-center gap-1 whitespace-nowrap rounded-[6px] pl-1 pr-[6px] align-[-0.09em] text-[0.9em] font-medium leading-[1.2] data-[kind=question]:bg-blue-500/14 data-[kind=subject]:bg-amber-500/18 data-[kind=question]:text-blue-700 data-[kind=subject]:text-amber-800 dark:data-[kind=question]:text-blue-300 dark:data-[kind=subject]:text-amber-300" :data-kind="parseFeedback(sentence.analysis.raw[1])[0]?.kind">
                   <Icon :name="REFERENCE_ICONS[parseFeedback(sentence.analysis.raw[1])[0]?.kind ?? 'question']" class="size-3.5" aria-hidden="true" />
                   {{ parseFeedback(sentence.analysis.raw[1])[0]?.text }}
                 </span>
@@ -225,46 +213,8 @@ function onKey(event: KeyboardEvent, index: number) {
   --tint: var(--tint-2);
 }
 
-.segmented {
-  display: inline-flex;
-  padding: 2px;
-  border-radius: 9px;
-  background: rgb(163 163 163 / 0.16);
-}
-
-.segment {
-  padding: 4px 14px;
-  border-radius: 7px;
-  font-size: 13px;
-  font-weight: 500;
-  color: rgb(115 115 115);
-  transition:
-    background-color 180ms var(--ease-out),
-    color 180ms var(--ease-out);
-}
-
-.segment[aria-selected='true'] {
-  background: white;
-  color: rgb(23 23 23);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
-}
-
-.dark .segment[aria-selected='true'] {
-  background: rgb(64 64 64);
-  color: rgb(245 245 245);
-}
-
-/* The grey bubble of the app */
 .bubble {
-  padding: 12px 16px;
-  border-radius: 16px;
-  background: rgb(245 245 245);
-  line-height: 1.7;
   animation: swap 280ms var(--ease-out);
-}
-
-.dark .bubble {
-  background: rgb(38 38 38 / 0.7);
 }
 
 @keyframes swap {
@@ -275,12 +225,6 @@ function onKey(event: KeyboardEvent, index: number) {
 }
 
 .sentence {
-  cursor: pointer;
-  margin-right: 6px;
-  padding: 3px 6px;
-  border-radius: 6px;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
   transition: background-color 200ms var(--ease-out);
 }
 
@@ -303,160 +247,18 @@ function onKey(event: KeyboardEvent, index: number) {
   }
 }
 
-.num {
-  margin-left: 2px;
-  font-size: 10px;
-  font-weight: 600;
-  color: rgb(var(--tint));
-  font-variant-numeric: tabular-nums;
-}
-
-/* A reference to a question or a subject, as the learner sees it in the app */
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0 6px 0 4px;
-  border-radius: 6px;
-  font-size: 0.9em;
-  font-weight: 500;
-  line-height: 1.2;
-  /* Centers the chip in the highlight of its sentence, which is the height of the text */
-  vertical-align: -0.09em;
-  white-space: nowrap;
-}
-
-.chip[data-kind='question'] {
-  background: rgb(59 130 246 / 0.14);
-  color: rgb(29 78 216);
-}
-
-.chip[data-kind='subject'] {
-  background: rgb(245 158 11 / 0.18);
-  color: rgb(146 64 14);
-}
-
-.dark .chip[data-kind='question'] {
-  color: rgb(147 197 253);
-}
-
-.dark .chip[data-kind='subject'] {
-  color: rgb(252 211 77);
-}
-
-.step {
-  border: 1px solid rgb(229 229 229);
-  border-radius: 12px;
-  background: white;
-  transition: border-color 200ms var(--ease-out);
-}
-
-.dark .step {
-  border-color: rgb(64 64 64 / 0.8);
-  background: rgb(38 38 38 / 0.4);
-}
-
-.step[data-active='true'] {
-  border-color: rgb(var(--tint) / 0.45);
-}
-
-.step-head {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  text-align: left;
-  font-size: 15px;
-}
-
-.badge {
-  display: grid;
-  place-items: center;
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-  border-radius: 9999px;
-  background: rgb(var(--tint) / 0.16);
-  color: rgb(var(--tint));
-  font-size: 11px;
-  font-weight: 600;
-}
-
 .chevron {
-  color: rgb(163 163 163);
   transition: transform 240ms var(--ease-out);
-}
-
-.step[data-active='true'] .chevron {
-  transform: rotate(180deg);
 }
 
 /* Opens by animating the row from 0fr to 1fr, so the height is never measured */
 .step-body {
-  display: grid;
-  grid-template-rows: 0fr;
   transition: grid-template-rows 260ms var(--ease-out);
 }
 
-.step[data-active='true'] .step-body {
-  grid-template-rows: 1fr;
-}
-
-.verdict {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.tone {
-  display: grid;
-  place-items: center;
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-  border-radius: 9999px;
-  color: white;
-}
-
-.verdict[data-tone='works'] .tone {
-  background: rgb(16 185 129);
-}
-
-.verdict[data-tone='partial'] .tone {
-  background: rgb(245 158 11);
-}
-
-.verdict[data-tone='fails'] .tone {
-  background: rgb(244 63 94);
-}
-
-.prompt {
-  padding: 2px 0 2px 12px;
-  border-left: 2px solid rgb(var(--tint) / 0.5);
-  font-size: 13px;
-  line-height: 1.6;
-  color: rgb(82 82 82);
-}
-
-.dark .prompt {
-  color: rgb(163 163 163);
-}
-
-.prompt-label {
-  margin-right: 6px;
-  font-family: ui-monospace, monospace;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: rgb(var(--tint));
-}
-
-.code {
-  padding: 2px 6px;
-  border-radius: 5px;
-  background: rgb(163 163 163 / 0.16);
-  font-size: 12px;
+/* Wins over the dark border of the step, whose utility has the same specificity */
+.step[data-active='true'] {
+  border-color: rgb(var(--tint) / 0.45);
 }
 
 @media (prefers-reduced-motion: reduce) {

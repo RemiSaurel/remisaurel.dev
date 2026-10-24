@@ -228,7 +228,7 @@ function clear() {
         v-for="starter in STARTERS"
         :key="starter"
         type="button"
-        class="starter pressable"
+        class="pressable border border-neutral-200 rounded-full bg-white px-2.5 py-1 text-[13px] text-neutral-600 transition-[border-color,background-color] duration-[180ms] ease-[var(--ease-out)] dark:border-neutral-700/80 hover:border-[rgb(var(--learner)/0.5)] dark:bg-neutral-800/40 dark:text-neutral-300 [@media(prefers-reduced-motion:reduce)]:transition-none"
         @click="start(starter)"
       >
         {{ starter }}
@@ -236,16 +236,16 @@ function clear() {
     </div>
 
     <!-- The input and what it sends, in one card: the panel hangs under the input like a node footer -->
-    <div class="card">
+    <div class="border border-neutral-300 rounded-xl bg-white shadow-[0_1px_2px_rgb(0_0_0/0.06)] transition-[border-color,box-shadow] duration-[180ms] ease-[var(--ease-out)] dark:border-neutral-700 focus-within:border-blue-600 dark:bg-neutral-800/60 focus-within:outline-2 focus-within:outline-blue-600 focus-within:outline-offset-1 focus-within:outline-solid [@media(prefers-reduced-motion:reduce)]:transition-none dark:focus-within:border-blue-400 [@media(forced-colors:active)]:focus-within:outline-[Highlight] dark:focus-within:outline-blue-400">
       <div class="relative">
-        <div class="box">
+        <div class="flex items-start gap-1 py-1.5 pl-[14px] pr-2">
           <textarea
             ref="input"
             rows="1"
             role="combobox"
             autocomplete="off"
             spellcheck="false"
-            class="field"
+            class="[outline:0] block max-h-[128px] min-w-0 flex-1 resize-none overflow-y-auto border-0 bg-transparent px-0 py-2 text-[16px] text-inherit leading-6 placeholder:text-neutral-500 dark:placeholder:text-neutral-400"
             placeholder="Ask a question, type @ or # to point at something"
             aria-label="Question for the chatbot"
             aria-autocomplete="list"
@@ -263,7 +263,7 @@ function clear() {
           <button
             v-if="text"
             type="button"
-            class="clear pressable"
+            class="clear relative grid mt-1.5 size-7 shrink-0 pressable place-items-center rounded-lg text-neutral-500 hover:bg-neutral-400/18"
             aria-label="Clear the question"
             @click="clear"
           >
@@ -272,15 +272,15 @@ function clear() {
         </div>
 
         <Transition name="pop">
-          <div v-if="open && list" :id="`${id}-list`" class="popup" role="listbox" :aria-label="list.title">
+          <div v-if="open && list" :id="`${id}-list`" class="absolute left-1.5 top-[calc(100%_+_4px)] z-20 w-[min(calc(100%_-_12px),16rem)] origin-top-left border border-neutral-200 rounded-[10px] bg-white shadow-[0_8px_24px_rgb(0_0_0/0.12)] dark:border-neutral-700 dark:bg-[#212121] dark:shadow-[0_8px_24px_rgb(0_0_0/0.5)]" role="listbox" :aria-label="list.title">
             <div
               ref="scroller"
-              class="popup-scroll"
+              class="popup-scroll max-h-48 overflow-y-auto rounded-[9px] p-1"
               :data-above="more.above || undefined"
               :data-below="more.below || undefined"
               @scroll.passive="measure"
             >
-              <div class="popup-title" aria-hidden="true">
+              <div class="flex items-center gap-1.5 px-2 pb-1 pt-[3px] text-[12px] text-neutral-700 font-semibold dark:text-neutral-300" aria-hidden="true">
                 <Icon :name="list.icon" class="size-3.5" aria-hidden="true" />
                 {{ list.title }}
               </div>
@@ -289,16 +289,16 @@ function clear() {
                 :id="optionId(index)"
                 :key="item.id"
                 role="option"
-                class="option"
+                class="flex cursor-pointer items-baseline justify-between gap-2 rounded-[5px] px-2 py-0.5 text-[13px] leading-5 aria-[selected=true]:bg-neutral-400/18"
                 :aria-selected="index === active"
                 @mousedown.prevent
                 @click="pick(item)"
                 @mousemove="active = index"
               >
                 {{ item.name }}
-                <span class="id">{{ item.id }}</span>
+                <span class="[font-family:ui-monospace,monospace] [font-variant-numeric:tabular-nums] text-[11px] font-normal opacity-75">{{ item.id }}</span>
               </div>
-              <div v-if="!options.length" class="empty" aria-hidden="true">
+              <div v-if="!options.length" class="px-2 py-[5px] text-[13px] text-neutral-500" aria-hidden="true">
                 Nothing matches “{{ found?.query }}”
               </div>
             </div>
@@ -306,56 +306,56 @@ function clear() {
         </Transition>
       </div>
 
-      <div class="panel">
+      <div class="flex flex-col gap-2 border-t border-neutral-200 rounded-b-[11px] bg-neutral-400/8 px-[14px] pb-3 pt-2.5 dark:border-neutral-700">
         <div class="sr-only" role="status">
           {{ announcement }}
         </div>
-        <div class="row">
-          <span class="label">Sent</span>
-          <code v-if="text" class="sent">
+        <div class="grid grid-cols-[5.5rem_1fr] items-start gap-[10px] text-[14px] max-[480px]:grid-cols-[1fr] max-[480px]:gap-0.5">
+          <span class="[font-family:ui-monospace,monospace] [text-transform:uppercase] h-6 flex items-center text-[11px] text-neutral-500 tracking-[0.04em]">Sent</span>
+          <code v-if="text" class="[overflow-wrap:anywhere] whitespace-pre-wrap p-0 text-[13px] leading-6">
             <template v-for="(part, index) in parts" :key="index">
               <span
                 v-if="part.kind"
-                class="tag"
+                class="tag rounded-[4px] py-px transition-[opacity,background-color] duration-150 ease-[var(--ease-out)] data-[state=dim]:opacity-35 [@media(prefers-reduced-motion:reduce)]:transition-none"
                 :data-kind="part.kind"
                 :data-state="stateOf(part.rank!)"
                 @pointerenter="light($event, part.rank!)"
                 @pointerleave="hovered = null"
               >
-                <span class="angle">&lt;{{ part.kind }} id="{{ part.id }}"&gt;</span>{{ part.text }}<span class="angle">&lt;/{{ part.kind }}&gt;</span>
+                <span class="text-[#5a5a5a] dark:text-neutral-400">&lt;{{ part.kind }} id="{{ part.id }}"&gt;</span>{{ part.text }}<span class="text-[#5a5a5a] dark:text-neutral-400">&lt;/{{ part.kind }}&gt;</span>
               </span>
               <template v-else>{{ part.text }}</template>
             </template>
           </code>
-          <span v-else class="muted">Nothing typed yet</span>
+          <span v-else class="text-neutral-500 leading-6 dark:text-neutral-400">Nothing typed yet</span>
         </div>
 
-        <div class="row">
-          <span class="label">Recognized</span>
+        <div class="grid grid-cols-[5.5rem_1fr] items-start gap-[10px] text-[14px] max-[480px]:grid-cols-[1fr] max-[480px]:gap-0.5">
+          <span class="[font-family:ui-monospace,monospace] [text-transform:uppercase] h-6 flex items-center text-[11px] text-neutral-500 tracking-[0.04em]">Recognized</span>
           <span v-if="recognized.length" class="flex flex-wrap gap-1.5">
             <span
               v-for="part in recognized"
               :key="part.rank"
-              class="chip"
+              class="chip h-6 inline-flex items-center gap-1 whitespace-nowrap rounded-md pl-[5px] pr-[7px] text-[13px] font-medium transition-[opacity,background-color] duration-150 ease-[var(--ease-out)] data-[state=dim]:opacity-35 [@media(prefers-reduced-motion:reduce)]:transition-none"
               :data-kind="part.kind"
               :data-state="stateOf(part.rank!)"
               @pointerenter="light($event, part.rank!)"
               @pointerleave="hovered = null"
             >
               <Icon :name="LISTS[part.kind!].icon" class="size-3.5 shrink-0" aria-hidden="true" />
-              <span class="name">
+              <span class="inline-flex items-baseline gap-1">
                 {{ part.text }}
-                <span class="id">{{ part.id }}</span>
+                <span class="[font-family:ui-monospace,monospace] [font-variant-numeric:tabular-nums] text-[11px] font-normal opacity-75">{{ part.id }}</span>
               </span>
             </span>
           </span>
-          <span v-else class="muted">No mention yet</span>
+          <span v-else class="text-neutral-500 leading-6 dark:text-neutral-400">No mention yet</span>
         </div>
 
-        <p v-if="handTyped.length" class="hint">
+        <p v-if="handTyped.length" class="m-0 flex gap-2 text-[13px] text-amber-800 leading-normal dark:text-amber-300">
           <Icon name="lucide:triangle-alert" class="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
           <span>
-            <code>{{ handTyped.join(' ') }}</code>
+            <code class="text-[12px]">{{ handTyped.join(' ') }}</code>
             {{ handTyped.length > 1 ? 'were' : 'was' }} typed, not picked from the list, so the backend gets
             {{ handTyped.length > 1 ? 'them' : 'it' }} as plain text.
           </span>
@@ -383,109 +383,6 @@ function clear() {
   --subject: 245 158 11;
 }
 
-.starter {
-  padding: 4px 10px;
-  border: 1px solid rgb(229 229 229);
-  border-radius: 9999px;
-  background: white;
-  font-size: 13px;
-  color: rgb(82 82 82);
-  transition:
-    border-color 180ms var(--ease-out),
-    background-color 180ms var(--ease-out);
-}
-
-.dark .starter {
-  border-color: rgb(64 64 64 / 0.8);
-  background: rgb(38 38 38 / 0.4);
-  color: rgb(212 212 212);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .starter:hover {
-    border-color: rgb(var(--learner) / 0.5);
-  }
-}
-
-/* The box of the app: white, a thin border, a small shadow. The panel under the input is part of it */
-.card {
-  border: 1px solid rgb(212 212 212);
-  border-radius: 12px;
-  background: white;
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
-  transition:
-    border-color 180ms var(--ease-out),
-    box-shadow 180ms var(--ease-out);
-}
-
-.dark .card {
-  border-color: rgb(64 64 64);
-  background: rgb(38 38 38 / 0.6);
-}
-
-.card:focus-within {
-  border-color: rgb(37 99 235);
-  outline: 2px solid rgb(37 99 235);
-  outline-offset: 1px;
-}
-
-.dark .card:focus-within {
-  border-color: rgb(96 165 250);
-  outline-color: rgb(96 165 250);
-}
-
-@media (forced-colors: active) {
-  .card:focus-within {
-    outline-color: Highlight;
-  }
-}
-
-.box {
-  display: flex;
-  align-items: flex-start;
-  gap: 4px;
-  padding: 6px 8px 6px 14px;
-}
-
-.field {
-  flex: 1;
-  min-width: 0;
-  display: block;
-  padding: 8px 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  resize: none;
-  /* Five lines, then it scrolls */
-  max-height: 128px;
-  overflow-y: auto;
-  /* 16px: below it, iOS zooms the page when the input gets focus */
-  font-size: 16px;
-  line-height: 24px;
-  color: inherit;
-}
-
-.field::placeholder {
-  color: rgb(115 115 115);
-}
-
-.dark .field::placeholder {
-  color: rgb(163 163 163);
-}
-
-.clear {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
-  /* Centered on the first line: 8px of padding and 24px of line make 40px */
-  margin-top: 6px;
-  border-radius: 8px;
-  color: rgb(115 115 115);
-}
-
 /* The button stays 28px; its hit area reaches 40px */
 .clear::after {
   content: '';
@@ -493,33 +390,10 @@ function clear() {
   inset: -6px;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .clear:hover {
-    background: rgb(163 163 163 / 0.18);
-  }
-}
-
-.popup {
-  position: absolute;
-  z-index: 20;
-  top: calc(100% + 4px);
-  left: 6px;
-  width: min(calc(100% - 12px), 16rem);
-  border: 1px solid rgb(229 229 229);
-  border-radius: 10px;
-  background: white;
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
-  transform-origin: top left;
-}
-
 /* The list scrolls inside the frame, so the fade never touches the border or the shadow */
 .popup-scroll {
   --fade-above: 0px;
   --fade-below: 0px;
-  max-height: 12rem;
-  overflow-y: auto;
-  padding: 4px;
-  border-radius: 9px;
   mask-image: linear-gradient(
     to bottom,
     transparent,
@@ -540,48 +414,6 @@ function clear() {
   --fade-below: 28px;
 }
 
-.dark .popup {
-  border-color: rgb(64 64 64);
-  background: rgb(33 33 33);
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.5);
-}
-
-.popup-title {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 8px 4px;
-  font-size: 12px;
-  font-weight: 600;
-  color: rgb(64 64 64);
-}
-
-.dark .popup-title {
-  color: rgb(212 212 212);
-}
-
-.option {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 2px 8px;
-  border-radius: 5px;
-  font-size: 13px;
-  line-height: 20px;
-  cursor: pointer;
-}
-
-.option[aria-selected='true'] {
-  background: rgb(163 163 163 / 0.18);
-}
-
-.empty {
-  padding: 5px 8px;
-  font-size: 13px;
-  color: rgb(115 115 115);
-}
-
 .pop-enter-active,
 .pop-leave-active {
   transition:
@@ -598,90 +430,12 @@ function clear() {
 @media (prefers-reduced-motion: reduce) {
   .pop-enter-active,
   .pop-leave-active,
-  .popup-scroll,
-  .starter,
-  .card,
-  .tag,
-  .chip {
+  .popup-scroll {
     transition: none;
   }
 }
 
-/* The footer of the card, like the footer of a node */
-.panel {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 10px 14px 12px;
-  border-top: 1px solid rgb(229 229 229);
-  border-radius: 0 0 11px 11px;
-  background: rgb(163 163 163 / 0.08);
-}
-
-.dark .panel {
-  border-top-color: rgb(64 64 64);
-}
-
-.row {
-  display: grid;
-  grid-template-columns: 5.5rem 1fr;
-  align-items: start;
-  gap: 10px;
-  font-size: 14px;
-}
-
-/* One line height for the label and what it names, so they sit on the same line */
-.label {
-  display: flex;
-  align-items: center;
-  height: 24px;
-  font-family: ui-monospace, monospace;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: rgb(115 115 115);
-}
-
-.sent {
-  /* The article gives inline code a padding: it would push the text under its label */
-  padding: 0;
-  font-size: 13px;
-  line-height: 24px;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-.muted {
-  line-height: 24px;
-  color: rgb(115 115 115);
-}
-
-.angle {
-  color: rgb(90 90 90);
-}
-
-.dark .muted,
-.dark .angle {
-  color: rgb(163 163 163);
-}
-
-.tag,
-.chip {
-  transition:
-    opacity 150ms var(--ease-out),
-    background-color 150ms var(--ease-out);
-}
-
-.tag[data-state='dim'],
-.chip[data-state='dim'] {
-  opacity: 0.35;
-}
-
-.tag {
-  padding: 1px 0;
-  border-radius: 4px;
-}
-
+/* The colour of a mention follows its kind, and gets stronger while it is lit */
 .tag[data-kind='learner'] {
   background: rgb(var(--learner) / 0.14);
 }
@@ -696,18 +450,6 @@ function clear() {
 
 .tag[data-kind='subject'][data-state='lit'] {
   background: rgb(var(--subject) / 0.34);
-}
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 24px;
-  padding: 0 7px 0 5px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
 }
 
 .chip[data-kind='learner'] {
@@ -734,45 +476,5 @@ function clear() {
 
 .dark .chip[data-kind='subject'] {
   color: rgb(252 211 77);
-}
-
-/* Name and id share a baseline: centred, the smaller id would sit higher than the name */
-.name {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 4px;
-}
-
-/* The id of the item, small and quiet next to its name */
-.id {
-  font-family: ui-monospace, monospace;
-  font-size: 11px;
-  font-weight: 400;
-  font-variant-numeric: tabular-nums;
-  opacity: 0.75;
-}
-
-.hint {
-  display: flex;
-  gap: 8px;
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.5;
-  color: rgb(146 64 14);
-}
-
-.dark .hint {
-  color: rgb(252 211 77);
-}
-
-.hint code {
-  font-size: 12px;
-}
-
-@media (max-width: 480px) {
-  .row {
-    grid-template-columns: 1fr;
-    gap: 2px;
-  }
 }
 </style>
