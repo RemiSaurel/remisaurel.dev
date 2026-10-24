@@ -118,19 +118,7 @@ function onKey(event: KeyboardEvent, index: number) {
 <template>
   <div class="feedback my-8 flex flex-col gap-5">
     <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-      <div role="tablist" aria-label="Version of the prompt" class="segmented">
-        <button
-          v-for="v in VERSIONS"
-          :key="v.id"
-          type="button"
-          role="tab"
-          class="segment"
-          :aria-selected="version === v.id"
-          @click="version = v.id"
-        >
-          {{ v.label }}
-        </button>
-      </div>
+      <SegmentedControl v-model="version" label="Version of the prompt" :options="VERSIONS" />
       <span class="text-[13px] text-neutral-500 dark:text-neutral-400">{{ message.caption }}</span>
     </div>
 
@@ -223,35 +211,6 @@ function onKey(event: KeyboardEvent, index: number) {
 
 [data-i='2'] {
   --tint: var(--tint-2);
-}
-
-.segmented {
-  display: inline-flex;
-  padding: 2px;
-  border-radius: 9px;
-  background: rgb(163 163 163 / 0.16);
-}
-
-.segment {
-  padding: 4px 14px;
-  border-radius: 7px;
-  font-size: 13px;
-  font-weight: 500;
-  color: rgb(115 115 115);
-  transition:
-    background-color 180ms var(--ease-out),
-    color 180ms var(--ease-out);
-}
-
-.segment[aria-selected='true'] {
-  background: white;
-  color: rgb(23 23 23);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
-}
-
-.dark .segment[aria-selected='true'] {
-  background: rgb(64 64 64);
-  color: rgb(245 245 245);
 }
 
 /* The grey bubble of the app */

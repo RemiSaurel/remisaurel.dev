@@ -132,42 +132,13 @@ const trace = computed(() => TRACES[version.value])
 const player = useFlowPlayer()
 useFlowDemo(graph, player, { rows: 1, edgeSeconds: 0.8, thinkSeconds: 0.9, restSeconds: 3 })
 const selected = ref<string | null>(null)
-
-const tabs = ref<HTMLElement[]>([])
-
-// Arrows move between the two choices, like any radio group
-function onTabKeydown(e: KeyboardEvent) {
-  const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0
-  if (!step)
-    return
-  e.preventDefault()
-  const next = (VERSIONS.findIndex(v => v.id === version.value) + step + VERSIONS.length) % VERSIONS.length
-  version.value = VERSIONS[next]!.id
-  tabs.value[next]?.focus()
-}
 </script>
 
 <template>
   <div class="pipeline my-8 flex flex-col gap-4">
     <div class="flex flex-col gap-3">
       <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <div role="radiogroup" aria-label="How the question is typed" class="segmented" :data-active="version" @keydown="onTabKeydown">
-          <span class="thumb" aria-hidden="true" />
-          <button
-            v-for="v in VERSIONS"
-            :key="v.id"
-            ref="tabs"
-            type="button"
-            role="radio"
-            class="segment"
-            :aria-checked="version === v.id"
-            :tabindex="version === v.id ? 0 : -1"
-            @click="version = v.id"
-          >
-            <Icon :name="v.icon" class="size-3.5" aria-hidden="true" />
-            {{ v.label }}
-          </button>
-        </div>
+        <SegmentedControl v-model="version" label="How the question is typed" :options="VERSIONS" />
         <span class="text-[13px] text-neutral-500 dark:text-neutral-400">
           Two learners are called Jean: Jean Martin and Jean Moreau. The teacher means Jean Martin.
         </span>
@@ -354,76 +325,7 @@ function onTabKeydown(e: KeyboardEvent) {
 </template>
 
 <style scoped>
-.segmented {
-  position: relative;
-  display: inline-grid;
-  grid-template-columns: 1fr 1fr;
-  padding: 2px;
-  border-radius: 9px;
-  background: rgb(163 163 163 / 0.16);
-}
-
-/* Slides under the selected tab: the two columns are equal, so one thumb width is the whole move */
-.thumb {
-  position: absolute;
-  top: 2px;
-  bottom: 2px;
-  left: 2px;
-  width: calc((100% - 4px) / 2);
-  border-radius: 7px;
-  background: white;
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
-  transition: transform 260ms var(--ease-out);
-}
-
-.dark .thumb {
-  background: rgb(64 64 64);
-}
-
-.segmented[data-active='mention'] .thumb {
-  transform: translateX(100%);
-}
-
-.segment {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 4px 14px;
-  border-radius: 7px;
-  font-size: 13px;
-  font-weight: 500;
-  color: rgb(82 82 82);
-  transition:
-    color 200ms var(--ease-out),
-    scale 160ms var(--ease-out);
-}
-
-.dark .segment {
-  color: rgb(163 163 163);
-}
-
-.segment:active {
-  scale: 0.96;
-}
-
-.segment[aria-checked='true'] {
-  color: rgb(23 23 23);
-}
-
-.dark .segment[aria-checked='true'] {
-  color: rgb(245 245 245);
-}
-
-.segment:focus-visible {
-  outline: 2px solid rgb(59 130 246);
-  outline-offset: 2px;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .thumb,
-  .segment,
   .outcome {
     transition: none;
   }
