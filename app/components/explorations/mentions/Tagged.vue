@@ -31,7 +31,7 @@ defineProps<{
   color: rgb(90 90 90);
 }
 
-:global(.dark) .angle {
+.dark .angle {
   color: rgb(163 163 163);
 }
 
