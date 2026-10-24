@@ -167,12 +167,14 @@ const mark = (cell: string) => props.lit ? (props.lit === cell ? 'on' : 'off') :
 
 .entry-to {
   display: inline-flex;
-  align-items: flex-start;
+  /* The baseline of the pair is the new name's: the arrow has none, and would drag it to its own bottom edge */
+  align-items: baseline;
   gap: 4px;
   min-width: 0;
 }
 
 .entry-arrow {
+  align-self: flex-start;
   margin-top: 0.28em;
 }
 
