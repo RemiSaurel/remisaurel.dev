@@ -1,0 +1,683 @@
+<script setup lang="ts">
+import type { Drawing } from '~/composables/useDrawing'
+import type { Kind, LogLine } from '~/utils/logLine'
+import type { Step } from '~/utils/session'
+import { useRafFn } from '@vueuse/core'
+import { CELL_PARTS } from '~/exercises/cell'
+import { namesPart } from '~/utils/labelMatch'
+import { kindOf, logLine } from '~/utils/logLine'
+import { activeSpans, condense, describeEvent, frameAt, squeeze, within } from '~/utils/session'
+import { describeTally, mmss, summarize } from '~/utils/trace'
+
+// The same session, read by the person who will grade it. The teacher gets what the learner never gets:
+// which parts were named, and where on the sheet (the counter says only how many), the log of what was
+// done and when, and what each ask for help showed. The session plays like a recording: the sheet is the
+// sheet as it was at the moment shown on the timeline, with the strokes that were undone and the labels
+// as they were before a rename. All of it comes from the drawing the learner was working on.
+const props = defineProps<{ drawing: Drawing }>()
+
+const events = computed(() => props.drawing.events.value)
+const summary = computed(() => summarize(events.value))
+const worked = computed(() => events.value.length > 0)
+const duration = computed(() => summary.value.duration)
+
+// --- The session as a recording ---
+
+// The time of the recording is real time, so a pause is a gap on the timeline. Playing it runs on a
+// clock that spends at most a moment on each pause.
+const clock = computed(() => squeeze(activeSpans(events.value)))
+
+// Opens on the end of the session: the answer first, then how it came
+const time = ref(duration.value)
+const playing = ref(false)
+
+const frame = computed(() => frameAt(events.value, time.value))
+const descriptions = computed(() => events.value.map((_, index) => describeEvent(events.value, index)))
+
+// --- The expected parts, and the labels that name them ---
+
+// Read on the sheet of this moment, so the list follows the recording, and what it points at is on the board
+const parts = computed(() => {
+  const { labels } = frame.value
+  return CELL_PARTS.map(part => ({
+    id: part.id,
+    name: part.name,
+    named: labels.filter(label => namesPart(label.text, part)),
+  }))
+})
+
+const namedCount = computed(() => parts.value.filter(part => part.named.length).length)
+
+// What matches nothing is what a better matcher, or a longer list, could still catch
+const unmatched = computed(() => frame.value.labels
+  .filter(label => !CELL_PARTS.some(part => namesPart(label.text, part)))
+  .map(label => label.text))
+
+// Where a part sits: pointing at one, or picking it, lights its labels on the sheet and dims the rest
+const hovered = ref<string | null>(null)
+const picked = ref<string | null>(null)
+
+const spotlight = computed(() => {
+  const id = hovered.value ?? picked.value
+  return parts.value.find(part => part.id === id)?.named.map(label => label.id) ?? []
+})
+
+const pick = (id: string) => picked.value = picked.value === id ? null : id
+
+const { pause, resume } = useRafFn(({ delta }) => {
+  const next = clock.value.clockAt(time.value) + delta
+  if (next >= clock.value.duration) {
+    time.value = duration.value
+    stop()
+    return
+  }
+  time.value = clock.value.timeAt(next)
+}, { immediate: false })
+
+function play() {
+  if (time.value >= duration.value)
+    time.value = 0
+  playing.value = true
+  resume()
+}
+
+function stop() {
+  playing.value = false
+  pause()
+}
+
+function seek(t: number) {
+  stop()
+  time.value = Math.min(duration.value, Math.max(0, t))
+}
+
+onBeforeUnmount(stop)
+
+// What is happening at this moment: the last act, or the stroke the learner is in the middle of
+const now = computed(() => {
+  const { index, strokes } = frame.value
+  if (strokes.length > (events.value[index]?.strokes?.length ?? 0))
+    return { time: time.value, text: 'Drawing a stroke' }
+  if (index < 0)
+    return { time: 0, text: 'Before the first act' }
+  return { time: events.value[index]!.t, text: descriptions.value[index]! }
+})
+
+const LEGEND: { kind: Kind, label: string }[] = [
+  { kind: 'draw', label: 'Stroke' },
+  { kind: 'label', label: 'Label' },
+  { kind: 'undo', label: 'Undo, redo, clear' },
+  { kind: 'check', label: 'Check' },
+]
+
+const at = (t: number) => duration.value ? t / duration.value * 100 : 0
+
+const ticks = computed(() => events.value.map((event, index) => ({
+  key: index,
+  kind: kindOf(event.type),
+  at: at(event.t),
+  past: event.t <= time.value,
+})))
+
+// --- The timeline is also the scrubber: drag it, click a mark, or use the arrows ---
+
+const track = ref<HTMLElement>()
+let scrubbing = false
+
+// A click near a mark lands on it, so the sheet shown is the one that act left
+const SNAP = 6
+
+function seekFromPointer(e: PointerEvent) {
+  const rect = track.value!.getBoundingClientRect()
+  const x = Math.min(rect.width, Math.max(0, e.clientX - rect.left))
+  const near = events.value.find(event => Math.abs(at(event.t) / 100 * rect.width - x) <= SNAP)
+  seek(near ? near.t : x / rect.width * duration.value)
+}
+
+function onScrubDown(e: PointerEvent) {
+  if (e.button !== 0)
+    return
+  scrubbing = true
+  ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+  ;(e.currentTarget as HTMLElement).focus()
+  seekFromPointer(e)
+}
+
+const onScrubMove = (e: PointerEvent) => scrubbing && seekFromPointer(e)
+const onScrubUp = () => scrubbing = false
+
+function onScrubKey(e: KeyboardEvent) {
+  const { index } = frame.value
+  const list = events.value
+  if (e.key === 'ArrowRight')
+    seek(list[index + 1]?.t ?? duration.value)
+  else if (e.key === 'ArrowLeft')
+    seek(list[index] && time.value > list[index].t ? list[index].t : (list[index - 1]?.t ?? 0))
+  else if (e.key === 'Home')
+    seek(0)
+  else if (e.key === 'End')
+    seek(duration.value)
+  else
+    return
+  e.preventDefault()
+}
+
+// --- The log: every act, the ones before this moment in full and the ones after faded ---
+
+// Acts that follow each other closely are one line: twenty strokes that make a circle are a circle
+const steps = computed(() => condense(events.value))
+
+// A line that gathers several acts can be unfolded into them, like a branch of the timeline
+interface Row {
+  key: string
+  step: Step
+  line: LogLine
+  /** One of the acts of an unfolded line */
+  child: boolean
+  /** A line that gathers several acts, and can be unfolded */
+  group: boolean
+  open: boolean
+}
+
+const unfolded = reactive(new Set<number>())
+
+// The chevron column exists only when some line can be unfolded: without one it would be an empty gutter
+const foldable = computed(() => steps.value.some(step => step.last > step.first))
+
+function toggle(first: number) {
+  if (!unfolded.delete(first))
+    unfolded.add(first)
+}
+
+const lineOf = (step: Step) => logLine(events.value, step, summary.value, CELL_PARTS)
+
+const rows = computed(() => steps.value.flatMap((step): Row[] => {
+  const group = step.last > step.first
+  const open = group && unfolded.has(step.first)
+  const head: Row = { key: `${step.first}`, step, line: lineOf(step), child: false, group, open }
+  if (!open)
+    return [head]
+  return [head, ...within(events.value, step).map((act): Row => ({ key: `${step.first}.${act.first}`, step: act, line: lineOf(act), child: true, group: false, open: false }))]
+}))
+
+function stateOf(step: { first: number, last: number }) {
+  const { index } = frame.value
+  return index > step.last ? 'past' : index >= step.first ? 'current' : 'future'
+}
+
+const log = ref<HTMLElement>()
+
+// Keeps the act of this moment in view as the recording plays, without moving a list the reader is scrolling
+watch(() => frame.value.index, async () => {
+  await nextTick()
+  const box = log.value
+  // The deepest one, so an unfolded line keeps the act of this moment in view
+  const item = [...box?.querySelectorAll<HTMLElement>('[data-current="true"]') ?? []].at(-1)
+  if (!box || !item)
+    return
+  if (item.offsetTop < box.scrollTop || item.offsetTop + item.offsetHeight > box.scrollTop + box.clientHeight)
+    box.scrollTop = item.offsetTop - box.clientHeight / 2
+})
+
+// --- Each ask for help, shown in the log where it was asked ---
+
+const after = computed(() => describeTally(summary.value.after))
+
+const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`
+</script>
+
+<template>
+  <div class="teacher flex flex-col gap-3">
+    <DrawingBoard :drawing="drawing" label="The drawing of the learner, at the moment shown on the timeline" readonly :frame="frame" :spotlight="spotlight" />
+
+    <p v-if="!worked" class="m-0 text-[13px] text-neutral-500 dark:text-neutral-400">
+      Nothing to read yet. Draw on the learner side, then come back: the trace builds as the learner works.
+    </p>
+
+    <template v-else>
+      <!-- The recording: play it, or move along the timeline to a moment -->
+      <section class="panel" aria-label="The session">
+        <div class="flex items-center gap-x-3">
+          <button type="button" class="play" :aria-label="playing ? 'Pause' : 'Play the session'" @click="playing ? stop() : play()">
+            <Icon :name="playing ? 'lucide:pause' : 'lucide:play'" class="size-4" aria-hidden="true" />
+          </button>
+
+          <div
+            class="scrub"
+            role="slider"
+            tabindex="0"
+            aria-label="Position in the session"
+            aria-valuemin="0"
+            :aria-valuemax="duration"
+            :aria-valuenow="Math.round(time)"
+            :aria-valuetext="`${mmss(time)}: ${now.text}`"
+            title="Playing skips the pauses, the timeline shows them"
+            @pointerdown="onScrubDown"
+            @pointermove="onScrubMove"
+            @pointerup="onScrubUp"
+            @pointercancel="onScrubUp"
+            @keydown="onScrubKey"
+          >
+            <div ref="track" class="track">
+              <span class="line" />
+              <span class="line played" :style="{ width: `${at(time)}%` }" />
+              <span v-for="tick in ticks" :key="tick.key" class="tick" :data-kind="tick.kind" :data-past="tick.past" :style="{ left: `${tick.at}%` }" />
+              <span class="head" :style="{ left: `${at(time)}%` }" />
+            </div>
+          </div>
+
+          <span class="tabular-nums text-[13px] text-neutral-500 dark:text-neutral-400">{{ mmss(time) }} / {{ mmss(duration) }}</span>
+        </div>
+
+        <!-- What is happening where the timeline is, and what the marks mean -->
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <p class="now" aria-hidden="true">
+            <span class="tabular-nums text-neutral-500 dark:text-neutral-400">{{ mmss(now.time) }}</span>
+            <span>{{ now.text }}</span>
+          </p>
+          <div class="flex flex-wrap gap-x-3 gap-y-0.5 text-[12px] text-neutral-500 dark:text-neutral-400">
+            <span v-for="item in LEGEND" :key="item.kind" class="flex items-center gap-1.5">
+              <span class="key" :data-kind="item.kind" />
+              {{ item.label }}
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid items-start gap-3 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+        <section class="panel" aria-label="Parts named">
+          <p class="caption">
+            <span>Parts named</span>
+            <span class="tabular-nums">{{ namedCount }} of {{ parts.length }}</span>
+          </p>
+          <ul class="list-none m-0 flex flex-col gap-0.5 p-0">
+            <li v-for="part in parts" :key="part.id">
+              <!-- A named part can be pointed at: its labels light up on the sheet -->
+              <button
+                type="button"
+                class="part"
+                :data-named="part.named.length > 0"
+                :aria-pressed="part.named.length ? picked === part.id : undefined"
+                :disabled="!part.named.length"
+                @pointerenter="hovered = part.id"
+                @pointerleave="hovered = null"
+                @click="pick(part.id)"
+              >
+                <Icon :name="part.named.length ? 'lucide:circle-check' : 'lucide:circle'" class="part-icon size-4 shrink-0" aria-hidden="true" />
+                <span class="part-name">{{ part.name }}</span>
+                <span v-if="part.named.length" class="part-label">{{ part.named.map(label => label.text).join(', ') }}</span>
+                <span v-else class="sr-only">not named</span>
+              </button>
+            </li>
+          </ul>
+          <p v-if="unmatched.length" class="m-0 text-[13px] text-neutral-500 dark:text-neutral-400">
+            Names no part: {{ unmatched.join(', ') }}
+          </p>
+        </section>
+
+        <!-- Every act, and each ask for help with what led to it -->
+        <section class="panel" aria-label="The log">
+          <p class="caption">
+            <span>The log</span>
+            <span class="tabular-nums">{{ plural(events.length, 'act') }}<template v-if="summary.checks.length">, {{ plural(summary.checks.length, 'check') }}</template></span>
+          </p>
+          <ol ref="log" class="log list-none m-0 p-0">
+            <li v-for="row in rows" :key="row.key" class="row" :data-child="row.child">
+              <button
+                v-if="row.group"
+                type="button"
+                class="fold"
+                :aria-expanded="row.open"
+                :aria-label="row.open ? 'Fold the acts' : 'Unfold the acts'"
+                @click="toggle(row.step.first)"
+              >
+                <Icon name="lucide:chevron-right" class="fold-icon size-3.5" aria-hidden="true" />
+              </button>
+              <span v-else-if="foldable && !row.child" class="fold" aria-hidden="true" />
+              <ExplorationsLearnerDrawingAnswersLogEntry :line="row.line" :state="stateOf(row.step)" :open="row.open" :compact="row.child" @click="seek(row.step.t)" />
+            </li>
+          </ol>
+          <p v-if="summary.checks.length && after !== 'nothing'" class="m-0 text-[13px] text-neutral-500 dark:text-neutral-400">
+            After the last check: {{ after }}
+          </p>
+        </section>
+      </div>
+    </template>
+  </div>
+</template>
+
+<style scoped>
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid rgb(229 229 229);
+  border-radius: 12px;
+}
+
+.dark .panel {
+  border-color: rgb(64 64 64 / 0.8);
+  background: rgb(38 38 38 / 0.4);
+}
+
+.caption {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.caption > :last-child:not(:first-child) {
+  color: rgb(115 115 115);
+  font-weight: 400;
+}
+
+.dark .caption > :last-child:not(:first-child) {
+  color: rgb(163 163 163);
+}
+
+/* A part: what the teacher expected, and which label of the learner named it. A named one can be pointed at */
+.part {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  padding: 3px 6px;
+  border-radius: 6px;
+  font-size: 13px;
+  text-align: left;
+  transition: background-color 120ms var(--ease-out);
+}
+
+.part:disabled {
+  cursor: default;
+}
+
+.part[aria-pressed='true'] {
+  background: rgb(163 163 163 / 0.18);
+}
+
+.part:focus-visible {
+  outline: 2px solid rgb(23 23 23);
+  outline-offset: 2px;
+}
+
+.dark .part:focus-visible {
+  outline-color: rgb(245 245 245);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .part:hover:not(:disabled) {
+    background: rgb(163 163 163 / 0.14);
+  }
+}
+
+.part-icon {
+  color: rgb(163 163 163 / 0.7);
+}
+
+.part[data-named='true'] .part-icon {
+  color: rgb(16 185 129);
+}
+
+.part[data-named='false'] .part-name {
+  color: rgb(115 115 115);
+}
+
+.dark .part[data-named='false'] .part-name {
+  color: rgb(163 163 163);
+}
+
+.part-label {
+  min-width: 0;
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: rgb(115 115 115);
+}
+
+.dark .part-label {
+  color: rgb(163 163 163);
+}
+
+/* The player */
+.play {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: rgb(23 23 23);
+  color: white;
+  transition: scale 160ms var(--ease-out);
+}
+
+.dark .play {
+  background: rgb(245 245 245);
+  color: rgb(23 23 23);
+}
+
+.play:active {
+  scale: 0.94;
+}
+
+.play:focus-visible,
+.scrub:focus-visible {
+  outline: 2px solid rgb(23 23 23);
+  outline-offset: 2px;
+}
+
+.dark .play:focus-visible,
+.dark .scrub:focus-visible {
+  outline-color: rgb(245 245 245);
+}
+
+/* The whole strip takes the pointer, a taller target than the line it draws */
+.scrub {
+  flex: 1 1 180px;
+  min-width: 0;
+  padding: 4px 7px;
+  border-radius: 8px;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.track {
+  position: relative;
+  height: 24px;
+}
+
+.line {
+  position: absolute;
+  inset: 50% 0 auto;
+  height: 1px;
+  background: rgb(163 163 163 / 0.4);
+}
+
+.line.played {
+  height: 2px;
+  margin-top: -0.5px;
+  background: rgb(115 115 115 / 0.7);
+}
+
+.tick {
+  position: absolute;
+  top: 50%;
+  width: 2px;
+  height: 12px;
+  margin-left: -1px;
+  border-radius: 1px;
+  translate: 0 -50%;
+  opacity: 0.35;
+  transition: opacity 120ms var(--ease-out);
+}
+
+.tick[data-past='true'] {
+  opacity: 1;
+}
+
+.tick[data-kind='check'] {
+  z-index: 1;
+  width: 3px;
+  height: 20px;
+}
+
+/* Follows the pointer 1:1 while it is dragged: no easing */
+.head {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: rgb(23 23 23);
+  pointer-events: none;
+}
+
+.dark .head {
+  background: rgb(245 245 245);
+}
+
+.head::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: inherit;
+  translate: -50% 0;
+}
+
+.tick[data-kind='draw'],
+.key[data-kind='draw'] {
+  background: rgb(115 115 115);
+}
+
+.tick[data-kind='label'],
+.key[data-kind='label'] {
+  background: rgb(59 130 246);
+}
+
+.tick[data-kind='undo'],
+.key[data-kind='undo'] {
+  background: rgb(244 63 94);
+}
+
+.tick[data-kind='check'],
+.key[data-kind='check'] {
+  background: rgb(16 185 129);
+}
+
+.key {
+  width: 3px;
+  height: 12px;
+  flex-shrink: 0;
+  border-radius: 1px;
+}
+
+.now {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  font-size: 14px;
+}
+
+/* The log: a check has a second line, with what the learner did before asking */
+.log {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 10rem;
+  max-height: 14rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* A line that gathers acts has a chevron; the others keep its place, so the columns line up (unless no line has one) */
+/* The article styles every li (size, line height, a margin below): a row is its own */
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin-bottom: 2px;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.fold {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 22px;
+  height: 30px;
+  border-radius: 6px;
+  color: rgb(115 115 115);
+}
+
+.dark .fold {
+  color: rgb(163 163 163);
+}
+
+button.fold:focus-visible {
+  outline: 2px solid rgb(23 23 23);
+  outline-offset: -2px;
+}
+
+.dark button.fold:focus-visible {
+  outline-color: rgb(245 245 245);
+}
+
+.fold-icon {
+  transition: rotate 160ms var(--ease-out);
+}
+
+.fold[aria-expanded='true'] .fold-icon {
+  rotate: 90deg;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  button.fold:hover {
+    background: rgb(163 163 163 / 0.18);
+  }
+}
+
+/*
+ * The acts of an unfolded line hang on one branch under its chevron, indented and a little tighter than
+ * the lines. Rows touch, so the branch is a single line
+ */
+.row[data-child='true'] {
+  gap: 0;
+  margin-bottom: 0;
+  margin-left: 11px;
+  padding-left: 22px;
+  border-left: 1px solid rgb(163 163 163 / 0.45);
+}
+
+/* The last act leaves some air before the next line */
+.row[data-child='true']:has(+ .row:not([data-child='true'])) {
+  margin-bottom: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play,
+  .tick,
+  .part,
+  .fold-icon {
+    transition: none;
+  }
+}
+</style>
