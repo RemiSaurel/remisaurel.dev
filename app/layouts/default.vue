@@ -4,7 +4,7 @@ const { play } = useSound()
 
 const { data: explorations } = await useExplorations()
 
-// Explorations only join the nav once there is one to open
+// Explorations only join the nav once there is one to show (a teaser counts)
 const navItems = computed(() => [
   { route: '/', label: 'About' },
   { route: '/research', label: 'Research' },

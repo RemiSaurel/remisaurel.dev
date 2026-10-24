@@ -27,9 +27,14 @@ const { data: posts } = await useAsyncData('home-posts', async () => {
 }, { default: () => [] })
 
 const { data: allExplorations } = await useExplorations()
-const explorations = computed(() => allExplorations.value
-  .filter(exploration => exploration.status !== 'draft')
-  .slice(0, EXPLORATION_LIMIT))
+// Teasers (drafts) come after the explorations you can open, so they never push one out of the list.
+// The openable ones are newest first (the query's order), the teasers nearest first, undated ones last
+const explorations = computed(() => [
+  ...allExplorations.value.filter(exploration => exploration.status !== 'draft'),
+  ...allExplorations.value
+    .filter(exploration => exploration.status === 'draft')
+    .sort((a, b) => (a.date ? new Date(a.date).getTime() : Infinity) - (b.date ? new Date(b.date).getTime() : Infinity)),
+].slice(0, EXPLORATION_LIMIT))
 
 const sortedPublications = [...publications]
   .sort((a, b) => b.date.getTime() - a.date.getTime())

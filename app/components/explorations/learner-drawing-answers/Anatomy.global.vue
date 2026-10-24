@@ -59,9 +59,11 @@ const NOTES: Record<string, { title: string, icon: string, text: string }> = {
   since: { title: 'Since', icon: 'lucide:list-restart', text: 'Everything done between the check before and this one, by kind of act.' },
 }
 
+// The flag comes last, not where it sits in the line: going from Fixes to Renames, the notes already there
+// stay where they are and the new one is added after them
 const CELLS: Record<CaseId, string[]> = {
   fixes: ['time', 'kind', 'what', 'figure', 'delta', 'since'],
-  renames: ['time', 'kind', 'what', 'figure', 'delta', 'flag', 'since'],
+  renames: ['time', 'kind', 'what', 'figure', 'delta', 'since', 'flag'],
   rename: ['time', 'kind', 'what', 'from', 'name', 'part'],
 }
 

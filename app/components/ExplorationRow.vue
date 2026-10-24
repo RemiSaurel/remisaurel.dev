@@ -11,16 +11,23 @@ interface ExplorationRowProps {
 const props = defineProps<ExplorationRowProps>()
 
 const isDraft = computed(() => props.status === 'draft')
+// In production a draft is only a teaser: same row, but nothing to open
+const isTeaser = computed(() => isDraft.value && !SHOW_DRAFTS)
+
+const NuxtLink = resolveComponent('NuxtLink')
 
 const { play } = useSound()
 </script>
 
 <template>
-  <NuxtLink
-    :to="to"
-    class="group flex items-center gap-4 rounded-xl px-2 py-2 -mx-2"
-    :class="{ draft: isDraft }"
-    @click="play('navigate', { emphasis: 'subtle', volume: 0.5 })"
+  <!-- No `group` on a teaser: the list's hover highlight skips it -->
+  <component
+    :is="isTeaser ? 'div' : NuxtLink"
+    :to="isTeaser ? undefined : to"
+    class="flex items-center gap-4 rounded-xl px-2 py-2 -mx-2"
+    :class="{ draft: isDraft, teaser: isTeaser, group: !isTeaser }"
+    :aria-disabled="isTeaser || undefined"
+    @click="!isTeaser && play('navigate', { emphasis: 'subtle', volume: 0.5 })"
   >
     <!-- The tile is a small sheet: an icon when the exploration has one, a few lines of text otherwise -->
     <span
@@ -44,13 +51,13 @@ const { play } = useSound()
         <span class="truncate text-base text-neutral-800 font-medium transition-colors duration-150 dark:text-neutral-200 group-hover:text-neutral-950 dark:group-hover:text-white">
           {{ title }}
         </span>
-        <!-- Dashed and penciled: a draft is a sketch, only ever seen in development -->
+        <!-- A draft is a promise: "Soon", in a light blue -->
         <span
           v-if="isDraft"
-          class="uppercase inline-flex shrink-0 items-center gap-1 border border-neutral-400 rounded-full border-dashed px-1.5 py-px text-[10px] text-neutral-500 font-medium tracking-wide dark:border-neutral-500 dark:text-neutral-400"
+          class="uppercase inline-flex shrink-0 items-center gap-1 border border-sky-200 rounded-full bg-sky-50 px-1.5 py-px text-[10px] text-sky-600 font-medium tracking-wide dark:border-sky-400/30 dark:bg-sky-400/10 dark:text-sky-300"
         >
-          <Icon name="lucide:pencil-line" class="size-2.5" />
-          Draft
+          <Icon name="lucide:clock" class="size-2.5" />
+          Soon
         </span>
         <span
           v-else-if="status === 'wip'"
@@ -58,13 +65,13 @@ const { play } = useSound()
         >
           WIP
         </span>
-        <NewTag v-if="isNew(date)" />
+        <NewTag v-if="!isDraft && isNew(date)" />
       </span>
       <span class="truncate text-[13px] text-neutral-500 dark:text-neutral-400">
         {{ description }}
       </span>
     </span>
-  </NuxtLink>
+  </component>
 </template>
 
 <style scoped>
@@ -74,9 +81,14 @@ const { play } = useSound()
   transition: opacity var(--duration-short) var(--ease-out);
 }
 
-.draft:hover > span:not(.tile),
-.draft:focus-visible > span:not(.tile) {
+.draft:not(.teaser):hover > span:not(.tile),
+.draft:not(.teaser):focus-visible > span:not(.tile) {
   opacity: 1;
+}
+
+.teaser {
+  cursor: default;
+  user-select: none;
 }
 
 .tile {

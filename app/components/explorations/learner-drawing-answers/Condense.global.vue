@@ -1,15 +1,19 @@
 <script setup lang="ts">
+import type { LogLine } from '~/utils/logLine'
+import type { Step } from '~/utils/session'
 import { CELL_PARTS } from '~/exercises/cell'
 import { buildSession } from '~/utils/demoSession'
 import { KIND_COLORS, kindOf, logLine } from '~/utils/logLine'
-import { activeSpans, condense } from '~/utils/session'
+import { activeSpans, condense, within } from '~/utils/session'
 import { mmss, summarize } from '~/utils/trace'
 
 // The same acts, as a timeline and as lines of the log. The gap decides which acts are one movement of
 // the learner: move it and see the lines merge or split. The session is written by hand, and the lines are
 // the ones the real log draws.
-// A circle of three strokes, a nucleus of two, its label, two undos and a check: nine acts, few enough to read
-// all the lines at once. The circle ends 2.1 s before the nucleus begins, so a gap of 2 s keeps them apart
+// A circle of three strokes, a nucleus of two, its label, two strokes for a mitochondrion and two undos, a second
+// label and its rename, one more stroke and a check: fourteen acts, few enough to read all the lines at once.
+// The circle ends 2.1 s before the nucleus begins, so a gap of 2 s keeps them apart. Only acts of the same kind
+// merge, so even a gap of 4 s leaves eight lines: the same stroke, label or undo never gathers across another act
 const events = buildSession([
   { at: 3, stroke: 1.2 },
   { at: 4.6, stroke: 0.9 },
@@ -17,9 +21,14 @@ const events = buildSession([
   { at: 9.5, stroke: 1.5 },
   { at: 11, stroke: 1.2 },
   { at: 14, label: 'nucleus' },
-  { at: 17, undo: true },
-  { at: 17.8, undo: true },
-  { at: 22, check: true },
+  { at: 16.5, stroke: 1 },
+  { at: 18, stroke: 0.8 },
+  { at: 19.5, undo: true },
+  { at: 20.3, undo: true },
+  { at: 22, label: 'cyto' },
+  { at: 24, rename: ['cyto', 'cytoplasm'] },
+  { at: 26, stroke: 1 },
+  { at: 28, check: true },
 ], CELL_PARTS)
 
 const summary = summarize(events)
@@ -33,24 +42,70 @@ const gap = ref(2)
 
 const steps = computed(() => condense(events, gap.value * 1000))
 
+const lineOf = (step: Step) => logLine(events, step, summary, CELL_PARTS)
+
 const lines = computed(() => steps.value.map(step => ({
   step,
-  line: logLine(events, step, summary, CELL_PARTS),
   // The span of the timeline the line stands for
   from: at(spans[step.first]![0]),
   to: at(spans[step.last]![1]),
 })))
 
-// The line the pointer is on, or the one clicked to stay
-const hovered = ref<number | null>(null)
-const picked = ref<number | null>(null)
+// A line that gathers several acts can be unfolded into them, like a branch of the timeline
+interface Row {
+  key: string
+  step: Step
+  line: LogLine
+  /** One of the acts of an unfolded line */
+  child: boolean
+  /** A line that gathers several acts, and can be unfolded */
+  group: boolean
+  open: boolean
+}
+
+const unfolded = reactive(new Set<number>())
+
+// The chevron column exists only when some line can be unfolded: without one it would be an empty gutter
+const foldable = computed(() => steps.value.some(step => step.last > step.first))
+
+const rows = computed(() => steps.value.flatMap((step): Row[] => {
+  const group = step.last > step.first
+  const open = group && unfolded.has(step.first)
+  const head: Row = { key: `${step.first}:${step.last}`, step, line: lineOf(step), child: false, group, open }
+  if (!open)
+    return [head]
+  return [head, ...within(events, step).map((act): Row => ({ key: `${step.first}.${act.first}`, step: act, line: lineOf(act), child: true, group: false, open: false }))]
+}))
+
+// The acts of the line the pointer is on, or of the one clicked to stay
+interface Range { first: number, last: number }
+
+const hovered = ref<Range | null>(null)
+const picked = ref<Range | null>(null)
 const lit = computed(() => hovered.value ?? picked.value)
 
-const pick = (first: number) => picked.value = picked.value === first ? null : first
+const same = (a: Range, b: Range | null) => a.first === b?.first && a.last === b.last
+const hover = (step: Range | null) => hovered.value = step && { first: step.first, last: step.last }
+const pick = (step: Range) => picked.value = same(step, picked.value) ? null : { first: step.first, last: step.last }
+const stateOf = (step: Range) => same(step, lit.value) ? 'current' : 'past'
 
-// A line that no longer exists after the gap moved is not picked any more
+function toggle(step: Step) {
+  // What was pointed at inside the line goes away with it
+  hovered.value = null
+  if (!unfolded.delete(step.first))
+    unfolded.add(step.first)
+  else if (picked.value && !same(picked.value, step))
+    picked.value = null
+}
+
+// A line that no longer exists after the gap moved is not picked any more, nor unfolded
 watch(steps, (next) => {
-  if (picked.value !== null && !next.some(step => step.first === picked.value))
+  for (const first of unfolded) {
+    if (!next.some(step => step.first === first && step.last > step.first))
+      unfolded.delete(first)
+  }
+  const range = picked.value
+  if (range && !next.some(step => same(step, range) || (range.first === range.last && step.first <= range.first && range.first <= step.last && unfolded.has(step.first))))
     picked.value = null
 })
 
@@ -61,7 +116,8 @@ const ticks = events.map((event, index) => ({
   width: at(spans[index]![1]) - at(spans[index]![0]),
 }))
 
-const owner = computed(() => new Map(steps.value.flatMap(step => Array.from({ length: step.last - step.first + 1 }, (_, i) => [step.first + i, step.first] as const))))
+// A tick fades unless the line lit is made of it
+const dimmed = (index: number) => lit.value !== null && (index < lit.value.first || index > lit.value.last)
 </script>
 
 <template>
@@ -78,7 +134,7 @@ const owner = computed(() => new Map(steps.value.flatMap(step => Array.from({ le
             v-for="item in lines"
             :key="item.step.first"
             class="bracket absolute bottom-1.5 top-1.5 box-content border-[1.5px] border-transparent rounded-md px-[5px] -mx-[5px] data-[group=true]:border-neutral-400/55 data-[on=true]:border-neutral-900 data-[on=true]:bg-neutral-400/18 dark:data-[on=true]:border-neutral-100"
-            :data-on="lit === item.step.first"
+            :data-on="lit !== null && lit.first <= item.step.last && lit.last >= item.step.first"
             :data-group="item.step.last > item.step.first"
             :style="{ left: `${item.from}%`, width: `${item.to - item.from}%` }"
           />
@@ -87,7 +143,7 @@ const owner = computed(() => new Map(steps.value.flatMap(step => Array.from({ le
           v-for="tick in ticks"
           :key="tick.key"
           class="absolute top-3 h-4 rounded-[1.5px] transition-[opacity] duration-[140ms] ease-[var(--ease-out)] data-[dim=true]:opacity-25 [@media(prefers-reduced-motion:reduce)]:transition-none"
-          :data-dim="lit !== null && owner.get(tick.key) !== lit"
+          :data-dim="dimmed(tick.key)"
           :style="{ left: `${tick.left}%`, width: `max(${tick.width}%, 3px)`, background: tick.color }"
         />
       </div>
@@ -112,17 +168,37 @@ const owner = computed(() => new Map(steps.value.flatMap(step => Array.from({ le
         <span>The log</span>
         <span class="tabular-nums text-neutral-500 font-normal dark:text-neutral-400">{{ lines.length }} lines</span>
       </p>
-      <TransitionGroup tag="div" name="line" class="relative [&>*]:mb-0.5 [&>*]:w-full">
-        <ExplorationsLearnerDrawingAnswersLogEntry
-          v-for="item in lines"
-          :key="`${item.step.first}:${item.step.last}`"
-          :line="item.line"
-          :state="lit === item.step.first ? 'current' : 'past'"
-          :aria-pressed="picked === item.step.first"
-          @pointerenter="hovered = item.step.first"
-          @pointerleave="hovered = null"
-          @click="pick(item.step.first)"
-        />
+      <TransitionGroup tag="ol" name="line" class="list-none relative m-0 p-0 [&>*]:w-full">
+        <!-- The article styles every li (size, line height, a margin below): a row is its own -->
+        <li
+          v-for="row in rows"
+          :key="row.key"
+          class="row [font-size:inherit] [line-height:inherit] flex items-start"
+          :class="row.child ? 'ml-[11px] mb-0 gap-0 border-l border-neutral-400/45 pl-[22px]' : 'mb-[2px] gap-1'"
+          :data-child="row.child"
+        >
+          <button
+            v-if="row.group"
+            type="button"
+            class="grid h-[30px] w-[22px] shrink-0 place-items-center rounded-[6px] text-neutral-500 hover:bg-neutral-400/18 dark:text-neutral-400 focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-solid dark:focus-visible:outline-neutral-100 focus-visible:-outline-offset-2"
+            :aria-expanded="row.open"
+            :aria-label="row.open ? 'Fold the acts' : 'Unfold the acts'"
+            @click="toggle(row.step)"
+          >
+            <Icon name="lucide:chevron-right" class="[transition-property:rotate] size-3.5 duration-[160ms] ease-[var(--ease-out)] [@media(prefers-reduced-motion:reduce)]:transition-none" :class="row.open && '[rotate:90deg]'" aria-hidden="true" />
+          </button>
+          <span v-else-if="foldable && !row.child" class="grid h-[30px] w-[22px] shrink-0 place-items-center rounded-[6px] text-neutral-500 dark:text-neutral-400" aria-hidden="true" />
+          <ExplorationsLearnerDrawingAnswersLogEntry
+            :line="row.line"
+            :state="stateOf(row.step)"
+            :open="row.open"
+            :compact="row.child"
+            :aria-pressed="same(row.step, picked)"
+            @pointerenter="hover(row.step)"
+            @pointerleave="hover(null)"
+            @click="pick(row.step)"
+          />
+        </li>
       </TransitionGroup>
     </div>
   </figure>
@@ -166,6 +242,11 @@ const owner = computed(() => new Map(steps.value.flatMap(step => Array.from({ le
 
 .line-leave-active {
   position: absolute;
+}
+
+/* The last act leaves some air before the next line */
+.row[data-child='true']:has(+ .row:not([data-child='true'])) {
+  margin-bottom: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -135,7 +135,16 @@ export function useDrawing() {
       log('unlabel')
   }
 
-  return { strokes, labels, live, events, color, size, canUndo, canRedo, begin, extend, finish, cancel, undo, redo, clear, addLabel, editLabel, removeLabel, log }
+  /** Back to a blank sheet and an empty log, as if the page had just opened */
+  function reset() {
+    state.value = emptyDrawing()
+    live.value = null
+    events.value = []
+    origin = null
+    nextId = 1
+  }
+
+  return { strokes, labels, live, events, color, size, canUndo, canRedo, begin, extend, finish, cancel, undo, redo, clear, addLabel, editLabel, removeLabel, log, reset }
 }
 
 export type Drawing = ReturnType<typeof useDrawing>

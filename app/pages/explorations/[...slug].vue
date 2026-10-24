@@ -68,7 +68,7 @@ usePageSeo({
           class="uppercase mb-3 ml-3 mt-0 w-fit inline-flex items-center gap-1.5 border border-neutral-400 rounded-full border-dashed px-2.5 py-0.5 text-[11px] text-neutral-500 font-medium tracking-wide dark:border-neutral-500 dark:text-neutral-400"
         >
           <Icon name="lucide:pencil-line" class="size-3" />
-          Draft · development only
+          Draft
         </p>
         <h1 class="font-display mb-3 text-balance text-4xl font-medium tracking-tight">
           {{ page.title }}

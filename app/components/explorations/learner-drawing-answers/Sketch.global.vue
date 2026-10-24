@@ -44,6 +44,15 @@ function check() {
   drawing.log('help', `counter ${covered.length}/${CELL_PARTS.length}`)
 }
 
+// A scripted learner for the reader who would rather watch than draw: it fills the same drawing, so the
+// counter and the teacher's side read it like a real one
+const simulation = useSimulatedLearner(drawing, check)
+
+function simulate() {
+  count.value = null
+  simulation.start()
+}
+
 const stale = computed(() => !!count.value && (count.value.strokes !== drawing.strokes.value || count.value.labels !== drawing.labels.value))
 
 const trace = computed(() => {
@@ -71,7 +80,7 @@ const trace = computed(() => {
 
     <ExplorationsLearnerDrawingAnswersTeacher v-if="view === 'teacher'" :drawing="drawing" />
 
-    <DrawingBoard v-else :drawing="drawing" label="Your drawing of a living cell">
+    <DrawingBoard v-else :drawing="drawing" label="Your drawing of a living cell" :inert="simulation.running.value">
       <template #stats>
         <dl class="m-0 flex flex-wrap gap-x-5 gap-y-1 text-[13px] text-neutral-500 dark:text-neutral-400">
           <div v-for="item in trace" :key="item.label" class="flex gap-1.5">
@@ -90,7 +99,7 @@ const trace = computed(() => {
         <button
           type="button"
           class="[transition-property:scale,background-color] h-8 inline-flex items-center gap-1.5 rounded-lg bg-neutral-400/16 px-3 text-[13px] text-neutral-800 font-medium duration-[160ms] ease-[var(--ease-out)] disabled:cursor-not-allowed dark:text-neutral-200 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:outline-solid [@media(prefers-reduced-motion:reduce)]:transition-none active:enabled:[scale:0.96] hover:enabled:bg-neutral-400/26 dark:focus-visible:outline-neutral-100"
-          :disabled="!drawing.labels.value.length"
+          :disabled="!drawing.labels.value.length || simulation.running.value"
           @click="check"
         >
           <Icon name="lucide:list-checks" class="size-4" aria-hidden="true" />
@@ -116,6 +125,15 @@ const trace = computed(() => {
             {{ ' ' }}<span class="text-neutral-500 font-normal dark:text-neutral-400">parts named</span>
           </span>
         </div>
+
+        <button
+          type="button"
+          class="[transition-property:scale,background-color] ml-auto h-8 inline-flex items-center gap-1.5 rounded-lg px-3 text-[13px] text-neutral-600 font-medium duration-[160ms] ease-[var(--ease-out)] active:[scale:0.96] hover:bg-neutral-400/16 dark:text-neutral-300 focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:outline-solid [@media(prefers-reduced-motion:reduce)]:transition-none dark:focus-visible:outline-neutral-100"
+          @click="simulation.running.value ? simulation.stop() : simulate()"
+        >
+          <Icon :name="simulation.running.value ? 'lucide:square' : 'lucide:play'" class="size-4" aria-hidden="true" />
+          {{ simulation.running.value ? 'Stop' : 'Simulate a learner' }}
+        </button>
       </div>
 
       <p class="m-0 text-[13px] text-neutral-500 dark:text-neutral-400">
