@@ -21,6 +21,7 @@
     "cuelume": "^0.2.8",
     "motion-v": "2.2.1",
     "nuxt": "^4.5.1",
+    "perfect-freehand": "^1.2.3",
     "reka-ui": "2.10.1",
     "tailwindcss": "^4.3.3"
   },
