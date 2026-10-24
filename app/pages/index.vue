@@ -14,8 +14,8 @@ onMounted(() => {
   }, 2000)
 })
 
-const POST_LIMIT = 3
-const EXPLORATION_LIMIT = 3
+const POST_LIMIT = 5
+const EXPLORATION_LIMIT = 5
 
 const { data: posts } = await useAsyncData('home-posts', async () => {
   const all = await queryCollection('posts').all()
@@ -27,7 +27,9 @@ const { data: posts } = await useAsyncData('home-posts', async () => {
 }, { default: () => [] })
 
 const { data: allExplorations } = await useExplorations()
-const explorations = computed(() => allExplorations.value.slice(0, EXPLORATION_LIMIT))
+const explorations = computed(() => allExplorations.value
+  .filter(exploration => exploration.status !== 'draft')
+  .slice(0, EXPLORATION_LIMIT))
 
 const sortedPublications = [...publications]
   .sort((a, b) => b.date.getTime() - a.date.getTime())
