@@ -1,6 +1,7 @@
 ---
 title: Grading learner responses on Konsolidation
 description: How Konsolidation grades what learners write. MCQ scores give a trusted binary grade, an AI proposes a score and skills, and a teacher validates them.
+date: 2027-01-10
 tags: [AI, ASAG, Workflow]
 status: draft
 icon: lucide:git-merge
