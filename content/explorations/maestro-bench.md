@@ -3,7 +3,7 @@ title: MAESTRO-bench, comparing AI agents
 description: How a benchmark tool for AI agents went from scripts and CSV files to a loop of dataset, experiment and analysis, grouped in studies.
 date: 2026-10-22
 tags: [AI, Benchmark, Workflow]
-status: wip
+status: published
 icon: lucide:flask-conical
 ---
 
