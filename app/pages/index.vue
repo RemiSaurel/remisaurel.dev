@@ -59,6 +59,14 @@ const sortedPublications = [...publications]
             <span class="underline decoration-neutral-400 underline-offset-2 dark:decoration-neutral-500">research</span>
           </NuxtLink> behind it.
         </p>
+        <p class="mb-0 mt-4 text-neutral-500 dark:text-neutral-400">
+          You can find me on
+          <a href="https://scholar.google.com/citations?hl=fr&user=r8AM0OIAAAAJ" target="_blank" rel="noopener noreferrer" class="font-medium"><Icon name="academicons:google-scholar" class="mr-1.5 inline-block size-4.5 align-text-bottom" /><span class="underline decoration-neutral-400 underline-offset-2 dark:decoration-neutral-500">Google Scholar</span></a>,
+          <a href="https://github.com/remisaurel" target="_blank" rel="noopener noreferrer" class="font-medium"><Icon name="uil:github-alt" class="mr-1.5 inline-block size-4.5 align-text-bottom" /><span class="underline decoration-neutral-400 underline-offset-2 dark:decoration-neutral-500">GitHub</span></a>,
+          <a href="https://www.linkedin.com/in/r%C3%A9mi-saurel/" target="_blank" rel="noopener noreferrer" class="font-medium"><Icon name="uil:linkedin" class="mr-1.5 inline-block size-4.5 align-text-bottom" /><span class="underline decoration-neutral-400 underline-offset-2 dark:decoration-neutral-500">LinkedIn</span></a>
+          and
+          <a href="https://twitter.com/remisaurel" target="_blank" rel="noopener noreferrer" class="font-medium"><Icon name="i-simple-icons-x" class="mr-1.5 inline-block size-4.5 align-text-bottom" /><span class="underline decoration-neutral-400 underline-offset-2 dark:decoration-neutral-500">X</span></a>.
+        </p>
       </div>
     </div>
 

@@ -118,7 +118,7 @@ function itemEnter(index: number) {
             >
               <!-- Mobile: tile + text, categories under the title -->
               <div class="flex items-start gap-3 md:hidden">
-                <DateTile :date="item.date" />
+                <DateTile :date="item.date" :linked="hasLink(item)" />
                 <div class="min-w-0 flex flex-1 flex-col gap-1.5">
                   <div class="flex flex-col gap-1">
                     <span class="text-sm font-medium leading-snug">{{ item.title }}</span>
@@ -134,7 +134,7 @@ function itemEnter(index: number) {
 
               <!-- Desktop: Grid layout -->
               <div class="grid-cols-[auto_1fr_auto] hidden items-center gap-4 md:grid">
-                <DateTile :date="item.date" />
+                <DateTile :date="item.date" :linked="hasLink(item)" />
 
                 <div class="flex flex-col gap-1">
                   <span class="text-sm font-medium leading-snug">{{ item.title }}</span>

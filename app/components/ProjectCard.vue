@@ -18,7 +18,7 @@ function getIconName(key: string) {
 </script>
 
 <template>
-  <!-- A bigger sheet of the same paper as the bento tiles -->
+  <!-- A bigger sheet of the same paper as the posts and explorations tiles -->
   <div class="project-card sheet group h-full flex flex-col justify-between gap-4 rounded-2xl p-4">
     <div class="flex flex-col gap-3">
       <div class="flex items-center gap-3">

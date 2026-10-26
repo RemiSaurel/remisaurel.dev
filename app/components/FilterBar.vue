@@ -83,7 +83,7 @@ const iconOptions = (definition: FilterDefinition) => selectedOptions(definition
 const chipIcons = (definition: FilterDefinition) => iconOptions(definition).slice(0, CHIP_ICON_LIMIT)
 const hasMoreIcons = (definition: FilterDefinition) => iconOptions(definition).length > CHIP_ICON_LIMIT
 
-// Same sheet as the bento tiles, raised a little more. Rows inside sit 4px in, so their 8px corners stay concentric.
+// Same sheet as the posts and explorations tiles, raised a little more. Rows inside sit 4px in, so their 8px corners stay concentric.
 const PANEL_BOX = 'sheet rounded-xl shadow-lg'
 const POPOVER_UI = { content: `rounded-xl overflow-hidden ring-0 ${PANEL_BOX}` }
 const POPOVER_CONTENT = { align: 'start', sideOffset: 6, collisionPadding: 16 } as const
@@ -274,7 +274,7 @@ const OPERATOR_SHOWN = { opacity: 1, filter: 'blur(0px)' }
     color 150ms var(--ease-out);
 }
 
-/* Same hover as the bento links, kept while its panel is open */
+/* Hover state kept while its panel is open */
 .filter-trigger[data-state='open'] {
   border-color: rgb(163 163 163);
   color: rgb(23 23 23);

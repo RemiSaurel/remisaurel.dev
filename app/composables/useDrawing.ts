@@ -16,7 +16,7 @@ export function useDrawing() {
   const events = shallowRef<DrawingEvent[]>([])
 
   const color = ref<InkColor>(DEFAULT_INK)
-  const size = ref(4)
+  const size = ref(6)
 
   // The session starts with the first stroke, so a drawing opened and left alone has no duration
   let origin: number | null = null

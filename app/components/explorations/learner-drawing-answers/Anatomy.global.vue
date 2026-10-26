@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import type { Kind } from '~/utils/logLine'
 import { CELL_PARTS } from '~/exercises/cell'
 import { buildSession } from '~/utils/demoSession'
 import { logLine } from '~/utils/logLine'
 import { condense } from '~/utils/session'
-import { summarize } from '~/utils/trace'
+import { mmss, summarize } from '~/utils/trace'
 
 // One line of the teacher's log taken out of the log, with the cells it is made of named. The lines are the
 // last ones of three sessions written by hand, run through the same functions as the real log: they are not
@@ -93,31 +94,44 @@ function onOver(e: PointerEvent) {
 
 const pin = (cell: string) => pinned.value = pinned.value === cell ? null : cell
 
-// The hint that invites to point goes away once it has been understood
-const touched = ref(false)
-watch(lit, (cell) => {
-  if (cell)
-    touched.value = true
+const KIND_WORDS: Record<Kind, string> = {
+  draw: 'grey: a stroke',
+  label: 'blue: a label',
+  undo: 'red: an undo or a clear',
+  check: 'green: a check',
+}
+
+// In the margin: what the lit cell says on this line, in a few words
+const margin = computed(() => {
+  const { detail, check, part, kind, from } = line.value
+  const notes: Record<string, string> = {
+    time: `${mmss(from)} after the first act`,
+    kind: KIND_WORDS[kind],
+    what: detail.what,
+    from: `it was "${detail.from}"`,
+    name: `the learner wrote "${detail.name}"`,
+    figure: `the learner saw ${detail.meta}`,
+    part: part ? `matched: ${part}` : 'no part matched',
+    delta: check?.delta == null ? '' : `${check.delta > 0 ? '+' : ''}${check.delta} since ${check.from}`,
+    flag: 'no stroke, no label: only names',
+    since: check?.done.length ? check.done.map(item => `${item.count} ${item.noun}`).join('\n') : 'nothing since',
+  }
+  return lit.value ? notes[lit.value] : null
 })
 </script>
 
 <template>
-  <figure class="my-8 flex flex-col gap-3">
+  <figure class="relative my-8 flex flex-col gap-3">
     <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
       <SegmentedControl v-model="current" label="Which line" :options="CASES" />
-      <p
-        class="hint m-0 flex items-center gap-[5px] text-[12px] text-neutral-500 transition-[opacity] duration-200 ease-[var(--ease-out)] dark:text-neutral-400 data-[gone=true]:opacity-0 [@media(prefers-reduced-motion:reduce)]:transition-none"
-        :data-gone="touched"
-        aria-hidden="true"
-      >
-        <Icon name="lucide:mouse-pointer-click" class="hint-icon size-3.5" />
-        Point at a cell
-      </p>
     </div>
 
     <Panel padding="none" class="[zoom:1.15] bg-neutral-50 px-2.5 py-3.5" @pointerover="onOver" @pointerleave="hovered = null">
       <ExplorationsLearnerDrawingAnswersLogEntry :line="line" plain :lit="lit" />
     </Panel>
+
+    <!-- Level with the line, on a wide screen -->
+    <MarginNote :note="margin" hint="point at a cell to see what it says" top="3.4rem" />
 
     <div class="grid gap-1 sm:grid-cols-2" role="group" aria-label="The cells of the line">
       <button
@@ -147,27 +161,3 @@ watch(lit, (cell) => {
     </div>
   </figure>
 </template>
-
-<style scoped>
-.hint-icon {
-  animation: nudge 1.8s var(--ease-out) infinite;
-}
-
-@keyframes nudge {
-  0%,
-  60%,
-  100% {
-    translate: 0 0;
-  }
-
-  80% {
-    translate: 2px 2px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hint-icon {
-    animation: none;
-  }
-}
-</style>

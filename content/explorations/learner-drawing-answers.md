@@ -83,9 +83,3 @@ Play on the recording's clock. The learner's time jumps over each pause.
 - **What does the teacher see?** The final drawing, the steps, or both.
 - **What does the learner learn?** A better answer can mean worse learning.
 - **Are rules enough?** A word list misses a synonym nobody planned. Is that a flaw, or a limit simple enough to explain to a learner?
-
-## To do
-
-- Build the next helps: a hint pinned to a part, a shape to trace over.
-- Test the teacher side with a real teacher: what do they look at first, and what do they ignore?
-- Try the counter on real drawings: how often does it miss a right label?

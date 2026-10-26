@@ -8,20 +8,29 @@ interface RowTileProps {
   as?: string
   /** A promise of a sheet, not one yet: dashed and without a fill */
   dashed?: boolean
+  /** The row opens a link: a small arrow badge on the corner tells it apart from the plain ones */
+  linked?: boolean
 }
 
-const props = withDefaults(defineProps<RowTileProps>(), { as: 'span', dashed: false })
+const props = withDefaults(defineProps<RowTileProps>(), { as: 'span', dashed: false, linked: false })
 </script>
 
 <template>
   <component
     :is="props.as"
-    class="tile grid size-11 shrink-0 place-items-center border rounded-xl text-neutral-400 dark:text-neutral-500"
+    class="tile relative grid size-11 shrink-0 place-items-center border rounded-xl text-neutral-400 dark:text-neutral-500"
     :class="props.dashed
       ? 'border-dashed border-neutral-300 bg-transparent dark:border-neutral-600'
       : 'border-neutral-200 bg-white dark:border-neutral-700/80 dark:bg-neutral-800'"
   >
     <slot />
+    <span
+      v-if="props.linked"
+      class="absolute grid size-4 place-items-center border border-neutral-200 rounded-full bg-neutral-50 text-neutral-400 -right-1.5 -top-1.5 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-500"
+      aria-hidden="true"
+    >
+      <Icon name="uil:arrow-up-right" class="size-3" />
+    </span>
   </component>
 </template>
 
