@@ -45,7 +45,7 @@ const PUB_IMAGE = {
         </template>
       </span>
       <span class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-        <span class="whitespace-nowrap border border-neutral-300 rounded-full px-2 py-0.5 text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">{{ publication.venue }}</span>
+        <Chip tone="outline">{{ publication.venue }}</Chip>
         <span v-if="publication.award" class="text-amber-800/80 dark:text-amber-300/70">{{ publication.award }}</span>
       </span>
     </span>

@@ -46,6 +46,8 @@ const lineOf = (step: Step) => logLine(events, step, summary, CELL_PARTS)
 
 const lines = computed(() => steps.value.map(step => ({
   step,
+  // Only acts of the same kind merge: the first one gives the colour of the whole line
+  color: KIND_COLORS[kindOf(events[step.first]!.type)],
   // The span of the timeline the line stands for
   from: at(spans[step.first]![0]),
   to: at(spans[step.last]![1]),
@@ -77,36 +79,29 @@ const rows = computed(() => steps.value.flatMap((step): Row[] => {
   return [head, ...within(events, step).map((act): Row => ({ key: `${step.first}.${act.first}`, step: act, line: lineOf(act), child: true, group: false, open: false }))]
 }))
 
-// The acts of the line the pointer is on, or of the one clicked to stay
+// The acts of the line the pointer is on
 interface Range { first: number, last: number }
 
-const hovered = ref<Range | null>(null)
-const picked = ref<Range | null>(null)
-const lit = computed(() => hovered.value ?? picked.value)
+const lit = ref<Range | null>(null)
 
 const same = (a: Range, b: Range | null) => a.first === b?.first && a.last === b.last
-const hover = (step: Range | null) => hovered.value = step && { first: step.first, last: step.last }
-const pick = (step: Range) => picked.value = same(step, picked.value) ? null : { first: step.first, last: step.last }
+const hover = (step: Range | null) => lit.value = step && { first: step.first, last: step.last }
 const stateOf = (step: Range) => same(step, lit.value) ? 'current' : 'past'
 
 function toggle(step: Step) {
   // What was pointed at inside the line goes away with it
-  hovered.value = null
+  lit.value = null
   if (!unfolded.delete(step.first))
     unfolded.add(step.first)
-  else if (picked.value && !same(picked.value, step))
-    picked.value = null
 }
 
-// A line that no longer exists after the gap moved is not picked any more, nor unfolded
+// A line that no longer exists after the gap moved is not unfolded any more
 watch(steps, (next) => {
   for (const first of unfolded) {
     if (!next.some(step => step.first === first && step.last > step.first))
       unfolded.delete(first)
   }
-  const range = picked.value
-  if (range && !next.some(step => same(step, range) || (range.first === range.last && step.first <= range.first && range.first <= step.last && unfolded.has(step.first))))
-    picked.value = null
+  lit.value = null
 })
 
 const ticks = events.map((event, index) => ({
@@ -121,8 +116,8 @@ const dimmed = (index: number) => lit.value !== null && (index < lit.value.first
 </script>
 
 <template>
-  <figure class="my-8 flex flex-col gap-3">
-    <div class="min-w-0 flex flex-col gap-2.5 border border-neutral-200 rounded-xl px-3 py-2.5 dark:border-neutral-700/80 dark:bg-neutral-800/40">
+  <figure class="my-8 flex flex-col select-none gap-3">
+    <Panel class="min-w-0 flex flex-col gap-2.5">
       <p class="m-0 flex items-baseline justify-between gap-2 text-[13px] font-medium">
         <span>The acts, on time</span>
         <span class="tabular-nums text-neutral-500 font-normal dark:text-neutral-400">{{ events.length }} acts in {{ mmss(end) }}</span>
@@ -133,10 +128,10 @@ const dimmed = (index: number) => lit.value !== null && (index < lit.value.first
           <span
             v-for="item in lines"
             :key="item.step.first"
-            class="bracket absolute bottom-1.5 top-1.5 box-content border-[1.5px] border-transparent rounded-md px-[5px] -mx-[5px] data-[group=true]:border-neutral-400/55 data-[on=true]:border-neutral-900 data-[on=true]:bg-neutral-400/18 dark:data-[on=true]:border-neutral-100"
+            class="bracket absolute bottom-1.5 top-1.5 box-content border-[1.5px] border-transparent rounded-md px-[5px] -mx-[5px] data-[group=true]:border-[color-mix(in_srgb,var(--kind)_55%,transparent)] data-[on=true]:border-[var(--kind)] data-[on=true]:bg-neutral-400/18"
             :data-on="lit !== null && lit.first <= item.step.last && lit.last >= item.step.first"
             :data-group="item.step.last > item.step.first"
-            :style="{ left: `${item.from}%`, width: `${item.to - item.from}%` }"
+            :style="{ 'left': `${item.from}%`, 'width': `${item.to - item.from}%`, '--kind': item.color }"
           />
         </TransitionGroup>
         <span
@@ -148,22 +143,15 @@ const dimmed = (index: number) => lit.value !== null && (index < lit.value.first
         />
       </div>
 
-      <label class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[13px]">
-        <span>Acts closer than</span>
-        <input
-          v-model.number="gap"
-          class="[accent-color:rgb(115_115_115)] max-w-56 min-w-24 flex-[1_1_8rem] focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:outline-solid dark:focus-visible:outline-neutral-100"
-          type="range" min="0"
-          max="4"
-          step="0.5"
-          :aria-valuetext="`${gap.toFixed(1)} seconds`"
-        >
-        <output class="tabular-nums min-w-[2.2rem] font-medium">{{ gap.toFixed(1) }} s</output>
-        <span>are one line</span>
-      </label>
-    </div>
+      <RangeInput v-model="gap" :min="0" :max="4" :step="0.5">
+        Acts closer than
+        <template #after>
+          are one line
+        </template>
+      </RangeInput>
+    </Panel>
 
-    <div class="min-w-0 flex flex-col gap-2.5 border border-neutral-200 rounded-xl px-3 py-2.5 dark:border-neutral-700/80 dark:bg-neutral-800/40">
+    <Panel class="min-w-0 flex flex-col gap-2.5">
       <p class="m-0 flex items-baseline justify-between gap-2 text-[13px] font-medium">
         <span>The log</span>
         <span class="tabular-nums text-neutral-500 font-normal dark:text-neutral-400">{{ lines.length }} lines</span>
@@ -193,14 +181,12 @@ const dimmed = (index: number) => lit.value !== null && (index < lit.value.first
             :state="stateOf(row.step)"
             :open="row.open"
             :compact="row.child"
-            :aria-pressed="same(row.step, picked)"
             @pointerenter="hover(row.step)"
             @pointerleave="hover(null)"
-            @click="pick(row.step)"
           />
         </li>
       </TransitionGroup>
-    </div>
+    </Panel>
   </figure>
 </template>
 

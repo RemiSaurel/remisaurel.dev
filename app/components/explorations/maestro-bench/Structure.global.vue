@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useIntersectionObserver } from '@vueuse/core'
+import { useIntersectionObserver, useRafFn } from '@vueuse/core'
 
 // How a study is structured in MAESTRO-bench, drawn like the trace of a request: the study holds a
 // batch, the batch holds experiments, an experiment is launched as executions. Bars are time. The
 // batch runs two experiments at once and the others wait for a free slot, like a setting says.
-// Running an experiment again adds an execution to it. Nothing is real here: the study is an
-// example and every value is synthetic.
+// Running an experiment again adds an execution to it. The timeline is a clock of its own, so it
+// can be paused and sped up. Nothing is real here: the study is an example and every value is synthetic.
 type Level = 'study' | 'batch' | 'experiment' | 'execution'
 
 interface Execution {
@@ -13,8 +13,8 @@ interface Execution {
   // Start and end on the timeline, in time units
   start: number
   end: number
-  // Just added by a click: it plays on its own, at once
-  fresh: boolean
+  // Just added by a click: it plays on its own, from the time it was added
+  born?: number
 }
 
 interface Experiment {
@@ -34,7 +34,7 @@ interface Row {
   name: string
   start: number
   end: number
-  fresh?: boolean
+  born?: number
   experiment?: Experiment
   // Position of an execution among those of its experiment
   index?: number
@@ -68,7 +68,7 @@ const MODELS = {
   claude: { label: 'Claude', icon: 'logos:claude-icon', full: 'claude-sonnet' },
 } as const
 
-const execution = (id: string, start: number, end: number): Execution => ({ id, start, end, fresh: false })
+const execution = (id: string, start: number, end: number): Execution => ({ id, start, end })
 
 const experiments = ref<Experiment[]>([
   { id: 'm2', name: 'Mistral · prompt v2', model: 'mistral', prompt: 'v2', start: 0, executions: [execution('m2-1', 0, 40)] },
@@ -82,8 +82,9 @@ const open = ref('m2')
 
 const MAX_EXECUTIONS = 3
 const RERUN_LENGTH = 30
-// Seconds of animation per time unit: slow enough to follow what waits and what runs
+// Seconds per time unit at normal speed: slow enough to follow what waits and what runs
 const UNIT = 0.06
+const SPEEDS = [1, 1.5, 2]
 
 const endOf = (experiment: Experiment) => experiment.executions.at(-1)!.end
 
@@ -103,7 +104,7 @@ const rows = computed<Row[]>(() => [
       name: `Execution ${index + 1}`,
       start: run.start,
       end: run.end,
-      fresh: run.fresh,
+      born: run.born,
       experiment,
       index,
     })),
@@ -142,23 +143,56 @@ const selected = ref('study')
 const current = computed(() => rows.value.find(row => row.id === selected.value) ?? rows.value[0]!)
 const info = computed(() => LEVELS[current.value.level])
 
+// The timeline is a clock, in time units: CSS animations can't be paused or sped up mid-flight.
+// The cursor sweeps the study's own timeline once (up to `sweepEnd`), and an execution added by a click
+// runs on from the time it was born, after the clock has run out the rest.
+const { prefersReducedMotion } = usePrefersReducedMotion()
+const time = ref(0)
+const sweepEnd = ref(0)
+const playing = ref(false)
+const speed = ref(1)
+
+// Where the clock stops: the end of the study, or of the execution added last
+const horizon = computed(() => Math.max(domain.value, ...experiments.value.flatMap(experiment => experiment.executions.map(one => (one.born === undefined ? 0 : one.born + one.end - one.start)))))
+
+const { pause: stopClock, resume: startClock } = useRafFn(({ delta }) => {
+  time.value = Math.min(time.value + (Math.min(delta, 100) / 1000) * speed.value / UNIT, horizon.value)
+  if (time.value >= horizon.value)
+    playing.value = false
+}, { immediate: false })
+
+watch(playing, on => (on ? startClock() : stopClock()))
+
+// How much of a bar is drawn: it fills over its own length, from its start (or from when it was born)
+const progress = (start: number, end: number, born = start) => Math.min(1, Math.max(0, (time.value - born) / (end - start)))
+
 // The timeline plays when it comes into view, and again on demand. Once it has played, only what
 // is added afterwards moves
-const run = ref(0)
-const settled = ref(false)
-let timer: ReturnType<typeof setTimeout> | undefined
-
 function play() {
-  clearTimeout(timer)
   for (const experiment of experiments.value) {
     for (const one of experiment.executions)
-      one.fresh = false
+      one.born = undefined
   }
-  settled.value = false
-  run.value++
-  timer = setTimeout(() => {
-    settled.value = true
-  }, domain.value * UNIT * 1000 + 300)
+  time.value = 0
+  sweepEnd.value = domain.value
+  // Under reduced motion it is drawn at once, with no clock
+  if (prefersReducedMotion.value)
+    time.value = horizon.value
+  else
+    playing.value = true
+}
+
+function togglePlay() {
+  if (playing.value)
+    playing.value = false
+  else if (time.value >= horizon.value)
+    play()
+  else
+    playing.value = true
+}
+
+function cycleSpeed() {
+  speed.value = SPEEDS[(SPEEDS.indexOf(speed.value) + 1) % SPEEDS.length]!
 }
 
 function toggle(experiment: Experiment) {
@@ -171,11 +205,14 @@ function toggle(experiment: Experiment) {
 function runAgain(experiment: Experiment) {
   if (experiment.executions.length >= MAX_EXECUTIONS)
     return
-  clearTimeout(timer)
-  settled.value = true
+  // What was running is drawn at once, and only the new execution moves
+  time.value = Math.max(time.value, horizon.value)
+  sweepEnd.value = 0
   open.value = experiment.id
   const start = endOf(experiment)
-  experiment.executions.push({ id: `${experiment.id}-${experiment.executions.length + 1}`, start, end: start + RERUN_LENGTH, fresh: true })
+  const born = prefersReducedMotion.value ? time.value - RERUN_LENGTH : time.value
+  experiment.executions.push({ id: `${experiment.id}-${experiment.executions.length + 1}`, start, end: start + RERUN_LENGTH, born })
+  playing.value = !prefersReducedMotion.value
 }
 
 const trace = ref<HTMLElement>()
@@ -186,8 +223,6 @@ const { stop } = useIntersectionObserver(trace, ([entry]) => {
   }
 }, { threshold: 0.4 })
 
-onBeforeUnmount(() => clearTimeout(timer))
-
 const percent = (units: number) => `${(units / domain.value) * 100}%`
 </script>
 
@@ -195,13 +230,18 @@ const percent = (units: number) => `${(units / domain.value) * 100}%`
   <div class="structure my-8 flex flex-col gap-4">
     <div class="flex items-center justify-between gap-3 text-[13px] text-neutral-500 dark:text-neutral-400">
       <span>Click a row to see what it holds</span>
-      <button type="button" class="inline-flex items-center gap-[5px] rounded-[7px] px-[8px] py-[3px] transition-[background-color] duration-[180ms] ease-[var(--ease-out)] active:scale-[0.97] hover:bg-neutral-400/16 [@media(prefers-reduced-motion:reduce)]:transition-none" @click="play">
-        <Icon name="lucide:rotate-ccw" class="size-3.5" aria-hidden="true" />
-        Replay
-      </button>
+      <div class="flex items-center gap-1">
+        <PlayButton :playing="playing" variant="ghost" @click="togglePlay" />
+        <TextButton size="md" aria-label="Speed" @click="cycleSpeed">
+          <span class="tabular-nums w-[2.5ch] text-center">{{ speed }}×</span>
+        </TextButton>
+        <TextButton icon="lucide:rotate-ccw" size="sm" @click="play">
+          Replay
+        </TextButton>
+      </div>
     </div>
 
-    <ul ref="trace" class="trace list-none relative m-0 overflow-hidden border border-neutral-200 rounded-[12px] border-solid bg-white p-0 dark:border-neutral-700/80 dark:bg-neutral-800/40" :data-settled="settled" :style="{ '--span': `${domain * UNIT}s`, '--unit': `${UNIT}s` }">
+    <ul ref="trace" class="trace list-none relative m-0 overflow-hidden border border-neutral-200 rounded-[12px] border-solid bg-white p-0 dark:border-neutral-700/80 dark:bg-neutral-800/40">
       <li v-for="{ row, guides } in guided" :key="row.id" class="m-0 p-0">
         <div
           class="row grid grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] h-[40px] cursor-pointer items-center pl-[8px] pr-[12px] text-[14px]"
@@ -226,7 +266,7 @@ const percent = (units: number) => `${(units / domain.value) * 100}%`
                 :aria-label="open === row.experiment!.id ? 'Fold the executions' : `Show the ${row.experiment!.executions.length} executions`"
                 @click.stop="toggle(row.experiment!)"
               >
-                <Icon name="lucide:chevron-right" class="size-3.5 data-[open=true]:rotate-90" :data-open="open === row.experiment!.id" aria-hidden="true" />
+                <Icon name="lucide:chevron-right" class="chevron size-3.5" :data-open="open === row.experiment!.id" aria-hidden="true" />
                 {{ row.experiment!.executions.length }}
               </button>
               <button
@@ -242,22 +282,21 @@ const percent = (units: number) => `${(units / domain.value) * 100}%`
             </span>
           </span>
 
-          <!-- The bar is replayed by changing the key: it waits dashed, then fills over its own time -->
-          <span v-if="row.level !== 'study'" :key="run" class="relative h-[14px]" aria-hidden="true">
-            <span v-if="row.level === 'experiment' && row.start > 0" class="wait absolute left-0 top-1/2 h-0 border-t border-neutral-400 border-dashed" :style="{ 'width': percent(row.start), '--from': row.start }" />
+          <!-- The bar waits dashed, then fills over its own time, as the clock reaches it -->
+          <span v-if="row.level !== 'study'" class="relative h-[14px]" aria-hidden="true">
+            <span v-if="row.level === 'experiment' && row.start > 0" class="wait absolute left-0 top-1/2 h-0 border-t border-neutral-400 border-dashed" :style="{ width: percent(row.start), clipPath: `inset(0 ${(1 - progress(0, row.start)) * 100}% 0 0)` }" />
             <span
               class="bar absolute inset-y-[2px] origin-left rounded-[4px]"
               :class="row.level === 'batch' ? 'bg-[rgb(var(--tint)/0.6)]' : 'bg-[rgb(var(--tint)/0.75)]'"
-              :data-fresh="row.fresh"
-              :style="{ 'left': percent(row.start), 'width': percent(row.end - row.start), '--from': row.fresh ? 0 : row.start, '--len': row.end - row.start }"
+              :style="{ left: percent(row.start), width: percent(row.end - row.start), transform: `scaleX(${progress(row.start, row.end, row.born)})` }"
             />
           </span>
         </div>
       </li>
 
       <!-- The time cursor sweeps over the lanes -->
-      <li :key="run" class="cursor" aria-hidden="true">
-        <span class="line" />
+      <li v-if="time < sweepEnd" class="cursor" aria-hidden="true">
+        <span class="line" :style="{ left: percent(time) }" />
       </li>
     </ul>
 
@@ -352,6 +391,21 @@ const percent = (units: number) => `${(units / domain.value) * 100}%`
   outline-offset: 1px;
 }
 
+/* Not `rotate-90`: UnoCSS and Tailwind both generate it, and the two turns add up to a half turn */
+.chevron {
+  transition: rotate 160ms var(--ease-out);
+}
+
+.chevron[data-open='true'] {
+  rotate: 90deg;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron {
+    transition: none;
+  }
+}
+
 /* One cell per level above the row: the lines that join a row to its parent and its siblings */
 .guide[data-guide='pass']::before,
 .guide[data-guide='tee']::before,
@@ -378,43 +432,6 @@ const percent = (units: number) => `${(units / domain.value) * 100}%`
   border-top: 1px solid rgb(var(--line));
 }
 
-/* Waiting for a free slot */
-.wait {
-  /* Grows with the cursor: it is the time spent waiting, up to the start of the bar */
-  animation: reveal calc(var(--from) * var(--unit)) linear backwards;
-}
-
-.bar {
-  /* Starts when the cursor reaches it, and takes as long as its width */
-  animation: fill calc(var(--len) * var(--unit)) linear calc(var(--from) * var(--unit)) backwards;
-}
-
-.trace[data-settled='true'] .bar:not([data-fresh='true']),
-.trace[data-settled='true'] .wait {
-  animation: none;
-}
-
-.trace[data-settled='true'] .cursor {
-  display: none;
-}
-
-@keyframes fill {
-  from {
-    transform: scaleX(0);
-  }
-}
-
-/* Both ends are insets: an inset cannot be animated to `none` */
-@keyframes reveal {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-
 /* The cursor covers the lane column only: same split as the rows, minus their padding */
 .cursor {
   position: absolute;
@@ -434,13 +451,6 @@ const percent = (units: number) => `${(units / domain.value) * 100}%`
   left: 0;
   width: 1px;
   background: rgb(59 130 246 / 0.6);
-  animation: sweep var(--span) linear forwards;
-}
-
-@keyframes sweep {
-  to {
-    left: 100%;
-  }
 }
 
 /* Tags: a tinted border and background, a darker text of the same hue */
@@ -493,11 +503,6 @@ const percent = (units: number) => `${(units / domain.value) * 100}%`
 @media (prefers-reduced-motion: reduce) {
   .cursor {
     display: none;
-  }
-
-  .wait,
-  .bar {
-    animation: none;
   }
 }
 </style>

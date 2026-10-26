@@ -38,7 +38,7 @@ const ITERATIONS: Iteration[] = [
 
 const MODEL_ICONS = { mistral: 'logos:mistral-ai-icon', claude: 'logos:claude-icon' } as const
 
-const player = useFlowPlayer()
+const player = useFlowPlayer({ autoplay: true })
 const { row, completed } = useFlowDemo(graph, player, { rows: ITERATIONS.length, continuous: true })
 const selected = ref<string | null>(null)
 

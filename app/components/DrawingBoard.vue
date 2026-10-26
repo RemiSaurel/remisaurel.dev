@@ -32,6 +32,8 @@ const props = withDefaults(defineProps<DrawingBoardProps>(), {
 })
 
 defineSlots<{
+  /** At the end of the toolbar, after undo, redo and clear: the page's own actions, as `tool` buttons */
+  actions?: () => any
   /** In the foot of the sheet, beside the replay */
   stats?: () => any
 }>()
@@ -528,6 +530,10 @@ onBeforeUnmount(stop)
           <Icon name="lucide:trash-2" class="size-4" aria-hidden="true" />
         </button>
       </div>
+
+      <div v-if="$slots.actions" class="group">
+        <slot name="actions" />
+      </div>
     </div>
 
     <div class="paper" :data-replaying="replaying">
@@ -662,7 +668,7 @@ onBeforeUnmount(stop)
               />
             </div>
             <button type="button" class="inspector-delete" @click="deleteInspected">
-              <Icon name="lucide:trash-2" class="size-3.5" aria-hidden="true" />
+              <Icon name="lucide:trash-2" class="size-3.5 -translate-y-[0.5px]" aria-hidden="true" />
               Delete this label
             </button>
           </div>
@@ -758,7 +764,9 @@ onBeforeUnmount(stop)
   opacity: 0.35;
 }
 
-.tool {
+/* Slotted: the page's actions in the toolbar look like the board's own */
+.tool,
+:slotted(.tool) {
   position: relative;
   display: grid;
   place-items: center;
@@ -774,20 +782,24 @@ onBeforeUnmount(stop)
     scale 160ms var(--ease-out);
 }
 
-.dark .tool {
+.dark .tool,
+.dark :slotted(.tool) {
   color: rgb(163 163 163);
 }
 
-.tool:active:not(:disabled) {
+.tool:active:not(:disabled),
+:slotted(.tool:active:not(:disabled)) {
   scale: 0.94;
 }
 
-.tool:disabled {
+.tool:disabled,
+:slotted(.tool:disabled) {
   opacity: 0.35;
   cursor: default;
 }
 
 .tool:focus-visible,
+:slotted(.tool:focus-visible),
 .replay:focus-visible,
 .board-surface:focus-visible,
 .scrubber:focus-visible,
@@ -798,7 +810,8 @@ onBeforeUnmount(stop)
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .tool:hover:not(:disabled) {
+  .tool:hover:not(:disabled),
+  :slotted(.tool:hover:not(:disabled)) {
     background: rgb(163 163 163 / 0.2);
   }
 }
@@ -923,10 +936,6 @@ onBeforeUnmount(stop)
   user-select: none;
   -webkit-user-select: none;
   outline-offset: -2px;
-}
-
-.board-surface[data-mode='label'] {
-  cursor: text;
 }
 
 .paper[data-replaying='true'] .board-surface,
@@ -1163,7 +1172,7 @@ onBeforeUnmount(stop)
   width: 224px;
   flex-direction: column;
   gap: 12px;
-  padding: 12px;
+  padding: 4px;
 }
 
 .inspector-name {
@@ -1181,13 +1190,17 @@ onBeforeUnmount(stop)
   color: rgb(245 245 245);
 }
 
+/* Inside the field: outside, the ring would crowd the edge of the popover */
 .inspector-name:focus {
   outline: 2px solid rgb(59 130 246);
+  outline-offset: -2px;
 }
 
 .inspector-inks {
   display: flex;
   justify-content: space-between;
+  /* Room for the ring of the colour in hand, which would otherwise touch the edge */
+  padding: 0 4px;
 }
 
 .inspector-ink {
@@ -1313,6 +1326,7 @@ onBeforeUnmount(stop)
 
 @media (prefers-reduced-motion: reduce) {
   .tool,
+  :slotted(.tool),
   .replay,
   .toolbar,
   .group,

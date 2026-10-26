@@ -562,34 +562,6 @@ async function toggleExpanded() {
 
 onBeforeUnmount(() => (scrollLock.value = false))
 
-// --- Playback ---
-
-const SPEEDS = [0.5, 1, 2]
-
-function cycleSpeed() {
-  if (!props.player)
-    return
-  const at = SPEEDS.indexOf(props.player.speed.value)
-  props.player.setSpeed(SPEEDS[(at + 1) % SPEEDS.length]!)
-  play('tap', { emphasis: 'subtle' })
-}
-
-function togglePlay() {
-  if (!props.player)
-    return
-  props.player.toggle()
-  play('toggle', { direction: props.player.playing.value ? 'forward' : 'back', emphasis: 'subtle' })
-}
-
-// One beat at a time: pauses, then runs to the next thing that resolves
-function stepPlay() {
-  if (!props.player)
-    return
-  props.player.step()
-  hasPlayed.value = true
-  play('tap', { emphasis: 'subtle' })
-}
-
 const STATUS_LABEL: Record<FlowStatus, string> = { idle: 'Waiting', running: 'Running', done: 'Done', error: 'Failed' }
 </script>
 
@@ -605,6 +577,7 @@ const STATUS_LABEL: Record<FlowStatus, string> = { idle: 'Waiting', running: 'Ru
           <slot name="inspector" v-bind="scope" />
         </template>
       </FlowStack>
+      <FlowControls v-if="player" :player="player" :step="false" :inviting="!hasPlayed" class="ml-auto mt-6 w-fit" tips="top-end" />
     </div>
 
     <div class="hidden md:block" :style="{ height: `${height}px` }">
@@ -752,15 +725,7 @@ const STATUS_LABEL: Record<FlowStatus, string> = { idle: 'Waiting', running: 'Ru
               :style="{ right: `${selectedNode ? PANEL + 12 : 12}px` }"
             >
               <!-- A flow that starts paused pulses its play button, until it has been played once -->
-              <FlowToolbar tips="top-end" :class="{ 'is-inviting': !hasPlayed }">
-                <FlowButton :label="player.playing.value ? 'Pause' : 'Play'" :pressed="player.playing.value" @click="togglePlay">
-                  <FlowIconSwap :icons="['lucide:play', 'lucide:pause']" :active="player.playing.value ? 1 : 0" />
-                </FlowButton>
-                <FlowButton label="Next step" icon="lucide:step-forward" @click="stepPlay" />
-                <FlowButton label="Speed" @click="cycleSpeed">
-                  <span class="tabular-nums w-7 text-center text-[11px] font-medium">{{ player.speed.value }}×</span>
-                </FlowButton>
-              </FlowToolbar>
+              <FlowControls :player="player" :inviting="!hasPlayed" @step="hasPlayed = true" />
             </div>
 
             <!-- The keyboard changes what the panel shows while focus stays on the node: say it -->
@@ -811,19 +776,6 @@ const STATUS_LABEL: Record<FlowStatus, string> = { idle: 'Waiting', running: 'Ru
 </template>
 
 <style scoped>
-.is-inviting {
-  animation: flow-invite 1.6s ease-out infinite;
-}
-
-@keyframes flow-invite {
-  0% { box-shadow: 0 0 0 0 rgb(59 130 246 / 0.35); }
-  70%, 100% { box-shadow: 0 0 0 8px rgb(59 130 246 / 0); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .is-inviting { animation: none; }
-}
-
 .flow-root {
   --flow-line: rgb(163 163 163);
   --flow-ink: rgb(23 23 23);

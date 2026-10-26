@@ -107,15 +107,15 @@ function pickSwatch(color: string) {
           <Transition name="mode" mode="out-in">
             <div :key="mode" class="flex items-center" :class="{ 'gap-0': mode === 'main', 'gap-1': mode !== 'main', 'pr-2': mode === 'palette' }">
               <template v-if="mode === 'main'">
-                <button
-                  type="button"
-                  class="h-8 w-8 flex pressable items-center justify-center rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700"
-                  aria-label="Highlight colour"
+                <IconButton
+                  variant="ghost"
+                  round
+                  label="Highlight colour"
                   @pointerdown.prevent
                   @click="mode = 'palette'"
                 >
                   <span class="h-5 w-5 rounded-full ring-1 ring-black/15 dark:ring-white/20" :style="{ backgroundColor: color }" />
-                </button>
+                </IconButton>
                 <button
                   v-if="existing"
                   type="button"
@@ -139,15 +139,15 @@ function pickSwatch(color: string) {
               </template>
 
               <template v-else-if="mode === 'palette'">
-                <button
-                  type="button"
-                  class="h-8 w-8 flex pressable items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
-                  aria-label="Back"
+                <IconButton
+                  variant="ghost"
+                  round
+                  label="Back"
                   @pointerdown.prevent
                   @click="mode = 'main'"
                 >
-                  <Icon name="uil:angle-left" class="h-5 w-5" />
-                </button>
+                  <Icon name="uil:angle-left" class="size-5" />
+                </IconButton>
                 <button
                   v-for="(swatch, i) in HIGHLIGHT_SWATCHES"
                   :key="swatch"
@@ -174,15 +174,15 @@ function pickSwatch(color: string) {
               </template>
 
               <template v-else>
-                <button
-                  type="button"
-                  class="h-8 w-8 flex pressable items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
-                  aria-label="Back to colours"
+                <IconButton
+                  variant="ghost"
+                  round
+                  label="Back to colours"
                   @pointerdown.prevent
                   @click="mode = 'palette'"
                 >
-                  <Icon name="uil:angle-left" class="h-5 w-5" />
-                </button>
+                  <Icon name="uil:angle-left" class="size-5" />
+                </IconButton>
                 <input
                   type="range"
                   min="0"

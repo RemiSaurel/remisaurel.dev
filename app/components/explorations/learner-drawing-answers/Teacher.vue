@@ -236,14 +236,12 @@ const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`
 
     <template v-else>
       <!-- The recording: play it, or move along the timeline to a moment -->
-      <section class="min-w-0 flex flex-col gap-2 border border-neutral-200 rounded-xl px-3 py-[10px] dark:border-neutral-700/80 dark:bg-neutral-800/40" aria-label="The session">
+      <Panel as="section" class="min-w-0 flex flex-col gap-2" aria-label="The session">
         <div class="flex items-center gap-x-3">
-          <button type="button" class="[transition-property:scale] grid size-8 shrink-0 place-items-center rounded-lg bg-neutral-900 text-white duration-[160ms] ease-[var(--ease-out)] active:[scale:0.94] dark:bg-neutral-100 dark:text-neutral-900 focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:outline-solid [@media(prefers-reduced-motion:reduce)]:transition-none dark:focus-visible:outline-neutral-100" :aria-label="playing ? 'Pause' : 'Play the session'" @click="playing ? stop() : play()">
-            <Icon :name="playing ? 'lucide:pause' : 'lucide:play'" class="size-4" aria-hidden="true" />
-          </button>
+          <PlayButton :playing="playing" play-label="Play the session" @click="playing ? stop() : play()" />
 
           <div
-            class="[touch-action:none] min-w-0 flex-[1_1_180px] cursor-pointer select-none rounded-lg px-[7px] py-1 focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:outline-solid dark:focus-visible:outline-neutral-100"
+            class="[touch-action:none] min-w-0 flex-[1_1_180px] cursor-pointer select-none rounded-lg px-[7px] py-1 keyboard-focus"
             role="slider"
             tabindex="0"
             aria-label="Position in the session"
@@ -282,73 +280,71 @@ const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`
             </span>
           </div>
         </div>
-      </section>
+      </Panel>
 
-      <div class="grid items-start gap-3 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-        <section class="min-w-0 flex flex-col gap-2 border border-neutral-200 rounded-xl px-3 py-[10px] dark:border-neutral-700/80 dark:bg-neutral-800/40" aria-label="Parts named">
-          <p class="m-0 flex items-baseline justify-between gap-2 text-[13px] font-medium">
-            <span>Parts named</span>
-            <span class="tabular-nums text-neutral-500 font-normal dark:text-neutral-400">{{ namedCount }} of {{ parts.length }}</span>
-          </p>
-          <ul class="list-none m-0 flex flex-col gap-0.5 p-0">
-            <li v-for="part in parts" :key="part.id">
-              <!-- A named part can be pointed at: its labels light up on the sheet -->
-              <button
-                type="button"
-                class="[transition-property:background-color] min-w-0 w-full flex items-center gap-2 rounded-[6px] px-[6px] py-[3px] text-left text-[13px] duration-[120ms] ease-[var(--ease-out)] disabled:cursor-default aria-[pressed=true]:bg-neutral-400/18 focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:outline-solid [@media(prefers-reduced-motion:reduce)]:transition-none hover:enabled:bg-neutral-400/14 dark:focus-visible:outline-neutral-100"
-                :data-named="part.named.length > 0"
-                :aria-pressed="part.named.length ? picked === part.id : undefined"
-                :disabled="!part.named.length"
-                @pointerenter="hovered = part.id"
-                @pointerleave="hovered = null"
-                @click="pick(part.id)"
-              >
-                <Icon :name="part.named.length ? 'lucide:circle-check' : 'lucide:circle'" class="size-4 shrink-0" :class="part.named.length ? 'text-emerald-500' : 'text-neutral-400/70'" aria-hidden="true" />
-                <span :class="!part.named.length && 'text-neutral-500 dark:text-neutral-400'">{{ part.name }}</span>
-                <span v-if="part.named.length" class="ml-auto min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[12px] text-neutral-500 dark:text-neutral-400">{{ part.named.map(label => label.text).join(', ') }}</span>
-                <span v-else class="sr-only">not named</span>
-              </button>
-            </li>
-          </ul>
-          <p v-if="unmatched.length" class="m-0 text-[13px] text-neutral-500 dark:text-neutral-400">
-            Names no part: {{ unmatched.join(', ') }}
-          </p>
-        </section>
+      <!-- The parts, in one line: they are a checklist, the log is what there is to read -->
+      <Panel as="section" class="min-w-0 flex flex-wrap items-center gap-x-1.5 gap-y-1" padding="sm" aria-label="Parts named">
+        <p class="m-0 mr-1.5 flex items-baseline gap-2 text-[13px] font-medium">
+          <span>Parts named</span>
+          <span class="tabular-nums text-neutral-500 font-normal dark:text-neutral-400">{{ namedCount }} of {{ parts.length }}</span>
+        </p>
+        <!-- A named part can be pointed at: its labels light up on the sheet -->
+        <button
+          v-for="part in parts"
+          :key="part.id"
+          type="button"
+          class="[transition-property:background-color] min-w-0 flex items-center gap-1.5 border border-neutral-200 rounded-full py-0.5 pl-1.5 pr-2.5 text-left text-[12px] keyboard-focus duration-[120ms] ease-[var(--ease-out)] disabled:cursor-default dark:border-neutral-700/80 aria-[pressed=true]:bg-neutral-400/18 [@media(prefers-reduced-motion:reduce)]:transition-none hover:enabled:bg-neutral-400/14"
+          :data-named="part.named.length > 0"
+          :aria-pressed="part.named.length ? picked === part.id : undefined"
+          :disabled="!part.named.length"
+          :title="part.named.length ? part.named.map(label => label.text).join(', ') : undefined"
+          @pointerenter="hovered = part.id"
+          @pointerleave="hovered = null"
+          @click="pick(part.id)"
+        >
+          <Icon :name="part.named.length ? 'lucide:circle-check' : 'lucide:circle'" class="size-3.5 shrink-0" :class="part.named.length ? 'text-emerald-500' : 'text-neutral-400/70'" aria-hidden="true" />
+          <span :class="!part.named.length && 'text-neutral-500 dark:text-neutral-400'">{{ part.name }}</span>
+          <span v-if="part.named.length" class="max-w-32 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-neutral-500 dark:text-neutral-400">{{ part.named.map(label => label.text).join(', ') }}</span>
+          <span v-else class="sr-only">not named</span>
+        </button>
+        <p v-if="unmatched.length" class="m-0 text-[12px] text-neutral-500 dark:text-neutral-400">
+          Names no part: {{ unmatched.join(', ') }}
+        </p>
+      </Panel>
 
-        <!-- Every act, and each ask for help with what led to it -->
-        <section class="min-w-0 flex flex-col gap-2 border border-neutral-200 rounded-xl px-3 py-[10px] dark:border-neutral-700/80 dark:bg-neutral-800/40" aria-label="The log">
-          <p class="m-0 flex items-baseline justify-between gap-2 text-[13px] font-medium">
-            <span>The log</span>
-            <span class="tabular-nums text-neutral-500 font-normal dark:text-neutral-400">{{ plural(events.length, 'act') }}<template v-if="summary.checks.length">, {{ plural(summary.checks.length, 'check') }}</template></span>
-          </p>
-          <ol ref="log" class="list-none [overscroll-behavior:contain] relative m-0 max-h-56 min-h-40 flex-[1_1_0] overflow-y-auto p-0">
-            <!-- The article styles every li (size, line height, a margin below): a row is its own -->
-            <li
-              v-for="row in rows"
-              :key="row.key"
-              class="row [font-size:inherit] [line-height:inherit] flex items-start"
-              :class="row.child ? 'ml-[11px] mb-0 gap-0 border-l border-neutral-400/45 pl-[22px]' : 'mb-[2px] gap-1'"
-              :data-child="row.child"
+      <!-- Every act, and each ask for help with what led to it -->
+      <Panel as="section" class="min-w-0 flex flex-col gap-2" aria-label="The log">
+        <p class="m-0 flex items-baseline justify-between gap-2 text-[13px] font-medium">
+          <span>The log</span>
+          <span class="tabular-nums text-neutral-500 font-normal dark:text-neutral-400">{{ plural(events.length, 'act') }}<template v-if="summary.checks.length">, {{ plural(summary.checks.length, 'check') }}</template></span>
+        </p>
+        <ol ref="log" class="list-none [overscroll-behavior:contain] relative m-0 max-h-80 min-h-40 flex-[1_1_0] overflow-y-auto p-0">
+          <!-- The article styles every li (size, line height, a margin below): a row is its own -->
+          <li
+            v-for="row in rows"
+            :key="row.key"
+            class="row [font-size:inherit] [line-height:inherit] flex items-start"
+            :class="row.child ? 'ml-[11px] mb-0 gap-0 border-l border-neutral-400/45 pl-[22px]' : 'mb-[2px] gap-1'"
+            :data-child="row.child"
+          >
+            <button
+              v-if="row.group"
+              type="button"
+              class="grid h-[30px] w-[22px] shrink-0 place-items-center rounded-[6px] text-neutral-500 hover:bg-neutral-400/18 dark:text-neutral-400 focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-solid dark:focus-visible:outline-neutral-100 focus-visible:-outline-offset-2"
+              :aria-expanded="row.open"
+              :aria-label="row.open ? 'Fold the acts' : 'Unfold the acts'"
+              @click="toggle(row.step.first)"
             >
-              <button
-                v-if="row.group"
-                type="button"
-                class="grid h-[30px] w-[22px] shrink-0 place-items-center rounded-[6px] text-neutral-500 hover:bg-neutral-400/18 dark:text-neutral-400 focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-solid dark:focus-visible:outline-neutral-100 focus-visible:-outline-offset-2"
-                :aria-expanded="row.open"
-                :aria-label="row.open ? 'Fold the acts' : 'Unfold the acts'"
-                @click="toggle(row.step.first)"
-              >
-                <Icon name="lucide:chevron-right" class="[transition-property:rotate] size-3.5 duration-[160ms] ease-[var(--ease-out)] [@media(prefers-reduced-motion:reduce)]:transition-none" :class="row.open && '[rotate:90deg]'" aria-hidden="true" />
-              </button>
-              <span v-else-if="foldable && !row.child" class="grid h-[30px] w-[22px] shrink-0 place-items-center rounded-[6px] text-neutral-500 dark:text-neutral-400" aria-hidden="true" />
-              <ExplorationsLearnerDrawingAnswersLogEntry :line="row.line" :state="stateOf(row.step)" :open="row.open" :compact="row.child" @click="seek(row.step.t)" />
-            </li>
-          </ol>
-          <p v-if="summary.checks.length && after !== 'nothing'" class="m-0 text-[13px] text-neutral-500 dark:text-neutral-400">
-            After the last check: {{ after }}
-          </p>
-        </section>
-      </div>
+              <Icon name="lucide:chevron-right" class="[transition-property:rotate] size-3.5 duration-[160ms] ease-[var(--ease-out)] [@media(prefers-reduced-motion:reduce)]:transition-none" :class="row.open && '[rotate:90deg]'" aria-hidden="true" />
+            </button>
+            <span v-else-if="foldable && !row.child" class="grid h-[30px] w-[22px] shrink-0 place-items-center rounded-[6px] text-neutral-500 dark:text-neutral-400" aria-hidden="true" />
+            <ExplorationsLearnerDrawingAnswersLogEntry :line="row.line" :state="stateOf(row.step)" :open="row.open" :compact="row.child" @click="seek(row.step.t)" />
+          </li>
+        </ol>
+        <p v-if="summary.checks.length && after !== 'nothing'" class="m-0 text-[13px] text-neutral-500 dark:text-neutral-400">
+          After the last check: {{ after }}
+        </p>
+      </Panel>
     </template>
   </div>
 </template>

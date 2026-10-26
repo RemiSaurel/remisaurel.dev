@@ -9,11 +9,10 @@ function toggleSound() {
 </script>
 
 <template>
-  <button
-    type="button"
-    class="relative h-8 w-8 flex pressable items-center justify-center rounded-lg bg-neutral-100 transition-colors duration-200 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700"
-    :aria-label="isEnabled ? 'Mute sounds' : 'Unmute sounds'"
-    :aria-pressed="isEnabled"
+  <IconButton
+    variant="solid"
+    :label="isEnabled ? 'Mute sounds' : 'Unmute sounds'"
+    :pressed="isEnabled"
     @click="toggleSound"
   >
     <ClientOnly>
@@ -28,7 +27,7 @@ function toggleSound() {
         :style="{ opacity: isEnabled ? 0 : 1, scale: isEnabled ? 0.25 : 1, filter: isEnabled ? 'blur(4px)' : 'blur(0px)' }"
       />
     </ClientOnly>
-  </button>
+  </IconButton>
 </template>
 
 <style scoped>

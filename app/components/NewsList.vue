@@ -125,13 +125,9 @@ function itemEnter(index: number) {
                     <span v-if="item.content" class="text-xs text-neutral-500 dark:text-neutral-400">{{ item.content }}</span>
                   </div>
                   <div class="flex items-center gap-1.5">
-                    <span
-                      v-for="cat in item.categories?.slice(0, 2)"
-                      :key="cat"
-                      class="whitespace-nowrap rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
-                    >
+                    <Chip v-for="cat in item.categories?.slice(0, 2)" :key="cat">
                       {{ cat }}
-                    </span>
+                    </Chip>
                   </div>
                 </div>
               </div>
@@ -147,13 +143,9 @@ function itemEnter(index: number) {
 
                 <div class="flex flex-nowrap items-center justify-end gap-1.5">
                   <div class="flex items-center gap-1">
-                    <span
-                      v-for="cat in item.categories?.slice(0, 2)"
-                      :key="cat"
-                      class="whitespace-nowrap border border-neutral-300 rounded-full px-2 py-0.5 text-xs text-neutral-500 dark:border-neutral-700 dark:text-neutral-400"
-                    >
+                    <Chip v-for="cat in item.categories?.slice(0, 2)" :key="cat" tone="outline">
                       {{ cat }}
-                    </span>
+                    </Chip>
                   </div>
                 </div>
               </div>

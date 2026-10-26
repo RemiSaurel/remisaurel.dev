@@ -59,7 +59,6 @@ const { row, completed } = useFlowDemo(graph, player, { rows: ROWS.length, edgeS
 const selected = ref<string | null>(null)
 const formulaId = ref('mean')
 
-const formulaIndex = computed(() => FORMULAS.findIndex(f => f.id === formulaId.value))
 const formula = computed(() => FORMULAS.find(f => f.id === formulaId.value)!)
 const current = computed(() => ROWS[Math.min(row.value, ROWS.length - 1)]!)
 const scoreOf = (r: Row) => formula.value.run(r.c, r.l)
@@ -135,20 +134,7 @@ const MAX_RMSE = Math.max(...Object.values(RMSES))
         <p class="m-0">
           A formula turns the grades of the agents into one score. Pick one: the table shows what each row would get.
         </p>
-        <div class="relative flex rounded-[9px] bg-neutral-400/15 p-[3px]" role="radiogroup" aria-label="Aggregation formula">
-          <span class="absolute inset-y-[3px] left-[3px] w-[calc((100%-6px)/3)] rounded-[6px] bg-white shadow-[0_1px_2px_rgb(0_0_0/0.12)] transition-transform duration-[250ms] ease-[var(--ease-out)] dark:bg-neutral-700 [@media(prefers-reduced-motion:reduce)]:transition-none" aria-hidden="true" :style="{ transform: `translateX(${formulaIndex * 100}%)` }" />
-          <button
-            v-for="f in FORMULAS"
-            :key="f.id"
-            type="button"
-            role="radio"
-            :aria-checked="f.id === formulaId"
-            class="relative flex-1 rounded-[6px] px-[8px] py-[4px] text-[12px] text-neutral-500 font-medium transition-colors duration-200 ease-[var(--ease-out)] aria-[checked=true]:text-neutral-900 dark:text-neutral-400 [@media(prefers-reduced-motion:reduce)]:transition-none dark:aria-[checked=true]:text-neutral-100"
-            @click="formulaId = f.id"
-          >
-            {{ f.label }}
-          </button>
-        </div>
+        <SegmentedControl v-model="formulaId" label="Aggregation formula" size="sm" :options="FORMULAS" class="w-full" />
         <div class="tabular-nums grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-3 gap-y-1 text-xs">
           <span class="text-neutral-400">row</span>
           <span class="text-neutral-400">c</span>

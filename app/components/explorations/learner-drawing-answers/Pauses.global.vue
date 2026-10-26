@@ -112,16 +112,12 @@ const seconds = (ms: number) => `${Math.round(ms / 1000)} s`
 </script>
 
 <template>
-  <figure class="my-8 flex flex-col gap-2 border border-neutral-200 rounded-xl p-3 dark:border-neutral-700/80 dark:bg-neutral-800/40">
+  <Panel as="figure" padding="lg" class="my-8 flex flex-col select-none gap-2">
     <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-      <button type="button" class="[transition-property:scale,background-color] grid size-8 shrink-0 place-items-center rounded-lg bg-neutral-400/18 text-neutral-600 duration-[160ms] ease-[var(--ease-out)] [@media(prefers-reduced-motion:reduce)]:[transition-property:background-color] active:[scale:0.94] dark:bg-neutral-400/20 hover:bg-neutral-400/30 dark:text-neutral-300 focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:outline-solid dark:focus-visible:outline-neutral-100" :aria-label="playing ? 'Pause' : 'Play the session'" @click="playing ? stop() : play()">
-        <Icon :name="playing ? 'lucide:pause' : 'lucide:play'" class="size-4" aria-hidden="true" />
-      </button>
-      <label class="min-w-0 flex flex-1 flex-wrap items-center gap-x-[10px] gap-y-1 text-[13px]">
-        <span>A pause lasts at most</span>
-        <input v-model.number="cap" type="range" class="[accent-color:rgb(115_115_115)] max-w-56 min-w-20 flex-[1_1_6rem] focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:outline-solid dark:focus-visible:outline-neutral-100" min="0.2" max="10" step="0.2" :aria-valuetext="`${cap.toFixed(1)} seconds`">
-        <output class="tabular-nums min-w-[2.2rem] font-medium">{{ cap.toFixed(1) }} s</output>
-      </label>
+      <PlayButton :playing="playing" play-label="Play the session" @click="playing ? stop() : play()" />
+      <RangeInput v-model="cap" :min="0.2" :max="10" :step="0.2" class="flex-1">
+        A pause lasts at most
+      </RangeInput>
       <SegmentedControl v-model="speed" label="Speed of the recording" :options="SPEEDS" class="shrink-0" />
     </div>
 
@@ -157,7 +153,7 @@ const seconds = (ms: number) => `${Math.round(ms / 1000)} s`
         <span class="tabular-nums text-neutral-500 font-normal dark:text-neutral-400">{{ mmss(played) }}</span>
       </p>
     </div>
-  </figure>
+  </Panel>
 </template>
 
 <style scoped>

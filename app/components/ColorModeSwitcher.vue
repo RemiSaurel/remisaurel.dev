@@ -67,10 +67,9 @@ const isDark = computed(() => colorMode.value === 'dark')
 </script>
 
 <template>
-  <button
-    class="relative h-8 w-8 flex pressable items-center justify-center rounded-lg bg-neutral-100 transition-colors duration-200 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700"
-    type="button"
-    :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+  <IconButton
+    variant="solid"
+    :label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
     @click="toggleColorMode"
   >
     <ClientOnly>
@@ -85,7 +84,7 @@ const isDark = computed(() => colorMode.value === 'dark')
         :style="{ opacity: isDark ? 0 : 1, scale: isDark ? 0.25 : 1, filter: isDark ? 'blur(4px)' : 'blur(0px)' }"
       />
     </ClientOnly>
-  </button>
+  </IconButton>
 </template>
 
 <style scoped>

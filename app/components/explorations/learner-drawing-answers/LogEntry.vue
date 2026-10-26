@@ -27,13 +27,15 @@ const mark = (cell: string) => props.lit ? (props.lit === cell ? 'on' : 'off') :
   <component
     :is="plain ? 'div' : 'button'"
     :type="plain ? undefined : 'button'"
-    class="[transition-property:opacity,background-color] grid grid-cols-[2.25rem_3px_5.5rem_minmax(0,1fr)] min-w-0 flex-1 items-start gap-x-2 gap-y-0 rounded-[6px] p-[6px] text-left duration-[120ms] ease-[var(--ease-out)] focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-solid [@media(prefers-reduced-motion:reduce)]:transition-none dark:focus-visible:outline-neutral-100 focus-visible:-outline-offset-2"
+    class="[transition-property:opacity,background-color] grid grid-cols-[2rem_3px_5.5rem_minmax(0,1fr)] min-w-0 flex-1 items-start gap-x-[6px] gap-y-0 rounded-[6px] p-[6px] text-left duration-[120ms] ease-[var(--ease-out)] focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-solid [@media(prefers-reduced-motion:reduce)]:transition-none dark:focus-visible:outline-neutral-100 focus-visible:-outline-offset-2"
     :class="[
       compact ? 'text-[12px] leading-[1.3]' : 'text-[13px] leading-[1.4]',
       state === 'future' && 'opacity-45',
       // An unfolded line leaves the highlight to the act inside it
       state === 'current' && !open && 'bg-neutral-400/18',
       !plain && 'hover:bg-neutral-400/14',
+      // A drawing of a line, not text to copy: the cells answer to the pointer, not to a selection
+      plain && 'cursor-default select-none',
     ]"
     :data-state="state"
     :data-current="state === 'current'"

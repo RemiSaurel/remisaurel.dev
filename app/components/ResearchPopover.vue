@@ -27,10 +27,6 @@ watch(() => props.node, (node, previous) => {
     closedAt = performance.now()
 })
 
-function pct(value: number, total: number) {
-  return `${((value / total) * 100).toFixed(3)}%`
-}
-
 /**
  * The popover sits to the left or right of the node (whichever side has more room) so the node
  * stays visible. Vertically it is centred on the node, except near the top or bottom edge where
@@ -46,17 +42,17 @@ const placement = computed(() => {
   const align = pos.y < VIEW_H * 0.3 ? 'top' : pos.y > VIEW_H * 0.7 ? 'bottom' : 'middle'
 
   const style: Record<string, string> = side === 'right'
-    ? { left: `calc(${pct(pos.x + box.hw, VIEW_W)} + ${GAP})` }
-    : { right: `calc(${pct(VIEW_W - pos.x + box.hw, VIEW_W)} + ${GAP})` }
+    ? { left: `calc(${percent(pos.x + box.hw, VIEW_W)} + ${GAP})` }
+    : { right: `calc(${percent(VIEW_W - pos.x + box.hw, VIEW_W)} + ${GAP})` }
 
   if (align === 'top') {
-    style.top = pct(pos.y - box.hh, VIEW_H)
+    style.top = percent(pos.y - box.hh, VIEW_H)
   }
   else if (align === 'bottom') {
-    style.bottom = pct(VIEW_H - pos.y - box.hh, VIEW_H)
+    style.bottom = percent(VIEW_H - pos.y - box.hh, VIEW_H)
   }
   else {
-    style.top = pct(pos.y, VIEW_H)
+    style.top = percent(pos.y, VIEW_H)
     style.translate = '0 -50%'
   }
 

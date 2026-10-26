@@ -21,17 +21,13 @@ defineEmits<{
 
 /** The cascade stops growing after this many steps, so the last nodes don't land seconds late. */
 const ENTRANCE_STEPS = 8
-
-function pct(value: number, total: number) {
-  return `${(value / total) * 100}%`
-}
 </script>
 
 <template>
   <div
     class="absolute z-10 w-max"
     :class="{ 'z-20': dragging }"
-    :style="{ left: pct(position.x, VIEW_W), top: pct(position.y, VIEW_H), transform: 'translate(-50%, -50%)' }"
+    :style="{ left: percent(position.x, VIEW_W), top: percent(position.y, VIEW_H), transform: 'translate(-50%, -50%)' }"
   >
     <component
       :is="node.url ? 'a' : 'div'"

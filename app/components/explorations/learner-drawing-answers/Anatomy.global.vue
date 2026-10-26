@@ -115,16 +115,16 @@ watch(lit, (cell) => {
       </p>
     </div>
 
-    <div class="[zoom:1.15] border border-neutral-200 rounded-xl bg-neutral-50 px-2.5 py-3.5 dark:border-neutral-700/80 dark:bg-neutral-800/40" @pointerover="onOver" @pointerleave="hovered = null">
+    <Panel padding="none" class="[zoom:1.15] bg-neutral-50 px-2.5 py-3.5" @pointerover="onOver" @pointerleave="hovered = null">
       <ExplorationsLearnerDrawingAnswersLogEntry :line="line" plain :lit="lit" />
-    </div>
+    </Panel>
 
     <div class="grid gap-1 sm:grid-cols-2" role="group" aria-label="The cells of the line">
       <button
         v-for="cell in cells"
         :key="cell"
         type="button"
-        class="flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13px] leading-[1.4] transition-[background-color] duration-[140ms] ease-[var(--ease-out)] data-[on=true]:bg-neutral-400/18 focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:outline-solid [@media(prefers-reduced-motion:reduce)]:transition-none dark:focus-visible:outline-neutral-100"
+        class="flex select-none items-start gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13px] leading-[1.4] keyboard-focus transition-[background-color] duration-[140ms] ease-[var(--ease-out)] data-[on=true]:bg-neutral-400/18 [@media(prefers-reduced-motion:reduce)]:transition-none"
         :data-on="lit === cell"
         :aria-pressed="pinned === cell"
         @pointerenter="hovered = cell"

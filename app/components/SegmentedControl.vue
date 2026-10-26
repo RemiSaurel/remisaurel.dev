@@ -14,9 +14,11 @@ interface SegmentedControlProps {
   options: SegmentedOption<T>[]
   /** Names the group for assistive technology */
   label: string
+  /** `sm` is tighter and a size down, for a control inside a block. Give it a width (`class="w-full"`) to stretch the choices */
+  size?: 'md' | 'sm'
 }
 
-const props = defineProps<SegmentedControlProps>()
+const props = withDefaults(defineProps<SegmentedControlProps>(), { size: 'md' })
 
 const model = defineModel<T>({ required: true })
 
@@ -40,6 +42,7 @@ function onKeydown(e: KeyboardEvent) {
     role="radiogroup"
     :aria-label="label"
     class="segmented"
+    :data-size="props.size"
     :style="{ '--count': options.length, '--index': index }"
     @keydown="onKeydown"
   >
@@ -104,6 +107,11 @@ function onKeydown(e: KeyboardEvent) {
 
 .dark .segment {
   color: rgb(163 163 163);
+}
+
+.segmented[data-size='sm'] .segment {
+  padding: 4px 8px;
+  font-size: 12px;
 }
 
 .segment[aria-checked='true'] {

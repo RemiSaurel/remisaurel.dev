@@ -8,6 +8,7 @@ import { edgeId, LOOP_EDGE } from '~/utils/flow/types'
 // The workflow of a FlowCanvas on a phone: no pan or zoom, the stages one under the other, parallel
 // steps side by side. A tap on a step unfolds its details right under it. A loop runs back up the
 // left gutter, from its label (right after the step that closes the loop) into the step it restarts.
+// Its balls are CSS animations: they pause and speed up with the player through `is-paused` and `--speed`.
 interface FlowStackProps {
   graph: FlowGraph
   player?: FlowPlayer
@@ -95,7 +96,12 @@ function toggle(id: string) {
 </script>
 
 <template>
-  <ol ref="list" class="list-none relative m-0 flex flex-col p-0" :class="{ 'pl-6': graph.loop }">
+  <ol
+    ref="list"
+    class="list-none relative m-0 flex flex-col p-0"
+    :class="{ 'pl-6': graph.loop, 'is-paused': player && !player.playing.value }"
+    :style="{ '--speed': player?.speed.value ?? 1 }"
+  >
     <svg
       v-if="graph.loop && loopSpan"
       class="loop pointer-events-none absolute overflow-visible"
@@ -244,7 +250,7 @@ function toggle(id: string) {
 
 /* Card edge to card edge, slow at both ends, like a ball on the canvas */
 .hot .ball {
-  animation: travel 0.9s var(--ease-in-out) infinite;
+  animation: travel calc(0.9s / var(--speed, 1)) var(--ease-in-out) infinite;
 }
 
 @keyframes travel {
@@ -294,7 +300,7 @@ function toggle(id: string) {
 }
 
 .looping .loop-line {
-  animation: loop-flow 0.8s linear infinite;
+  animation: loop-flow calc(0.8s / var(--speed, 1)) linear infinite;
 }
 
 /* The dashes travel the way the loop goes: up, back to the start */
@@ -305,13 +311,20 @@ function toggle(id: string) {
 }
 
 .spin {
-  animation: spin 1.2s var(--ease-in-out) infinite;
+  animation: spin calc(1.2s / var(--speed, 1)) var(--ease-in-out) infinite;
 }
 
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Paused, the flow holds where it is: the balls and dashes stop with the clock */
+.is-paused .ball,
+.is-paused .loop-line,
+.is-paused .spin {
+  animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {
