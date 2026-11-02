@@ -90,7 +90,7 @@ const REVEALED = { opacity: 1, y: 0, filter: 'blur(0px)' }
         {{ project.date }}
       </span>
 
-      <div class="[grid-area:body] min-w-0 flex items-center gap-3">
+      <div class="[grid-area:body] min-w-0 flex items-start gap-3">
         <!-- Same sheet tile as the posts and explorations lists, holding the project's icon -->
         <span
           v-if="project.icon"
