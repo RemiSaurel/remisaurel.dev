@@ -3,7 +3,7 @@ title: Helping a learner draw an answer
 description: A learner answers by drawing. What help can plain rules give, and what can a teacher read from the way the drawing was made?
 date: 2026-11-01
 tags: [Interaction Design, Learning, Assessment]
-status: draft
+status: published
 icon: lucide:pencil-ruler
 ---
 
