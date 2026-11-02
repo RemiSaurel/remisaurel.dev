@@ -106,8 +106,8 @@ body {
   --rl-grid: rgb(255 255 255 / 0.06);
   --rl-hairline: rgb(255 255 255 / 0.09);
   --rl-hairline-strong: rgb(255 255 255 / 0.22);
-  --rl-hub-bg: #e5e5e5;
-  --rl-hub-on: #171717;
+  --rl-hub-bg: #3a3a3a;
+  --rl-hub-on: #f5f5f5;
   --rl-region-fill: 0.06;
   --rl-region-stroke: 0.28;
   --rl-edge: rgb(163 163 163 / 0.2);

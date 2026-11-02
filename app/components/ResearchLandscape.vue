@@ -245,14 +245,11 @@ const rawRegions = computed(() => {
 /**
  * Regions in the same column share both their sides, and regions in the same row both
  * their top and bottom, so the four read as one grid whose seams run straight through
- * the hub, even where no node bridges two regions. Once the reader drags things around,
- * each region follows its own nodes again.
+ * the hub, even where no node bridges two regions. The alignment holds while dragging, so
+ * the empty space of a region doesn't vanish on the first move.
  */
 const regions = computed(() => {
   const raw = rawRegions.value
-  if (userMoved.value)
-    return raw.map(({ id, rect }) => ({ id, rect }))
-
   const span = (pick: (r: typeof raw[number]) => boolean, from: (r: typeof raw[number]) => number, to: (r: typeof raw[number]) => number) => {
     const group = raw.filter(pick)
     return { start: Math.min(...group.map(from)), end: Math.max(...group.map(to)) }
