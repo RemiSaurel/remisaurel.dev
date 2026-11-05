@@ -1,7 +1,7 @@
 import type { PlayOptions, SoundName } from 'cuelume'
 import type { Board, PieceId, PieceState } from '~/tetris/tetris'
 import { useDocumentVisibility, useLocalStorage, useRafFn } from '@vueuse/core'
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 import {
   BUFFER_ROWS,
   clearFullRows,
@@ -31,9 +31,10 @@ const CLEAR_ANIMATION_MS = 160
 const GAME_VOLUME = 0.45
 
 export function useTetrisGame() {
-  const board = ref<Board>(createEmptyBoard())
+  const board = shallowRef<Board>(createEmptyBoard())
   const bag = ref<PieceId[]>([])
-  const current = ref<PieceState | null>(null)
+  const current = shallowRef<PieceState | null>(null)
+  let clearTimer: ReturnType<typeof setTimeout> | undefined
   const next = ref<PieceId | null>(null)
   const status = ref<TetrisStatus>('ready')
   const score = ref(0)
@@ -170,11 +171,14 @@ export function useTetrisGame() {
     if (level.value > previousLevel)
       setTimeout(sfx, 260, 'ready')
 
-    setTimeout(() => {
+    clearTimer = setTimeout(() => {
       board.value = cleared
       clearingRows.value = []
       status.value = 'playing'
       spawnNext()
+      // Hidden during the clear, `pause` was a no-op: pause now, or pieces keep falling in the background
+      if (document.visibilityState === 'hidden')
+        pause(true)
     }, CLEAR_ANIMATION_MS)
   }
 
@@ -248,6 +252,7 @@ export function useTetrisGame() {
 
   function resetToReady() {
     pauseLoop()
+    clearTimeout(clearTimer)
     board.value = createEmptyBoard()
     bag.value = []
     current.value = null
@@ -293,7 +298,10 @@ export function useTetrisGame() {
       pause(true)
   })
 
-  onBeforeUnmount(pauseLoop)
+  onBeforeUnmount(() => {
+    pauseLoop()
+    clearTimeout(clearTimer)
+  })
 
   return {
     status,

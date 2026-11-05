@@ -76,6 +76,6 @@ const displayTitle = computed(() =>
       </p>
     </span>
 
-    <time v-if="date" class="ml-auto shrink-0 pl-2 text-[13px] text-neutral-400 tabular-nums dark:text-neutral-500" :datetime="new Date(date).toISOString()">{{ formatDate(date) }}</time>
+    <time v-if="date" class="tabular-nums ml-auto shrink-0 pl-2 text-[13px] text-neutral-400 dark:text-neutral-500" :datetime="new Date(date).toISOString()">{{ formatDate(date) }}</time>
   </component>
 </template>

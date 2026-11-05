@@ -25,7 +25,8 @@ function onMouseMove(event: MouseEvent) {
   }
 }
 
-useEventListener(window, 'mousemove', onMouseMove, { passive: true })
+// Only listened to while the follower exists: touch screens and reduced motion never pay for it
+useEventListener(() => enabled.value ? window : null, 'mousemove', onMouseMove, { passive: true })
 </script>
 
 <template>

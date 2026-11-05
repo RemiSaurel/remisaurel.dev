@@ -1,9 +1,9 @@
-import { computed } from 'vue'
+import type { MaybeRefOrGetter } from 'vue'
+import { computed, toValue } from 'vue'
 
-export function useMotionHover(hover: Record<string, number | string>) {
+/** A motion-v `whileHover` target, dropped when the visitor prefers reduced motion. */
+export function useMotionHover(hover: MaybeRefOrGetter<Record<string, number | string>>) {
   const { prefersReducedMotion } = usePrefersReducedMotion()
 
-  return computed(() => {
-    return prefersReducedMotion.value ? undefined : hover
-  })
+  return computed(() => prefersReducedMotion.value ? undefined : toValue(hover))
 }

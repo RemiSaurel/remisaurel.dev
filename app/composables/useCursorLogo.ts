@@ -1,4 +1,4 @@
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, shallowRef } from 'vue'
 
 export interface CursorLogo {
   src: string
@@ -12,10 +12,10 @@ export const ENTITY_LOGOS = {
   ut: { src: '/logos/ut.png', alt: 'Université de Toulouse' },
 } satisfies Record<string, CursorLogo>
 
-const activeLogo = ref<CursorLogo | null>(null)
+const activeLogo = shallowRef<CursorLogo | null>(null)
 // Starts false on both server and the initial client render so hydration matches;
 // the real value is only read once mounted (see `initHoverDetection` below).
-const isHoverCapable = ref(false)
+const isHoverCapable = shallowRef(false)
 let hoverDetectionInitialized = false
 
 function initHoverDetection() {

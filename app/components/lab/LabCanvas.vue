@@ -109,7 +109,13 @@ function measure() {
   boxes.value = next
 }
 
-watch(composition, measure, { deep: true, flush: 'post' })
+// getBBox leaves out the node's own transform, so moving, rotating or scaling never changes
+// the dragged node's box: skip the full SVG layout pass per move and measure once on release
+const transforming = () => !!drag.value && drag.value.mode !== 'marquee'
+watch(composition, () => {
+  if (!transforming())
+    measure()
+}, { deep: true, flush: 'post' })
 onMounted(measure)
 
 // Geometry: every node's local space mapped to the frame, through its groups
@@ -427,8 +433,7 @@ function framePoint(event: PointerEvent | MouseEvent): Point {
 }
 
 function showHud(event: PointerEvent, text: string) {
-  const rect = stage.value!.getBoundingClientRect()
-  hud.value = { left: event.clientX - rect.left + 14, top: event.clientY - rect.top + 14, text }
+  hud.value = { left: event.clientX - frameBox.left.value + 14, top: event.clientY - frameBox.top.value + 14, text }
 }
 
 function originInFrame(id: string): Point {
@@ -516,7 +521,11 @@ function onPointerMove(event: PointerEvent) {
       const ys = points.map(([, y]) => y)
       return Math.max(...xs) >= box.x && Math.min(...xs) <= box.x + box.width && Math.max(...ys) >= box.y && Math.min(...ys) <= box.y + box.height
     }).map(node => node.id)
-    selectMany([...new Set([...current.initial, ...hits])])
+    // Only touch the selection when the hits change: every selection-derived view re-renders otherwise
+    const next = [...new Set([...current.initial, ...hits])]
+    const now = selectedIds.value
+    if (next.length !== now.length || next.some((id, i) => id !== now[i]))
+      selectMany(next)
     return
   }
 
@@ -608,6 +617,8 @@ function onPointerUp() {
   if (current && current.mode !== 'marquee' && (current.mode !== 'move' || current.moved))
     commit()
   drag.value = null
+  if (current && current.mode !== 'marquee')
+    nextTick(measure)
   snapLines.value = []
   litGuides.value = new Set()
   hud.value = null

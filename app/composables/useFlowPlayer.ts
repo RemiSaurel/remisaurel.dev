@@ -53,7 +53,9 @@ export function useFlowPlayer(options: FlowPlayerOptions = {}) {
 
     const landed = flights.filter(flight => clock >= landsAt(flight))
     flights = flights.filter(flight => clock < landsAt(flight))
-    packets.value = flights.map(flight => ({ ...flight.packet, t: (clock - flight.start) / flight.duration }))
+    // Nothing flying and nothing shown: keep the same array so the canvas doesn't re-render
+    if (flights.length || packets.value.length)
+      packets.value = flights.map(flight => ({ ...flight.packet, t: (clock - flight.start) / flight.duration }))
     landed.forEach(flight => flight.done())
   }
 
@@ -74,10 +76,15 @@ export function useFlowPlayer(options: FlowPlayerOptions = {}) {
     schedule()
   }
 
-  // The frame loop only runs while something is waiting on the clock
+  // The frame loop only runs while the clock moves (playing or stepping, and on screen) and
+  // something is waiting on it. Paused or offscreen it stops, and `watch([playing, visible])` restarts it
   function schedule() {
-    if (import.meta.server || raf || (!timers.length && !flights.length))
+    if (import.meta.server || raf)
       return
+    if (!running() || (!timers.length && !flights.length)) {
+      last = 0 // the next start measures from then, not from when it stopped
+      return
+    }
     if (!last)
       last = performance.now()
     raf = requestAnimationFrame(tick)
@@ -103,7 +110,10 @@ export function useFlowPlayer(options: FlowPlayerOptions = {}) {
   /** Sends a ball along `edge` (an edge id, or `loop`); resolves when it lands */
   function send(edge: string, seconds = 1) {
     return new Promise<void>((resolve) => {
-      flights.push({ packet: { id: nextPacket++, edge, t: 0 }, start: clock, duration: seconds, done: resolve })
+      const packet = { id: nextPacket++, edge, t: 0 }
+      flights.push({ packet, start: clock, duration: seconds, done: resolve })
+      // Shown at once, so its edge turns hot even while the clock holds (a ball at t=0 is transparent)
+      packets.value = [...packets.value, packet]
       schedule()
     })
   }

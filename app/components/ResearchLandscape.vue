@@ -16,6 +16,9 @@ const activeId = ref<string | null>(null)
 const draggingId = ref<string | null>(null)
 
 /** Entrance cascade reads from the centre outwards: hub, themes, topics, then papers. */
+// Static: the list view's nodes per cluster, computed once instead of on every drag render
+const listNodes = Object.fromEntries(clusters.map(cluster => [cluster.id, researchNodes.filter(n => n.clusters[0] === cluster.id && n.kind !== 'theme')]))
+
 const KIND_RANK: Record<ResearchNode['kind'], number> = { hub: 0, theme: 1, topic: 2, paper: 3 }
 const entranceOrder = Object.fromEntries(
   [...researchNodes]
@@ -414,7 +417,7 @@ const enter = computed(() =>
         </p>
         <ul class="list-none mb-0 mt-3 flex flex-col gap-2.5 p-0">
           <li
-            v-for="node in researchNodes.filter(n => n.clusters[0] === cluster.id && n.kind !== 'theme')"
+            v-for="node in listNodes[cluster.id]"
             :key="node.id"
             class="text-sm"
           >

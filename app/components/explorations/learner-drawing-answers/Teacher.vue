@@ -32,24 +32,25 @@ const time = ref(duration.value)
 const playing = ref(false)
 
 const frame = computed(() => frameAt(events.value, time.value))
+// `frame` is new on every playback frame, but its labels and index only change between acts: reading
+// them through these keeps the matching below (and the ticks) from rebuilding 60 times a second
+const frameLabels = computed(() => frame.value.labels)
+const frameIndex = computed(() => frame.value.index)
 const descriptions = computed(() => events.value.map((_, index) => describeEvent(events.value, index)))
 
 // --- The expected parts, and the labels that name them ---
 
 // Read on the sheet of this moment, so the list follows the recording, and what it points at is on the board
-const parts = computed(() => {
-  const { labels } = frame.value
-  return CELL_PARTS.map(part => ({
-    id: part.id,
-    name: part.name,
-    named: labels.filter(label => namesPart(label.text, part)),
-  }))
-})
+const parts = computed(() => CELL_PARTS.map(part => ({
+  id: part.id,
+  name: part.name,
+  named: frameLabels.value.filter(label => namesPart(label.text, part)),
+})))
 
 const namedCount = computed(() => parts.value.filter(part => part.named.length).length)
 
 // What matches nothing is what a better matcher, or a longer list, could still catch
-const unmatched = computed(() => frame.value.labels
+const unmatched = computed(() => frameLabels.value
   .filter(label => !CELL_PARTS.some(part => namesPart(label.text, part)))
   .map(label => label.text))
 
@@ -116,7 +117,8 @@ const ticks = computed(() => events.value.map((event, index) => ({
   key: index,
   kind: kindOf(event.type),
   at: at(event.t),
-  past: event.t <= time.value,
+  // The same as `event.t <= time`: the frame's index is the last event at or before it
+  past: index <= frameIndex.value,
 })))
 
 // --- The timeline is also the scrubber: drag it, click a mark, or use the arrows ---

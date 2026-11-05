@@ -15,7 +15,7 @@ const logo = ENTITY_LOGOS[props.entity]
     <img
       :src="logo.src"
       alt=""
-      class="my-0 mr-1.5 inline-block h-5.5 w-5.5 rounded-none object-contain outline-0 align-text-bottom"
+      class="object-contain my-0 mr-1.5 inline-block h-5.5 w-5.5 rounded-none align-text-bottom outline-0"
       :class="{ 'dark:invert': props.entity === 'ut' }"
     >
     <span class="underline decoration-neutral-400 underline-offset-2 dark:decoration-neutral-500"><slot /></span>

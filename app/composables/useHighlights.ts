@@ -68,6 +68,8 @@ export function useHighlights(root: MaybeRefOrGetter<HTMLElement | null>, storag
   // leaving, or the one we are entering) may share the same names, so only remove our own
   const painted = new Map<string, Highlight>()
   let sheet: CSSStyleSheet | null = null
+  /** The rules last written to `sheet` */
+  let paintedCss = ''
 
   const fullKey = () => `highlights:${toValue(storageKey)}`
 
@@ -106,10 +108,6 @@ export function useHighlights(root: MaybeRefOrGetter<HTMLElement | null>, storag
       if (range)
         byColor.set(quote.color, [...(byColor.get(quote.color) ?? []), range])
     }
-    if (!sheet) {
-      sheet = new CSSStyleSheet()
-      document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet]
-    }
     const rules: string[] = []
     for (const [color, group] of byColor) {
       const name = `${REGISTRY_PREFIX}${color.slice(1).toLowerCase()}`
@@ -118,7 +116,16 @@ export function useHighlights(root: MaybeRefOrGetter<HTMLElement | null>, storag
       painted.set(name, highlight)
       rules.push(`::highlight(${name}) { background-color: color-mix(in srgb, ${color} 45%, transparent); color: inherit; }`)
     }
-    sheet.replaceSync(rules.join('\n'))
+    // Replacing a document-wide sheet restyles the whole page: only when the colours in use change
+    const css = rules.join('\n')
+    if (css === paintedCss)
+      return
+    if (!sheet) {
+      sheet = new CSSStyleSheet()
+      document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet]
+    }
+    sheet.replaceSync(css)
+    paintedCss = css
   }
 
   // Locates every quote in the current DOM again. Quotes that cannot be found stay stored (the
@@ -208,8 +215,9 @@ export function useHighlights(root: MaybeRefOrGetter<HTMLElement | null>, storag
 
   // Content that renders after mount (async components) shifts the text: locate again.
   // Painting never touches the DOM, so this cannot loop
+  // Live demos change text all the time: with no quotes stored there is nothing to locate
   useMutationObserver(() => toValue(root), useDebounceFn(() => {
-    if (supported.value)
+    if (supported.value && quotes.value.length)
       refresh()
   }, 120), { childList: true, subtree: true, characterData: true })
 

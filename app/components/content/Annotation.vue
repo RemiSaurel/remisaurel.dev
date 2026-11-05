@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ArrowPaths } from '~/utils/arrow'
-import { useEventListener, useResizeObserver } from '@vueuse/core'
+import { useResizeObserver } from '@vueuse/core'
 import { arrowBetween, nearestOutside } from '~/utils/arrow'
 
 // A note written by hand next to a block of text, like a pencil mark on a printed page: a bracket beside the
@@ -81,8 +81,8 @@ onMounted(() => {
   measure()
   document.fonts?.ready.then(measure)
 })
-useResizeObserver([root, body, noteEl], measure)
-useEventListener(window, 'resize', measure, { passive: true })
+// The observer already sees every resize that moves the arrow; the bracket needs no measuring
+useResizeObserver(() => props.mark === 'arrow' ? [root.value, body.value, noteEl.value] : [], measure)
 watch(() => [props.mark, props.side, props.note], () => nextTick(measure))
 </script>
 

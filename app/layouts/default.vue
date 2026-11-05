@@ -14,7 +14,10 @@ const navItems = computed(() => [
 ])
 
 // Below `sm` the links fold into a menu opened by the hamburger
-const menuOpen = ref(false)
+const menuOpen = shallowRef(false)
+
+// Read once and carried in the payload: the prerendered page and the client agree on it
+const year = useState('footer-year', () => new Date().getFullYear())
 
 watch(() => route.path, () => {
   menuOpen.value = false
@@ -132,7 +135,7 @@ function isActive(path: string) {
       <div class="mx-auto max-w-7xl w-full px-6 py-10">
         <div class="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
           <p class="m-0">
-            &copy; {{ new Date().getFullYear() }} Rémi Saurel
+            &copy; {{ year }} Rémi Saurel
           </p>
           <NuxtLink
             to="/failures"

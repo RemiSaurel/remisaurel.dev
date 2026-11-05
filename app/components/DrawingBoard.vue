@@ -400,8 +400,13 @@ const shownLabels = computed<Label[]>(() => {
 const placements = reactive<Record<number, Placement>>({})
 
 watch(() => shownLabels.value, (list) => {
-  for (const label of list)
-    placements[label.id] = placementOf(label, placements[label.id])
+  // Written only when a side changes: the list is rebuilt on every replay frame and pin drag
+  for (const label of list) {
+    const was = placements[label.id]
+    const next = placementOf(label, was)
+    if (!was || was.flip !== next.flip || was.top !== next.top)
+      placements[label.id] = next
+  }
 }, { immediate: true })
 
 const placed = (label: Label) => placements[label.id] ?? placementOf(label)
@@ -552,7 +557,7 @@ onBeforeUnmount(stop)
         @lostpointercapture="onUp"
         @contextmenu.prevent
       >
-        <path v-for="stroke in shown" :key="stroke.id" class="ink" :style="inkStyle(stroke.color)" :d="strokePath(stroke)" />
+        <path v-for="stroke in shown" :key="stroke.id" v-memo="[stroke]" class="ink" :style="inkStyle(stroke.color)" :d="strokePath(stroke)" />
         <path v-if="live" class="ink" :style="inkStyle(live.color)" :d="strokePath(live, false)" />
       </svg>
 

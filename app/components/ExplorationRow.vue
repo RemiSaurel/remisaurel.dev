@@ -60,8 +60,8 @@ const { play } = useSound()
     </span>
 
     <!-- A draft's date is a secret: a placeholder stands in for it, so the real one never reaches the page -->
-    <span v-if="isDraft" aria-hidden="true" class="ml-auto shrink-0 select-none pl-2 text-[13px] text-neutral-400 blur-[5px] tabular-nums dark:text-neutral-500">Mar 2026</span>
-    <time v-else-if="date" class="ml-auto shrink-0 pl-2 text-[13px] text-neutral-400 tabular-nums dark:text-neutral-500" :datetime="new Date(date).toISOString()">{{ formatDate(date) }}</time>
+    <span v-if="isDraft" aria-hidden="true" class="blur-[5px] tabular-nums ml-auto shrink-0 select-none pl-2 text-[13px] text-neutral-400 dark:text-neutral-500">Mar 2026</span>
+    <time v-else-if="date" class="tabular-nums ml-auto shrink-0 pl-2 text-[13px] text-neutral-400 dark:text-neutral-500" :datetime="new Date(date).toISOString()">{{ formatDate(date) }}</time>
   </component>
 </template>
 

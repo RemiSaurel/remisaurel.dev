@@ -9,7 +9,7 @@ useHead({
 // The game (and its engine) is only downloaded once the easter egg is found, then
 // stays mounted so reopening it is instant.
 const { isOpen: isTetrisOpen } = useTetrisEasterEgg()
-const tetrisLoaded = ref(false)
+const tetrisLoaded = shallowRef(false)
 watch(isTetrisOpen, (open) => {
   if (open)
     tetrisLoaded.value = true

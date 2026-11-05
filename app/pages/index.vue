@@ -18,10 +18,12 @@ const POST_LIMIT = 5
 const EXPLORATION_LIMIT = 5
 
 const { data: posts } = await useAsyncData('home-posts', async () => {
-  const all = await queryCollection('posts').all()
+  const all = await queryCollection('posts')
+    .select('path', 'title', 'description', 'date', 'disabled')
+    .order('date', 'DESC')
+    .all()
   return all
     .filter(post => !post.disabled)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, POST_LIMIT)
     .map(({ path, title, description, date }) => ({ path, title, description, date }))
 }, { default: () => [] })

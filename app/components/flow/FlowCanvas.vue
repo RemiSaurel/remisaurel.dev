@@ -199,6 +199,16 @@ function bindPath(id: string, el: unknown) {
 }
 
 const FADE = 0.12
+// getTotalLength is a layout read: measured once per path shape, not once per ball per frame
+const pathLengths = new WeakMap<SVGPathElement, { d: string | null, length: number }>()
+function lengthOf(path: SVGPathElement) {
+  const d = path.getAttribute('d')
+  let cached = pathLengths.get(path)
+  if (cached?.d !== d)
+    pathLengths.set(path, cached = { d, length: path.getTotalLength() })
+  return cached.length
+}
+
 const balls = computed(() => {
   if (!props.player || !isDesktop.value || !motionOk())
     return []
@@ -207,7 +217,7 @@ const balls = computed(() => {
     const path = pathEls.get(packet.edge)
     if (!path)
       return []
-    const length = path.getTotalLength()
+    const length = lengthOf(path)
     const point = path.getPointAtLength(easeInOut(packet.t) * length)
     return [{
       id: packet.id,
@@ -219,7 +229,11 @@ const balls = computed(() => {
 })
 
 // An edge carrying a ball is drawn in ink, like the node it leaves
-const hotEdges = computed(() => new Set(props.player?.packets.value.map(packet => packet.edge) ?? []))
+// Kept as the same Set while the busy edges don't change: packets move every frame, the edges rarely
+const hotEdges = computed<Set<string>>((previous) => {
+  const next = new Set(props.player?.packets.value.map(packet => packet.edge) ?? [])
+  return previous && previous.size === next.size && [...next].every(edge => previous.has(edge)) ? previous : next
+})
 
 // --- Hover: a node lights up everything it depends on and everything that depends on it ---
 

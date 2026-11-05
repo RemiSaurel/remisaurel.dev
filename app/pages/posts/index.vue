@@ -5,19 +5,18 @@ const { prefersReducedMotion } = usePrefersReducedMotion()
 
 usePageSeo()
 
-const { data } = await useAsyncData('posts', () =>
-  queryCollection('posts').all())
+// Only what the list shows: the bodies would otherwise ship in the page payload
+const { data } = await useAsyncData('posts', () => queryCollection('posts')
+  .select('path', 'title', 'description', 'date', 'disabled')
+  .order('date', 'DESC')
+  .all())
 
 // Posts grouped by MM/YY, newest first
 const postGroups = computed(() => {
   if (!data.value)
     return []
 
-  const sorted = [...data.value].sort((a, b) => {
-    return new Date(b.date).getTime() - new Date(a.date).getTime()
-  })
-
-  const grouped = sorted.reduce((acc, post) => {
+  const grouped = data.value.reduce((acc, post) => {
     const date = new Date(post.date)
     const monthYear = `${String(date.getMonth() + 1).padStart(2, '0')}/${date
       .getFullYear()
@@ -27,7 +26,7 @@ const postGroups = computed(() => {
       acc[monthYear] = []
     acc[monthYear].push(post)
     return acc
-  }, {} as Record<string, typeof sorted>)
+  }, {} as Record<string, typeof data.value>)
 
   return Object.entries(grouped).map(([monthYear, posts]) => ({
     monthYear,

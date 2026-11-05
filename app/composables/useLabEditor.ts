@@ -1,6 +1,7 @@
 import type { InjectionKey } from 'vue'
 import type { ArtComposition, ArtGroup, ArtNode, ArtNodeColor, ArtPreset, ArtTheme, LayerType, ParamValue } from '~/art/art'
 import type { Matrix } from '~/art/geometry'
+import { watchDebounced } from '@vueuse/core'
 import { ART_PRESETS, ART_STROKE, cloneNode, createGroup, createLayer, isGroup, LAYER_TYPES, newId, normalizeNode } from '~/art/art'
 import { apply, decompose, IDENTITY, invert, multiply, nodeMatrix } from '~/art/geometry'
 
@@ -203,12 +204,13 @@ export function useLabEditor() {
     catch {}
   })
 
-  watch(guides, (list) => {
+  // Debounced: dragging a guide mutates it on every pointer move
+  watchDebounced(guides, (list) => {
     try {
       localStorage.setItem(GUIDES_KEY, JSON.stringify(list))
     }
     catch {}
-  }, { deep: true })
+  }, { deep: true, debounce: 300, maxWait: 1000 })
 
   // Guides
 

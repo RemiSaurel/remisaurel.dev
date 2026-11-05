@@ -18,13 +18,12 @@ const c = {
 </script>
 
 <template>
-  <ClientOnly>
-    <div
-      class="inline-flex items-baseline border-1 border-zinc-2 rounded-lg border-solid px-2 text-sm font-400 dark:border-zinc-7"
-      :class="color"
-    >
-      <div class="mr-2 size-2 rounded-full" :class="c[color]" />
-      <slot mdc-unwrap="p" />
-    </div>
-  </ClientOnly>
+  <!-- Spans, not divs: a tag sits inside a paragraph, and a div there breaks hydration -->
+  <span
+    class="inline-flex items-baseline border-1 border-zinc-2 rounded-lg border-solid px-2 text-sm font-400 dark:border-zinc-7"
+    :class="color"
+  >
+    <span class="mr-2 size-2 rounded-full" :class="c[color]" />
+    <slot mdc-unwrap="p" />
+  </span>
 </template>

@@ -1,6 +1,8 @@
-import { ref } from 'vue'
+import { shallowRef } from 'vue'
 
-const prefersReducedMotion = ref(false)
+// Module-scope singleton: one media query listener for the whole app, however many
+// components ask for it.
+const prefersReducedMotion = shallowRef(false)
 let isListening = false
 
 export function usePrefersReducedMotion() {

@@ -31,9 +31,11 @@ const stages = computed(() => stageGroups(props.graph.nodes.map(node => node.id)
   .map(ids => ids.map(id => byId.value.get(id)!)))
 
 // The connector under a stage carries a ball while any edge leaving that stage does
-const hot = computed(() => {
+// Kept as the same array while no connector changes: packets move every frame
+const hot = computed<boolean[]>((previous) => {
   const flying = new Set(props.player?.packets.value.map(packet => packet.edge) ?? [])
-  return stages.value.map(stage => props.graph.edges.some(edge => flying.has(edgeId(edge)) && stage.some(node => node.id === edge.from)))
+  const next = stages.value.map(stage => props.graph.edges.some(edge => flying.has(edgeId(edge)) && stage.some(node => node.id === edge.from)))
+  return previous && previous.length === next.length && previous.every((value, i) => value === next[i]) ? previous : next
 })
 const looping = computed(() => props.player?.packets.value.some(packet => packet.edge === LOOP_EDGE) ?? false)
 
