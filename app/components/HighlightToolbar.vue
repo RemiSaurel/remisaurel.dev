@@ -201,7 +201,7 @@ function pickSwatch(color: string) {
                   spellcheck="false"
                   autocomplete="off"
                   aria-label="Hex colour"
-                  class="h-8 w-20 rounded-full bg-neutral-100 px-3 text-sm text-neutral-700 font-mono outline-none dark:bg-neutral-700 dark:text-neutral-200"
+                  class="h-8 w-20 rounded-full bg-neutral-100 px-3 text-sm text-neutral-700 font-mono dark:bg-neutral-700 dark:text-neutral-200 focus-visible:outline-2 focus-visible:outline-neutral-900 focus-visible:outline-solid dark:focus-visible:outline-neutral-100 focus-visible:-outline-offset-2"
                   @input="onHex"
                 >
               </template>
@@ -295,6 +295,16 @@ function pickSwatch(color: string) {
   appearance: none;
   border-radius: 9999px;
   outline: none;
+}
+
+/* The pill clips at its edge (overflow: hidden), so the ring sits inside the control */
+.hue-slider:focus-visible {
+  outline: 2px solid rgb(23 23 23);
+  outline-offset: -2px;
+}
+
+.dark .hue-slider:focus-visible {
+  outline-color: rgb(245 245 245);
 }
 
 .hue-slider::-webkit-slider-thumb {

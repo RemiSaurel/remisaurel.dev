@@ -30,8 +30,9 @@ const ENTRANCE_STEPS = 8
     :style="{ left: percent(position.x, VIEW_W), top: percent(position.y, VIEW_H), transform: 'translate(-50%, -50%)' }"
   >
     <component
-      :is="node.url ? 'a' : 'div'"
-      :href="node.url"
+      :is="node.url ? 'a' : 'button'"
+      :type="node.url ? undefined : 'button'"
+      :href="node.url || undefined"
       :target="node.url ? '_blank' : undefined"
       :rel="node.url ? 'noopener noreferrer' : undefined"
       :draggable="false"
@@ -67,6 +68,12 @@ const ENTRANCE_STEPS = 8
 <style scoped>
 .rl-node {
   display: flex;
+  /* Nodes without a URL render as <button>: strip the UA chrome so only the
+     kind classes below (which come later and win) style the surface */
+  border: 0;
+  padding: 0;
+  font-family: inherit;
+  text-align: left;
   font-size: 0.78rem;
   line-height: 1.35;
   color: var(--rl-text);

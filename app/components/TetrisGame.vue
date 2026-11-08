@@ -223,19 +223,30 @@ function onKeyUp(event: KeyboardEvent) {
 useEventListener(window, 'keydown', onKeyDown)
 useEventListener(window, 'keyup', onKeyUp)
 
+// While the dialog is open the page behind it must not be reachable: `inert` removes
+// it from the tab order and from assistive technology, matching aria-modal="true".
+// This component is teleported to <body>, so #__nuxt is the background to freeze.
+function setBackgroundInert(inert: boolean) {
+  document.getElementById('__nuxt')?.toggleAttribute('inert', inert)
+}
+
 watch(isOpen, (open) => {
   if (open) {
     resetToReady()
     previouslyFocused = document.activeElement as HTMLElement | null
+    setBackgroundInert(true)
     nextTick(() => panelRef.value?.focus())
   }
   else {
     stop()
     stopAllRepeats()
     cancelHoldRestart()
+    setBackgroundInert(false)
     previouslyFocused?.focus?.()
   }
 }, { immediate: true }) // Lazy-loaded: the first open is what mounts this component.
+
+onBeforeUnmount(() => setBackgroundInert(false))
 </script>
 
 <template>
@@ -470,6 +481,11 @@ watch(isOpen, (open) => {
 </template>
 
 <style scoped>
+/* The dialog owns the scroll: the page behind must not scroll from inside it */
+.tetris-root {
+  overscroll-behavior: contain;
+}
+
 .tetris-board {
   display: grid;
   grid-template-columns: repeat(10, clamp(14px, 3.4dvh, 22px));
