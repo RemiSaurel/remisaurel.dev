@@ -7,18 +7,23 @@ usePageSeo()
 
 const { data: explorations } = await useExplorations()
 
-// Explorations grouped by MM/YY, newest first (the query already sorts them), like /posts
+// Explorations grouped by MM/YY, newest first (the query already sorts them), like /posts.
+// Drafts hide their date, so they all go in one "Soon" group on top instead of under a month
 const explorationGroups = computed(() => {
-  const groups: { monthYear: string | null, items: typeof explorations.value }[] = []
+  const groups: { heading: string | null, items: typeof explorations.value }[] = []
+  const drafts = explorations.value.filter(exploration => exploration.status === 'draft')
+  if (drafts.length)
+    groups.push({ heading: 'Soon', items: drafts })
   for (const exploration of explorations.value) {
-    // Drafts can still lack a date: they get no heading
+    if (exploration.status === 'draft')
+      continue
     const date = exploration.date ? new Date(exploration.date) : null
-    const monthYear = date ? `${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear().toString().slice(2)}` : null
+    const heading = date ? `${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear().toString().slice(2)}` : null
     const last = groups.at(-1)
-    if (last?.monthYear === monthYear)
+    if (last && last.heading === heading && last.heading !== 'Soon')
       last.items.push(exploration)
     else
-      groups.push({ monthYear, items: [exploration] })
+      groups.push({ heading, items: [exploration] })
   }
   return groups
 })
@@ -39,7 +44,7 @@ const explorationGroups = computed(() => {
     <div v-if="explorations.length" class="flex flex-col gap-12 pl-4">
       <motion.div
         v-for="(group, groupIndex) in explorationGroups"
-        :key="group.monthYear ?? 'undated'"
+        :key="group.heading ?? 'undated'"
         class="relative"
         :initial="prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }"
         :while-in-view="prefersReducedMotion ? undefined : { opacity: 1, y: 0 }"
@@ -47,10 +52,10 @@ const explorationGroups = computed(() => {
         :transition="prefersReducedMotion ? { duration: 0 } : { duration: 0.5, delay: Math.min(groupIndex, 2) * 0.1, ease: EASE_OUT }"
       >
         <h2
-          v-if="group.monthYear"
+          v-if="group.heading"
           class="absolute z-0 my-1 cursor-default text-lg text-zinc-500 tracking-tight -left-4 -top-8 dark:text-zinc-400"
         >
-          {{ group.monthYear }}
+          {{ group.heading }}
         </h2>
         <HoverList tag="ul" class="list-none m-0 flex flex-col gap-1 p-0">
           <li v-for="exploration in group.items" :key="exploration.path">
